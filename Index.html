@@ -1,99 +1,471 @@
-<!DOCTYPE html>
+     <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CaloriFlow</title>
-    <style>
-        body {
-            background: #0d0d0d;
-            color: #fff;
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 20px;
-        }
-        .container {
-            max-width: 500px;
-            margin: auto;
-            background: #1a1a1a;
-            padding: 20px;
-            border-radius: 12px;
-            box-shadow: 0 0 12px rgba(255,255,255,0.1);
-        }
-        input, select, textarea {
-            width: 100%;
-            margin-top: 10px;
-            padding: 12px;
-            border-radius: 8px;
-            border: none;
-            background: #2a2a2a;
-            color: white;
-            font-size: 16px;
-        }
-        button {
-            width: 100%;
-            padding: 15px;
-            margin-top: 20px;
-            background: #7f00ff;
-            border: none;
-            border-radius: 10px;
-            font-size: 18px;
-            color: white;
-            font-weight: bold;
-        }
-        #resultBox {
-            margin-top: 20px;
-            padding: 15px;
-            background: #262626;
-            border-radius: 10px;
-            display: none;
-        }
-    </style>
+  <meta charset="UTF-8" />
+  <title>CaloriFlow · IA DeepSeek</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <style>
+    :root {
+      --bg-main: #050712;
+      --bg-card: #0d1020;
+      --bg-soft: #15182b;
+      --accent: #e14bff;
+      --accent-2: #7b5cff;
+      --danger: #ff4b6a;
+      --text-main: #f7f7ff;
+      --text-muted: #b3b7d0;
+      --border-soft: #26283d;
+    }
+
+    * {
+      box-sizing: border-box;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "SF Pro Text",
+        "Segoe UI", sans-serif;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: radial-gradient(circle at top left, #261d4a 0, #050712 45%);
+      color: var(--text-main);
+      display: flex;
+      justify-content: center;
+    }
+
+    .app {
+      width: 100%;
+      max-width: 480px;
+      padding: 20px 16px 32px;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: 26px;
+    }
+
+    .subtitle {
+      font-size: 13px;
+      color: var(--text-muted);
+      margin-top: 4px;
+    }
+
+    .card {
+      background: radial-gradient(circle at top left, #1c1f3c, #050816 65%);
+      border-radius: 20px;
+      padding: 16px 14px;
+      margin-top: 16px;
+      border: 1px solid rgba(148, 163, 255, 0.25);
+      box-shadow: 0 16px 40px rgba(0, 0, 0, 0.85);
+    }
+
+    .card h2 {
+      margin: 0 0 4px;
+      font-size: 18px;
+    }
+
+    .card p {
+      margin: 0;
+      font-size: 13px;
+      color: var(--text-muted);
+    }
+
+    label {
+      display: block;
+      font-size: 13px;
+      margin-top: 10px;
+      margin-bottom: 4px;
+      color: var(--text-muted);
+    }
+
+    input[type="text"],
+    input[type="password"],
+    input[type="number"],
+    select,
+    textarea {
+      width: 100%;
+      border-radius: 12px;
+      border: 1px solid var(--border-soft);
+      background: rgba(6, 9, 24, 0.95);
+      color: var(--text-main);
+      font-size: 14px;
+      padding: 9px 11px;
+      outline: none;
+    }
+
+    textarea {
+      min-height: 70px;
+      resize: vertical;
+    }
+
+    input:focus,
+    select:focus,
+    textarea:focus {
+      border-color: var(--accent-2);
+      box-shadow: 0 0 0 1px rgba(129, 140, 248, 0.6);
+    }
+
+    .small-helper {
+      font-size: 12px;
+      color: var(--text-muted);
+      margin-top: 3px;
+    }
+
+    .btn {
+      width: 100%;
+      border-radius: 999px;
+      border: none;
+      padding: 12px 14px;
+      margin-top: 14px;
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, var(--accent-2), var(--accent));
+      color: #12071f;
+      box-shadow: 0 16px 32px rgba(0, 0, 0, 0.9);
+    }
+
+    .btn-secondary {
+      background: rgba(15, 23, 42, 0.9);
+      color: var(--text-main);
+      border: 1px solid var(--border-soft);
+    }
+
+    .btn:disabled {
+      opacity: 0.6;
+      cursor: default;
+    }
+
+    .values-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+      margin-top: 10px;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 11px;
+      padding: 4px 9px;
+      border-radius: 999px;
+      border: 1px solid rgba(148, 163, 255, 0.55);
+      background: rgba(8, 12, 32, 0.95);
+      margin-top: 8px;
+    }
+
+    .badge-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 999px;
+      background: #22c55e;
+    }
+
+    .status {
+      margin-top: 8px;
+      font-size: 13px;
+      min-height: 18px;
+    }
+
+    .status.error {
+      color: var(--danger);
+    }
+
+    .status.ok {
+      color: #4ade80;
+    }
+
+    .footer-note {
+      margin-top: 18px;
+      font-size: 11px;
+      color: var(--text-muted);
+      text-align: center;
+      line-height: 1.4;
+    }
+  </style>
 </head>
 <body>
+<div class="app">
+  <h1>CaloriFlow · IA</h1>
+  <div class="subtitle">
+    Estimá calorías y macros de tus comidas usando DeepSeek. Gratis, con tu propia API key.
+  </div>
 
-<div class="container">
-    <h2>CaloriFlow</h2>
+  <!-- Configuración de IA / API key -->
+  <div class="card">
+    <h2>Configuración DeepSeek</h2>
+    <p>
+      Pegá tu <strong>API key de DeepSeek</strong>. Se guardará solo en este dispositivo.
+    </p>
 
-    <label>Tipo de comida</label>
-    <select id="tipo">
-        <option>Desayuno</option>
-        <option>Almuerzo</option>
-        <option>Cena</option>
-        <option>Snack</option>
+    <label for="apiKey">API key de DeepSeek</label>
+    <input
+      type="password"
+      id="apiKey"
+      placeholder="Ej: sk-XXXXX..."
+      autocomplete="off"
+    />
+    <div class="small-helper">
+      Se recomienda crear una key solo para esta app desde
+      <strong>platform.deepseek.com</strong>.
+    </div>
+
+    <button class="btn btn-secondary" id="btnSaveKey">
+      💾 Guardar clave en este dispositivo
+    </button>
+    <button class="btn btn-secondary" id="btnClearKey" style="margin-top:8px;">
+      🧹 Borrar clave guardada
+    </button>
+
+    <div id="keyStatus" class="status"></div>
+  </div>
+
+  <!-- Nueva comida -->
+  <div class="card">
+    <h2>Nueva comida</h2>
+    <p>Describí lo que comiste y dejá que la IA estime los valores.</p>
+
+    <label for="mealType">Tipo de comida</label>
+    <select id="mealType">
+      <option value="Desayuno">Desayuno</option>
+      <option value="Almuerzo">Almuerzo</option>
+      <option value="Merienda">Merienda</option>
+      <option value="Cena">Cena</option>
+      <option value="Snack">Snack</option>
     </select>
 
-    <label>¿Qué comiste?</label>
-    <textarea id="texto" placeholder="Ej: 1 tostada y un café con leche"></textarea>
+    <label for="mealDescription">¿Qué comiste?</label>
+    <textarea
+      id="mealDescription"
+      placeholder="Ej: 2 tostadas con mermelada y 1 taza de café con leche"
+    ></textarea>
+    <div class="small-helper">
+      Cuanto más claro y concreto seas, mejores estimaciones va a dar la IA.
+    </div>
 
-    <button onclick="generarPrompt()">Obtener análisis con IA</button>
+    <button class="btn btn-primary" id="btnEstimate">
+      🤖 Estimar con IA (DeepSeek)
+    </button>
 
-    <div id="resultBox"></div>
+    <div id="estimateStatus" class="status"></div>
+
+    <div class="values-grid">
+      <div>
+        <label for="caloriesInput">Calorías (kcal)</label>
+        <input type="number" id="caloriesInput" placeholder="Ej: 320" />
+      </div>
+      <div>
+        <label for="sugarInput">Azúcares (g)</label>
+        <input type="number" id="sugarInput" placeholder="Ej: 18" />
+      </div>
+      <div>
+        <label for="fatInput">Grasas (g)</label>
+        <input type="number" id="fatInput" placeholder="Ej: 10" />
+      </div>
+      <div>
+        <label for="proteinInput">Proteínas (g)</label>
+        <input type="number" id="proteinInput" placeholder="Ej: 12" />
+      </div>
+    </div>
+
+    <div class="badge">
+      <div class="badge-dot"></div>
+      Formato que pedimos a la IA:
+      <code>{"calorias": 0, "azucares_g": 0, "grasas_g": 0, "proteinas_g": 0}</code>
+    </div>
+  </div>
+
+  <div class="footer-note">
+    Las estimaciones son aproximadas y no reemplazan el consejo de un profesional
+    de la salud. Usá esta app como guía orientativa.
+  </div>
 </div>
 
 <script>
-function generarPrompt() {
-    const tipo = document.getElementById("tipo").value;
-    const texto = document.getElementById("texto").value;
+  const STORAGE_KEY = "caloriflow_deepseek_key_v1";
+  const apiKeyInput = document.getElementById("apiKey");
+  const keyStatus = document.getElementById("keyStatus");
+  const btnSaveKey = document.getElementById("btnSaveKey");
+  const btnClearKey = document.getElementById("btnClearKey");
+  const btnEstimate = document.getElementById("btnEstimate");
+  const estimateStatus = document.getElementById("estimateStatus");
 
-    if (texto.trim() === "") {
-        alert("Ingresá una comida primero.");
-        return;
+  // Cargar key guardada (si existe)
+  (function initKey() {
+    try {
+      const saved = localStorage.getItem(STORAGE_KEY);
+      if (saved) {
+        apiKeyInput.value = saved;
+        keyStatus.textContent = "Clave cargada desde este dispositivo.";
+        keyStatus.className = "status ok";
+      } else {
+        keyStatus.textContent = "Aún no hay clave guardada.";
+        keyStatus.className = "status";
+      }
+    } catch (e) {
+      console.warn("No se pudo leer localStorage", e);
+    }
+  })();
+
+  btnSaveKey.addEventListener("click", () => {
+    const key = apiKeyInput.value.trim();
+    if (!key) {
+      keyStatus.textContent = "Ingresá una API key antes de guardar.";
+      keyStatus.className = "status error";
+      return;
+    }
+    try {
+      localStorage.setItem(STORAGE_KEY, key);
+      keyStatus.textContent = "Clave guardada en este dispositivo.";
+      keyStatus.className = "status ok";
+    } catch (e) {
+      keyStatus.textContent = "No se pudo guardar la clave (revisá permisos del navegador).";
+      keyStatus.className = "status error";
+    }
+  });
+
+  btnClearKey.addEventListener("click", () => {
+    try {
+      localStorage.removeItem(STORAGE_KEY);
+      apiKeyInput.value = "";
+      keyStatus.textContent = "Clave eliminada de este dispositivo.";
+      keyStatus.className = "status";
+    } catch (e) {
+      keyStatus.textContent = "No se pudo borrar la clave.";
+      keyStatus.className = "status error";
+    }
+  });
+
+  async function estimateWithDeepSeek() {
+    const apiKey = apiKeyInput.value.trim() || localStorage.getItem(STORAGE_KEY);
+    const mealType = document.getElementById("mealType").value;
+    const description = document
+      .getElementById("mealDescription")
+      .value.trim();
+
+    if (!apiKey) {
+      estimateStatus.textContent = "Primero ingresá y guardá tu API key de DeepSeek.";
+      estimateStatus.className = "status error";
+      return;
     }
 
-    const prompt =
-`Analizá nutricionalmente esto: ${texto}.
-Quiero calorías, azúcares, grasas y proteínas.
-Devolveme todo en formato limpio y claro.`;
+    if (!description) {
+      estimateStatus.textContent = "Escribí qué comiste.";
+      estimateStatus.className = "status error";
+      return;
+    }
 
-    const box = document.getElementById("resultBox");
-    box.style.display = "block";
-    box.innerHTML = `
-        <p>Copiá y pegá esto en ChatGPT:</p>
-        <textarea style="width:100%;height:200px;">${prompt}</textarea>
-    `;
+    const caloriesInput = document.getElementById("caloriesInput");
+    const sugarInput = document.getElementById("sugarInput");
+    const fatInput = document.getElementById("fatInput");
+    const proteinInput = document.getElementById("proteinInput");
+
+    btnEstimate.disabled = true;
+    btnEstimate.textContent = "Calculando con IA...";
+    estimateStatus.textContent = "Consultando a DeepSeek...";
+    estimateStatus.className = "status";
+
+    const prompt = `
+Eres un nutricionista experto.
+
+Analiza la siguiente comida:
+
+Tipo de comida: ${mealType}
+Descripción: "${description}"
+
+Necesito que estimes con la mayor precisión razonable:
+- calorías totales (kcal)
+- gramos de azúcares
+- gramos de grasas
+- gramos de proteínas
+
+Responde SOLO un JSON EXACTO con estas claves:
+{
+  "calorias": 0,
+  "azucares_g": 0,
+  "grasas_g": 0,
+  "proteinas_g": 0
 }
-</script>
 
+Sin texto extra, sin comentarios, sin explicaciones.
+`;
+
+    try {
+      const resp = await fetch("https://api.deepseek.com/v1/chat/completions", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": "Bearer " + apiKey,
+        },
+        body: JSON.stringify({
+          model: "deepseek-chat",
+          messages: [{ role: "user", content: prompt }],
+          temperature: 0.2,
+          max_tokens: 256,
+        }),
+      });
+
+      if (!resp.ok) {
+        const txt = await resp.text();
+        console.error("Error DeepSeek:", resp.status, txt);
+        estimateStatus.textContent =
+          "La IA devolvió un error (" +
+          resp.status +
+          "). Revisá tu API key o tus límites.";
+        estimateStatus.className = "status error";
+        return;
+      }
+
+      const data = await resp.json();
+      const content = data.choices?.[0]?.message?.content || "";
+      let text = content.trim();
+
+      // Limpiar posibles ```json ... ```
+      text = text.replace(/```json/gi, "").replace(/```/g, "").trim();
+
+      let json;
+      try {
+        json = JSON.parse(text);
+      } catch (e) {
+        console.error("No se pudo parsear JSON desde DeepSeek:", text);
+        estimateStatus.textContent =
+          "La IA respondió algo que no pude entender como JSON.";
+        estimateStatus.className = "status error";
+        return;
+      }
+
+      const calorias = Number(json.calorias ?? 0);
+      const azucares = Number(json.azucares_g ?? 0);
+      const grasas = Number(json.grasas_g ?? 0);
+      const proteinas = Number(json.proteinas_g ?? 0);
+
+      caloriesInput.value = calorias || "";
+      sugarInput.value = azucares || "";
+      fatInput.value = grasas || "";
+      proteinInput.value = proteinas || "";
+
+      estimateStatus.textContent =
+        "Valores estimados por DeepSeek. Revisá si tienen sentido antes de usarlos.";
+      estimateStatus.className = "status ok";
+    } catch (err) {
+      console.error("Error general llamando a DeepSeek:", err);
+      estimateStatus.textContent =
+        "No se pudo conectar con la IA. Revisá tu conexión a internet.";
+      estimateStatus.className = "status error";
+    } finally {
+      btnEstimate.disabled = false;
+      btnEstimate.textContent = "🤖 Estimar con IA (DeepSeek)";
+    }
+  }
+
+  btnEstimate.addEventListener("click", estimateWithDeepSeek);
+</script>
 </body>
 </html>
