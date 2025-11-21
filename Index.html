@@ -198,19 +198,47 @@
     .portion-row select {
       width: 65%;
     }
+
+    .items-list {
+      margin-top: 8px;
+      font-size: 13px;
+    }
+
+    .items-list-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 4px 0;
+      border-bottom: 1px solid rgba(148, 163, 255, 0.15);
+    }
+
+    .items-list-row span {
+      flex: 1;
+      margin-right: 8px;
+    }
+
+    .items-list-row button {
+      border-radius: 999px;
+      border: none;
+      padding: 4px 8px;
+      font-size: 11px;
+      cursor: pointer;
+      background: rgba(239, 68, 68, 0.15);
+      color: #fecaca;
+    }
   </style>
 </head>
 <body>
 <div class="app">
   <h1>CaloriFlow</h1>
   <div class="subtitle">
-    Usá ChatGPT como cerebro, y la app aprende tus comidas para no repetir consultas.
+    Agregá varios ítems a cada comida, usá ChatGPT la primera vez y la app aprende tus combinaciones.
   </div>
 
   <!-- Sección de comida -->
   <div class="card">
     <h2>Nueva comida</h2>
-    <p>Describe la comida. La primera vez usás ChatGPT, después la app la aprende.</p>
+    <p>Podés agregar varios ítems al mismo desayuno, almuerzo, etc.</p>
 
     <label for="mealType">Tipo de comida</label>
     <select id="mealType">
@@ -221,16 +249,16 @@
       <option value="Snack">Snack</option>
     </select>
 
-    <label for="portionAmount">Cantidad y unidad</label>
+    <label>Cantidad, unidad y descripción del ítem</label>
     <div class="portion-row">
       <input
         type="number"
-        id="portionAmount"
+        id="itemAmount"
         min="0"
         step="0.5"
         placeholder="Ej: 1"
       />
-      <select id="portionUnit">
+      <select id="itemUnit">
         <option value="ninguna">(sin unidad)</option>
         <option value="porción">porción</option>
         <option value="taza">taza</option>
@@ -239,30 +267,33 @@
         <option value="unidad">unidad</option>
       </select>
     </div>
-    <div class="small-helper">
-      Ej: 1 taza, 1 porción, 2 unidades, etc.
-    </div>
-
-    <label for="mealDescription">¿Qué comiste?</label>
     <textarea
-      id="mealDescription"
-      placeholder="Ej: café con leche, tostadas con mermelada"
+      id="itemDescription"
+      placeholder="Ej: café con leche, jugo de naranja, tostada con mermelada"
     ></textarea>
     <div class="small-helper">
-      Cuanto más claro seas (porciones, tamaño, ingredientes), mejor.
+      Ej: “1 taza de café con leche”, “1 vaso de jugo de naranja”, “1 porción de tostada con mermelada”.
+    </div>
+
+    <button class="btn btn-secondary" id="btnAddItem">
+      ➕ Agregar ítem a la comida
+    </button>
+
+    <div class="items-list" id="itemsList">
+      <span class="small-helper">Todavía no agregaste ítems a esta comida.</span>
     </div>
 
     <div id="templateSuggestion" class="small-helper"></div>
     <button class="btn btn-secondary" id="btnUseTemplate" style="display:none;">
-      📂 Usar valores guardados para esta comida
+      📂 Usar valores guardados para esta combinación de ítems
     </button>
 
     <button class="btn btn-primary" id="btnOpenChatGPT">
-      💬 Abrir en ChatGPT con prompt listo
+      💬 Abrir en ChatGPT con toda la comida
     </button>
 
     <div class="status">
-      Tenés que estar logueado en <strong>chat.openai.com</strong>. La app arma el prompt.
+      Tenés que estar logueado en <strong>chat.openai.com</strong>. La app arma el prompt por vos.
     </div>
   </div>
 
@@ -271,7 +302,7 @@
     <h2>Importar e incorporar comida</h2>
     <p>
       Pedile a ChatGPT que te devuelva <strong>SÓLO un JSON</strong> con estos
-      campos:
+      campos para la comida completa:
     </p>
     <div class="badge">
       {"calorias": 0, "azucares_g": 0, "grasas_g": 0, "proteinas_g": 0}
@@ -280,7 +311,7 @@
     <label for="jsonChatGPT">Pegá aquí el JSON que te devolvió ChatGPT</label>
     <textarea
       id="jsonChatGPT"
-      placeholder='Ej: {"calorias": 320, "azucares_g": 18, "grasas_g": 10, "proteinas_g": 12}'
+      placeholder='Ej: {"calorias": 520, "azucares_g": 32, "grasas_g": 18, "proteinas_g": 14}'
     ></textarea>
 
     <button class="btn btn-secondary" id="btnImportJson">
@@ -290,19 +321,19 @@
     <div class="values-grid">
       <div>
         <label for="caloriesInput">Calorías (kcal)</label>
-        <input type="number" id="caloriesInput" placeholder="Ej: 320" />
+        <input type="number" id="caloriesInput" placeholder="Ej: 520" />
       </div>
       <div>
         <label for="sugarInput">Azúcares (g)</label>
-        <input type="number" id="sugarInput" placeholder="Ej: 18" />
+        <input type="number" id="sugarInput" placeholder="Ej: 32" />
       </div>
       <div>
         <label for="fatInput">Grasas (g)</label>
-        <input type="number" id="fatInput" placeholder="Ej: 10" />
+        <input type="number" id="fatInput" placeholder="Ej: 18" />
       </div>
       <div>
         <label for="proteinInput">Proteínas (g)</label>
-        <input type="number" id="proteinInput" placeholder="Ej: 12" />
+        <input type="number" id="proteinInput" placeholder="Ej: 14" />
       </div>
     </div>
 
@@ -343,42 +374,103 @@
 </div>
 
 <script>
-  const STORAGE_KEY = "caloriflow_meals_v1";
-  const TEMPLATES_KEY = "caloriflow_templates_v1";
+  const STORAGE_KEY = "caloriflow_meals_v2";
+  const TEMPLATES_KEY = "caloriflow_templates_v2";
 
-  const mealDescriptionEl = document.getElementById("mealDescription");
-  const portionAmountEl = document.getElementById("portionAmount");
-  const portionUnitEl = document.getElementById("portionUnit");
+  let currentItems = [];
+
+  const itemAmountEl = document.getElementById("itemAmount");
+  const itemUnitEl = document.getElementById("itemUnit");
+  const itemDescriptionEl = document.getElementById("itemDescription");
+  const itemsListEl = document.getElementById("itemsList");
   const templateSuggestionEl = document.getElementById("templateSuggestion");
   const btnUseTemplate = document.getElementById("btnUseTemplate");
 
-  function normalizeDescription(desc) {
-    return desc
+  function normalizeString(str) {
+    return str
       .toLowerCase()
       .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
       .replace(/\s+/g, " ")
       .trim();
   }
 
-  function getFullDescription() {
-    const desc = mealDescriptionEl.value.trim();
-    const amount = portionAmountEl.value.trim();
-    const unit = portionUnitEl.value;
+  function formatItemText(item) {
+    const amount = item.amount || "1";
+    const unit = item.unit && item.unit !== "ninguna" ? ` ${item.unit}` : "";
+    const base = item.description || "";
+    if (!base) return "";
+    if (item.unit === "ninguna") {
+      return `${amount} ${base}`.trim();
+    }
+    return `${amount}${unit} de ${base}`.trim();
+  }
 
-    if (!desc) return "";
+  function buildMealKey(items) {
+    if (!items.length) return "";
+    const combined = items
+      .map(i => formatItemText(i))
+      .filter(Boolean)
+      .join(" | ");
+    return normalizeString(combined);
+  }
 
-    // Construimos algo tipo "1 taza de café con leche"
-    if (!amount && unit === "ninguna") {
-      return desc;
+  function renderItemsList() {
+    itemsListEl.innerHTML = "";
+
+    if (currentItems.length === 0) {
+      itemsListEl.innerHTML =
+        '<span class="small-helper">Todavía no agregaste ítems a esta comida.</span>';
+      templateSuggestionEl.textContent = "";
+      btnUseTemplate.style.display = "none";
+      return;
     }
 
-    const cantidadTexto = amount || "1";
+    currentItems.forEach((item, index) => {
+      const row = document.createElement("div");
+      row.className = "items-list-row";
 
-    if (unit === "ninguna") {
-      return `${cantidadTexto} ${desc}`;
+      const span = document.createElement("span");
+      span.textContent = formatItemText(item);
+
+      const btnDel = document.createElement("button");
+      btnDel.textContent = "❌";
+      btnDel.title = "Quitar este ítem";
+      btnDel.onclick = () => {
+        currentItems.splice(index, 1);
+        renderItemsList();
+        checkTemplateForCurrentItems();
+      };
+
+      row.appendChild(span);
+      row.appendChild(btnDel);
+      itemsListEl.appendChild(row);
+    });
+
+    checkTemplateForCurrentItems();
+  }
+
+  function addItem() {
+    const amount = itemAmountEl.value.trim();
+    const unit = itemUnitEl.value;
+    const description = itemDescriptionEl.value.trim();
+
+    if (!description) {
+      alert("Escribí la descripción del ítem (por ejemplo: tostada con mermelada).");
+      return;
     }
 
-    return `${cantidadTexto} ${unit} de ${desc}`;
+    const item = {
+      amount: amount || "1",
+      unit,
+      description
+    };
+
+    currentItems.push(item);
+
+    itemAmountEl.value = "";
+    itemDescriptionEl.value = "";
+
+    renderItemsList();
   }
 
   function loadTemplates() {
@@ -399,21 +491,20 @@
     }
   }
 
-  function checkTemplateForCurrentDescription() {
-    const fullDesc = getFullDescription();
-    const norm = normalizeDescription(fullDesc);
-    if (!norm) {
+  function checkTemplateForCurrentItems() {
+    const key = buildMealKey(currentItems);
+    if (!key) {
       templateSuggestionEl.textContent = "";
       btnUseTemplate.style.display = "none";
       return;
     }
 
     const templates = loadTemplates();
-    const t = templates[norm];
+    const t = templates[key];
 
     if (t) {
       templateSuggestionEl.textContent =
-        "Ya tenemos guardados valores para esta comida (con esa cantidad/unidad). Podés usarlos sin consultar a ChatGPT.";
+        "Ya tenemos guardados valores para esta combinación de ítems. Podés usarlos sin consultar a ChatGPT.";
       btnUseTemplate.style.display = "inline-flex";
 
       btnUseTemplate.onclick = () => {
@@ -428,29 +519,35 @@
       };
     } else {
       templateSuggestionEl.textContent =
-        "Todavía no hay datos guardados para esta combinación de comida y cantidad.";
+        "Esta combinación de ítems todavía no está aprendida. La primera vez podés usar ChatGPT.";
       btnUseTemplate.style.display = "none";
     }
   }
 
   function buildPrompt() {
-    const tipo = document.getElementById("mealType").value;
-    const fullDesc = getFullDescription();
-
-    if (!fullDesc) {
-      alert("Completá la comida antes de seguir (cantidad/unidad y descripción).");
+    const mealType = document.getElementById("mealType").value;
+    if (currentItems.length === 0) {
+      alert("Primero agregá al menos un ítem a la comida.");
       return null;
     }
+
+    const lines = currentItems
+      .map((item, idx) => `${idx + 1}. ${formatItemText(item)}`)
+      .filter(Boolean);
+
+    const itemsText = lines.join("\n");
 
     const prompt = `
 Eres un nutricionista experto.
 
-Analiza la siguiente comida y devuelve solo un JSON:
+Analiza la siguiente comida COMPLETA y devuelve solo un JSON con los valores totales:
 
-Tipo de comida: ${tipo}
-Descripción detallada de la comida: "${fullDesc}"
+Tipo de comida: ${mealType}
 
-Quiero que estimes de forma realista:
+La comida está compuesta por estos ítems:
+${itemsText}
+
+Quiero que estimes de forma realista para toda la comida en conjunto:
 - calorías totales (kcal)
 - gramos de azúcares
 - gramos de grasas
@@ -538,10 +635,15 @@ Completa los valores con números (pueden ser decimales).
     todaysMeals.forEach(m => {
       const div = document.createElement("div");
       div.className = "meal-item";
+
+      const itemsHtml = (m.items || [])
+        .map(i => "- " + formatItemText(i))
+        .join("<br/>");
+
       div.innerHTML = `
         <strong>${m.tipo}</strong> · ${new Date(m.date).toLocaleTimeString()}
         <br/>
-        <span>${m.descripcion}</span>
+        ${itemsHtml || ""}
         <br/>
         <span class="small-helper">
           ${m.calorias?.toFixed?.(1) || m.calorias || 0} kcal ·
@@ -554,15 +656,15 @@ Completa los valores con números (pueden ser decimales).
     });
   }
 
-  function saveTemplateFromMeal(fullDesc, cal, azu, gra, pro) {
-    const norm = normalizeDescription(fullDesc);
-    if (!norm) return;
+  function saveTemplateForCurrentItems(cal, azu, gra, pro) {
+    const key = buildMealKey(currentItems);
+    if (!key) return;
 
     const templates = loadTemplates();
-    const existing = templates[norm];
+    const existing = templates[key];
 
     if (!existing) {
-      templates[norm] = {
+      templates[key] = {
         calorias: cal,
         azucares_g: azu,
         grasas_g: gra,
@@ -576,24 +678,23 @@ Completa los valores con números (pueden ser decimales).
       existing.grasas_g = ((existing.grasas_g || 0) * (n - 1) + gra) / n;
       existing.proteinas_g = ((existing.proteinas_g || 0) * (n - 1) + pro) / n;
       existing.count = n;
-      templates[norm] = existing;
+      templates[key] = existing;
     }
 
     saveTemplates(templates);
-    checkTemplateForCurrentDescription();
+    checkTemplateForCurrentItems();
   }
 
   function saveMeal() {
-    const tipo = document.getElementById("mealType").value;
-    const fullDesc = getFullDescription();
+    const mealType = document.getElementById("mealType").value;
     const cal = Number(document.getElementById("caloriesInput").value || 0);
     const azu = Number(document.getElementById("sugarInput").value || 0);
     const gra = Number(document.getElementById("fatInput").value || 0);
     const pro = Number(document.getElementById("proteinInput").value || 0);
     const status = document.getElementById("saveStatus");
 
-    if (!fullDesc) {
-      status.textContent = "Completá la comida (cantidad/unidad y descripción).";
+    if (currentItems.length === 0) {
+      status.textContent = "Primero agregá al menos un ítem a la comida.";
       status.style.color = "var(--danger)";
       return;
     }
@@ -613,8 +714,8 @@ Completa los valores con números (pueden ser decimales).
     }
 
     const meal = {
-      tipo,
-      descripcion: fullDesc,
+      tipo: mealType,
+      items: currentItems.slice(),
       calorias: cal,
       azucares_g: azu,
       grasas_g: gra,
@@ -629,8 +730,7 @@ Completa los valores con números (pueden ser decimales).
       status.textContent = "Comida guardada en el registro.";
       status.style.color = "#4ade80";
 
-      // También actualizamos el template (mini base de datos)
-      saveTemplateFromMeal(fullDesc, cal, azu, gra, pro);
+      saveTemplateForCurrentItems(cal, azu, gra, pro);
       loadMeals();
     } catch (e) {
       status.textContent = "No se pudo guardar. Revisá espacio/permisos.";
@@ -638,6 +738,9 @@ Completa los valores con números (pueden ser decimales).
     }
   }
 
+  document
+    .getElementById("btnAddItem")
+    .addEventListener("click", addItem);
   document
     .getElementById("btnOpenChatGPT")
     .addEventListener("click", openChatGPT);
@@ -648,26 +751,9 @@ Completa los valores con números (pueden ser decimales).
     .getElementById("btnSaveMeal")
     .addEventListener("click", saveMeal);
 
-  mealDescriptionEl.addEventListener("blur", checkTemplateForCurrentDescription);
-  portionAmountEl.addEventListener("blur", checkTemplateForCurrentDescription);
-  portionUnitEl.addEventListener("change", checkTemplateForCurrentDescription);
-
-  mealDescriptionEl.addEventListener("input", () => {
-    templateSuggestionEl.textContent = "";
-    btnUseTemplate.style.display = "none";
-  });
-  portionAmountEl.addEventListener("input", () => {
-    templateSuggestionEl.textContent = "";
-    btnUseTemplate.style.display = "none";
-  });
-  portionUnitEl.addEventListener("change", () => {
-    templateSuggestionEl.textContent = "";
-    btnUseTemplate.style.display = "none";
-  });
-
   // Cargar resumen al abrir
   loadMeals();
-  checkTemplateForCurrentDescription();
+  renderItemsList();
 </script>
 </body>
 </html>
