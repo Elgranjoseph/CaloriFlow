@@ -685,6 +685,25 @@ Completa los valores con números (pueden ser decimales).
     checkTemplateForCurrentItems();
   }
 
+  function resetMealForm() {
+    // limpiamos ítems
+    currentItems = [];
+    renderItemsList();
+
+    // limpiamos campos de macros
+    document.getElementById("caloriesInput").value = "";
+    document.getElementById("sugarInput").value = "";
+    document.getElementById("fatInput").value = "";
+    document.getElementById("proteinInput").value = "";
+
+    // limpiamos JSON
+    document.getElementById("jsonChatGPT").value = "";
+
+    // limpiamos sugerencias
+    templateSuggestionEl.textContent = "";
+    btnUseTemplate.style.display = "none";
+  }
+
   function saveMeal() {
     const mealType = document.getElementById("mealType").value;
     const cal = Number(document.getElementById("caloriesInput").value || 0);
@@ -730,8 +749,12 @@ Completa los valores con números (pueden ser decimales).
       status.textContent = "Comida guardada en el registro.";
       status.style.color = "#4ade80";
 
+      // entrenar plantilla
       saveTemplateForCurrentItems(cal, azu, gra, pro);
       loadMeals();
+
+      // limpiar formulario para la próxima comida
+      resetMealForm();
     } catch (e) {
       status.textContent = "No se pudo guardar. Revisá espacio/permisos.";
       status.style.color = "var(--danger)";
