@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CaloriFlow</title>
+    <style>
+        body {
+            background: #0d0d0d;
+            color: #fff;
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            max-width: 500px;
+            margin: auto;
+            background: #1a1a1a;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 0 12px rgba(255,255,255,0.1);
+        }
+        input, select, textarea {
+            width: 100%;
+            margin-top: 10px;
+            padding: 12px;
+            border-radius: 8px;
+            border: none;
+            background: #2a2a2a;
+            color: white;
+            font-size: 16px;
+        }
+        button {
+            width: 100%;
+            padding: 15px;
+            margin-top: 20px;
+            background: #7f00ff;
+            border: none;
+            border-radius: 10px;
+            font-size: 18px;
+            color: white;
+            font-weight: bold;
+        }
+        #resultBox {
+            margin-top: 20px;
+            padding: 15px;
+            background: #262626;
+            border-radius: 10px;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>CaloriFlow</h2>
+
+    <label>Tipo de comida</label>
+    <select id="tipo">
+        <option>Desayuno</option>
+        <option>Almuerzo</option>
+        <option>Cena</option>
+        <option>Snack</option>
+    </select>
+
+    <label>¿Qué comiste?</label>
+    <textarea id="texto" placeholder="Ej: 1 tostada y un café con leche"></textarea>
+
+    <button onclick="generarPrompt()">Obtener análisis con IA</button>
+
+    <div id="resultBox"></div>
+</div>
+
+<script>
+function generarPrompt() {
+    const tipo = document.getElementById("tipo").value;
+    const texto = document.getElementById("texto").value;
+
+    if (texto.trim() === "") {
+        alert("Ingresá una comida primero.");
+        return;
+    }
+
+    const prompt =
+`Analizá nutricionalmente esto: ${texto}.
+Quiero calorías, azúcares, grasas y proteínas.
+Devolveme todo en formato limpio y claro.`;
+
+    const box = document.getElementById("resultBox");
+    box.style.display = "block";
+    box.innerHTML = `
+        <p>Copiá y pegá esto en ChatGPT:</p>
+        <textarea style="width:100%;height:200px;">${prompt}</textarea>
+    `;
+}
+</script>
+
+</body>
+</html>
