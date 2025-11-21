@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8" />
-  <title>CaloriFlow · ChatGPT helper</title>
+  <title>CaloriFlow · Registro diario</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <style>
     :root {
@@ -114,7 +114,7 @@
       border-radius: 999px;
       border: none;
       padding: 12px 14px;
-      margin-top: 14px;
+      margin-top: 10px;
       font-size: 15px;
       font-weight: 600;
       cursor: pointer;
@@ -161,19 +161,56 @@
       min-height: 18px;
       color: var(--text-muted);
     }
+
+    .summary-row {
+      display: flex;
+      justify-content: space-between;
+      font-size: 14px;
+      margin-top: 6px;
+    }
+
+    .meal-item {
+      border-top: 1px solid rgba(148, 163, 255, 0.2);
+      padding-top: 6px;
+      margin-top: 6px;
+      font-size: 13px;
+    }
+
+    .meal-item strong {
+      font-size: 13px;
+    }
+
+    #templateSuggestion {
+      margin-top: 6px;
+    }
+
+    .portion-row {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      margin-top: 4px;
+    }
+
+    .portion-row input[type="number"] {
+      width: 35%;
+    }
+
+    .portion-row select {
+      width: 65%;
+    }
   </style>
 </head>
 <body>
 <div class="app">
-  <h1>CaloriFlow · ChatGPT</h1>
+  <h1>CaloriFlow</h1>
   <div class="subtitle">
-    Escribí lo que comiste, abrí ChatGPT con el prompt listo y luego importá los valores.
+    Usá ChatGPT como cerebro, y la app aprende tus comidas para no repetir consultas.
   </div>
 
   <!-- Sección de comida -->
   <div class="card">
     <h2>Nueva comida</h2>
-    <p>Describe la comida. Tu sesión de ChatGPT hará el cálculo.</p>
+    <p>Describe la comida. La primera vez usás ChatGPT, después la app la aprende.</p>
 
     <label for="mealType">Tipo de comida</label>
     <select id="mealType">
@@ -184,27 +221,54 @@
       <option value="Snack">Snack</option>
     </select>
 
+    <label for="portionAmount">Cantidad y unidad</label>
+    <div class="portion-row">
+      <input
+        type="number"
+        id="portionAmount"
+        min="0"
+        step="0.5"
+        placeholder="Ej: 1"
+      />
+      <select id="portionUnit">
+        <option value="ninguna">(sin unidad)</option>
+        <option value="porción">porción</option>
+        <option value="taza">taza</option>
+        <option value="plato">plato</option>
+        <option value="vaso">vaso</option>
+        <option value="unidad">unidad</option>
+      </select>
+    </div>
+    <div class="small-helper">
+      Ej: 1 taza, 1 porción, 2 unidades, etc.
+    </div>
+
     <label for="mealDescription">¿Qué comiste?</label>
     <textarea
       id="mealDescription"
-      placeholder="Ej: 2 tostadas con mermelada y 1 taza de café con leche"
+      placeholder="Ej: café con leche, tostadas con mermelada"
     ></textarea>
     <div class="small-helper">
       Cuanto más claro seas (porciones, tamaño, ingredientes), mejor.
     </div>
 
+    <div id="templateSuggestion" class="small-helper"></div>
+    <button class="btn btn-secondary" id="btnUseTemplate" style="display:none;">
+      📂 Usar valores guardados para esta comida
+    </button>
+
     <button class="btn btn-primary" id="btnOpenChatGPT">
       💬 Abrir en ChatGPT con prompt listo
     </button>
 
-    <div class="status" id="statusInfo">
-      Tenés que estar logueado en <strong>chat.openai.com</strong> en el navegador.
+    <div class="status">
+      Tenés que estar logueado en <strong>chat.openai.com</strong>. La app arma el prompt.
     </div>
   </div>
 
-  <!-- Importar JSON devuelto por ChatGPT -->
+  <!-- Importar JSON devuelto por ChatGPT y guardar -->
   <div class="card">
-    <h2>Importar respuesta de ChatGPT</h2>
+    <h2>Importar e incorporar comida</h2>
     <p>
       Pedile a ChatGPT que te devuelva <strong>SÓLO un JSON</strong> con estos
       campos:
@@ -241,16 +305,140 @@
         <input type="number" id="proteinInput" placeholder="Ej: 12" />
       </div>
     </div>
+
+    <button class="btn btn-primary" id="btnSaveMeal">
+      ✅ Guardar comida en el registro
+    </button>
+
+    <div class="status" id="saveStatus"></div>
+  </div>
+
+  <!-- Resumen diario -->
+  <div class="card">
+    <h2>Resumen de hoy</h2>
+    <div id="summary">
+      <div class="summary-row">
+        <span>Calorías totales:</span>
+        <strong id="sumCal">0</strong>
+      </div>
+      <div class="summary-row">
+        <span>Azúcares totales (g):</span>
+        <strong id="sumSugar">0</strong>
+      </div>
+      <div class="summary-row">
+        <span>Grasas totales (g):</span>
+        <strong id="sumFat">0</strong>
+      </div>
+      <div class="summary-row">
+        <span>Proteínas totales (g):</span>
+        <strong id="sumProtein">0</strong>
+      </div>
+    </div>
+
+    <h3 style="margin-top:14px;font-size:15px;">Comidas de hoy</h3>
+    <div id="mealsList">
+      <span class="small-helper">Todavía no hay registros hoy.</span>
+    </div>
   </div>
 </div>
 
 <script>
+  const STORAGE_KEY = "caloriflow_meals_v1";
+  const TEMPLATES_KEY = "caloriflow_templates_v1";
+
+  const mealDescriptionEl = document.getElementById("mealDescription");
+  const portionAmountEl = document.getElementById("portionAmount");
+  const portionUnitEl = document.getElementById("portionUnit");
+  const templateSuggestionEl = document.getElementById("templateSuggestion");
+  const btnUseTemplate = document.getElementById("btnUseTemplate");
+
+  function normalizeDescription(desc) {
+    return desc
+      .toLowerCase()
+      .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
+      .replace(/\s+/g, " ")
+      .trim();
+  }
+
+  function getFullDescription() {
+    const desc = mealDescriptionEl.value.trim();
+    const amount = portionAmountEl.value.trim();
+    const unit = portionUnitEl.value;
+
+    if (!desc) return "";
+
+    // Construimos algo tipo "1 taza de café con leche"
+    if (!amount && unit === "ninguna") {
+      return desc;
+    }
+
+    const cantidadTexto = amount || "1";
+
+    if (unit === "ninguna") {
+      return `${cantidadTexto} ${desc}`;
+    }
+
+    return `${cantidadTexto} ${unit} de ${desc}`;
+  }
+
+  function loadTemplates() {
+    try {
+      const raw = localStorage.getItem(TEMPLATES_KEY);
+      return raw ? JSON.parse(raw) : {};
+    } catch (e) {
+      console.warn("Error leyendo templates:", e);
+      return {};
+    }
+  }
+
+  function saveTemplates(obj) {
+    try {
+      localStorage.setItem(TEMPLATES_KEY, JSON.stringify(obj));
+    } catch (e) {
+      console.warn("Error guardando templates:", e);
+    }
+  }
+
+  function checkTemplateForCurrentDescription() {
+    const fullDesc = getFullDescription();
+    const norm = normalizeDescription(fullDesc);
+    if (!norm) {
+      templateSuggestionEl.textContent = "";
+      btnUseTemplate.style.display = "none";
+      return;
+    }
+
+    const templates = loadTemplates();
+    const t = templates[norm];
+
+    if (t) {
+      templateSuggestionEl.textContent =
+        "Ya tenemos guardados valores para esta comida (con esa cantidad/unidad). Podés usarlos sin consultar a ChatGPT.";
+      btnUseTemplate.style.display = "inline-flex";
+
+      btnUseTemplate.onclick = () => {
+        document.getElementById("caloriesInput").value =
+          t.calorias ?? "";
+        document.getElementById("sugarInput").value =
+          t.azucares_g ?? "";
+        document.getElementById("fatInput").value =
+          t.grasas_g ?? "";
+        document.getElementById("proteinInput").value =
+          t.proteinas_g ?? "";
+      };
+    } else {
+      templateSuggestionEl.textContent =
+        "Todavía no hay datos guardados para esta combinación de comida y cantidad.";
+      btnUseTemplate.style.display = "none";
+    }
+  }
+
   function buildPrompt() {
     const tipo = document.getElementById("mealType").value;
-    const desc = document.getElementById("mealDescription").value.trim();
+    const fullDesc = getFullDescription();
 
-    if (!desc) {
-      alert("Escribí primero qué comiste.");
+    if (!fullDesc) {
+      alert("Completá la comida antes de seguir (cantidad/unidad y descripción).");
       return null;
     }
 
@@ -260,7 +448,7 @@ Eres un nutricionista experto.
 Analiza la siguiente comida y devuelve solo un JSON:
 
 Tipo de comida: ${tipo}
-Descripción detallada de la comida: "${desc}"
+Descripción detallada de la comida: "${fullDesc}"
 
 Quiero que estimes de forma realista:
 - calorías totales (kcal)
@@ -286,8 +474,6 @@ Completa los valores con números (pueden ser decimales).
     const prompt = buildPrompt();
     if (!prompt) return;
 
-    // Armamos URL para abrir ChatGPT con el prompt prellenado.
-    // El usuario solo revisa y aprieta Enviar.
     const url = "https://chat.openai.com/?q=" + encodeURIComponent(prompt);
     window.open(url, "_blank");
   }
@@ -317,12 +503,171 @@ Completa los valores con números (pueden ser decimales).
     }
   }
 
+  function loadMeals() {
+    let all = [];
+    try {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if (raw) all = JSON.parse(raw);
+    } catch (e) {
+      console.warn("Error leyendo meals:", e);
+    }
+
+    const today = new Date();
+    const todayStr = today.toISOString().slice(0, 10);
+
+    const todaysMeals = all.filter(m => m.date.startsWith(todayStr));
+
+    const sumCal = todaysMeals.reduce((acc, m) => acc + (m.calorias || 0), 0);
+    const sumSugar = todaysMeals.reduce((acc, m) => acc + (m.azucares_g || 0), 0);
+    const sumFat = todaysMeals.reduce((acc, m) => acc + (m.grasas_g || 0), 0);
+    const sumProtein = todaysMeals.reduce((acc, m) => acc + (m.proteinas_g || 0), 0);
+
+    document.getElementById("sumCal").textContent = sumCal.toFixed(1);
+    document.getElementById("sumSugar").textContent = sumSugar.toFixed(1);
+    document.getElementById("sumFat").textContent = sumFat.toFixed(1);
+    document.getElementById("sumProtein").textContent = sumProtein.toFixed(1);
+
+    const list = document.getElementById("mealsList");
+    list.innerHTML = "";
+
+    if (todaysMeals.length === 0) {
+      list.innerHTML = '<span class="small-helper">Todavía no hay registros hoy.</span>';
+      return;
+    }
+
+    todaysMeals.forEach(m => {
+      const div = document.createElement("div");
+      div.className = "meal-item";
+      div.innerHTML = `
+        <strong>${m.tipo}</strong> · ${new Date(m.date).toLocaleTimeString()}
+        <br/>
+        <span>${m.descripcion}</span>
+        <br/>
+        <span class="small-helper">
+          ${m.calorias?.toFixed?.(1) || m.calorias || 0} kcal ·
+          ${m.proteinas_g?.toFixed?.(1) || m.proteinas_g || 0} g prot ·
+          ${m.grasas_g?.toFixed?.(1) || m.grasas_g || 0} g grasa ·
+          ${m.azucares_g?.toFixed?.(1) || m.azucares_g || 0} g azúcar
+        </span>
+      `;
+      list.appendChild(div);
+    });
+  }
+
+  function saveTemplateFromMeal(fullDesc, cal, azu, gra, pro) {
+    const norm = normalizeDescription(fullDesc);
+    if (!norm) return;
+
+    const templates = loadTemplates();
+    const existing = templates[norm];
+
+    if (!existing) {
+      templates[norm] = {
+        calorias: cal,
+        azucares_g: azu,
+        grasas_g: gra,
+        proteinas_g: pro,
+        count: 1
+      };
+    } else {
+      const n = (existing.count || 1) + 1;
+      existing.calorias = ((existing.calorias || 0) * (n - 1) + cal) / n;
+      existing.azucares_g = ((existing.azucares_g || 0) * (n - 1) + azu) / n;
+      existing.grasas_g = ((existing.grasas_g || 0) * (n - 1) + gra) / n;
+      existing.proteinas_g = ((existing.proteinas_g || 0) * (n - 1) + pro) / n;
+      existing.count = n;
+      templates[norm] = existing;
+    }
+
+    saveTemplates(templates);
+    checkTemplateForCurrentDescription();
+  }
+
+  function saveMeal() {
+    const tipo = document.getElementById("mealType").value;
+    const fullDesc = getFullDescription();
+    const cal = Number(document.getElementById("caloriesInput").value || 0);
+    const azu = Number(document.getElementById("sugarInput").value || 0);
+    const gra = Number(document.getElementById("fatInput").value || 0);
+    const pro = Number(document.getElementById("proteinInput").value || 0);
+    const status = document.getElementById("saveStatus");
+
+    if (!fullDesc) {
+      status.textContent = "Completá la comida (cantidad/unidad y descripción).";
+      status.style.color = "var(--danger)";
+      return;
+    }
+
+    if (!cal && !azu && !gra && !pro) {
+      status.textContent = "Importá o cargá al menos un dato nutricional antes de guardar.";
+      status.style.color = "var(--danger)";
+      return;
+    }
+
+    let all = [];
+    try {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if (raw) all = JSON.parse(raw);
+    } catch (e) {
+      console.warn("No se pudo leer el storage:", e);
+    }
+
+    const meal = {
+      tipo,
+      descripcion: fullDesc,
+      calorias: cal,
+      azucares_g: azu,
+      grasas_g: gra,
+      proteinas_g: pro,
+      date: new Date().toISOString()
+    };
+
+    all.push(meal);
+
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(all));
+      status.textContent = "Comida guardada en el registro.";
+      status.style.color = "#4ade80";
+
+      // También actualizamos el template (mini base de datos)
+      saveTemplateFromMeal(fullDesc, cal, azu, gra, pro);
+      loadMeals();
+    } catch (e) {
+      status.textContent = "No se pudo guardar. Revisá espacio/permisos.";
+      status.style.color = "var(--danger)";
+    }
+  }
+
   document
     .getElementById("btnOpenChatGPT")
     .addEventListener("click", openChatGPT);
   document
     .getElementById("btnImportJson")
     .addEventListener("click", importFromJson);
+  document
+    .getElementById("btnSaveMeal")
+    .addEventListener("click", saveMeal);
+
+  mealDescriptionEl.addEventListener("blur", checkTemplateForCurrentDescription);
+  portionAmountEl.addEventListener("blur", checkTemplateForCurrentDescription);
+  portionUnitEl.addEventListener("change", checkTemplateForCurrentDescription);
+
+  mealDescriptionEl.addEventListener("input", () => {
+    templateSuggestionEl.textContent = "";
+    btnUseTemplate.style.display = "none";
+  });
+  portionAmountEl.addEventListener("input", () => {
+    templateSuggestionEl.textContent = "";
+    btnUseTemplate.style.display = "none";
+  });
+  portionUnitEl.addEventListener("change", () => {
+    templateSuggestionEl.textContent = "";
+    btnUseTemplate.style.display = "none";
+  });
+
+  // Cargar resumen al abrir
+  loadMeals();
+  checkTemplateForCurrentDescription();
 </script>
 </body>
 </html>
