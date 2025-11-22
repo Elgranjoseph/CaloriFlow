@@ -38,6 +38,14 @@
       padding: 20px 16px 32px;
     }
 
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 10px;
+    }
+
     h1 {
       margin: 0;
       font-size: 26px;
@@ -92,7 +100,7 @@
     }
 
     textarea {
-      min-height: 70px;
+      min-height: 60px;
       resize: vertical;
     }
 
@@ -110,24 +118,23 @@
     }
 
     .btn {
-      width: 100%;
       border-radius: 999px;
       border: none;
-      padding: 12px 14px;
-      margin-top: 10px;
-      font-size: 15px;
+      padding: 10px 16px;
+      font-size: 14px;
       font-weight: 600;
       cursor: pointer;
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      gap: 8px;
+      gap: 6px;
+      white-space: nowrap;
     }
 
     .btn-primary {
       background: linear-gradient(135deg, var(--accent-2), var(--accent));
       color: #12071f;
-      box-shadow: 0 16px 32px rgba(0, 0, 0, 0.9);
+      box-shadow: 0 12px 24px rgba(0, 0, 0, 0.9);
     }
 
     .btn-secondary {
@@ -136,11 +143,21 @@
       border: 1px solid var(--border-soft);
     }
 
+    .btn-small {
+      padding: 6px 10px;
+      font-size: 12px;
+    }
+
+    .top-actions {
+      display: flex;
+      gap: 8px;
+    }
+
     .values-grid {
       display: grid;
       grid-template-columns: repeat(2, minmax(0, 1fr));
       gap: 10px;
-      margin-top: 10px;
+      margin-top: 8px;
     }
 
     .badge {
@@ -152,7 +169,7 @@
       border-radius: 999px;
       border: 1px solid rgba(148, 163, 255, 0.55);
       background: rgba(8, 12, 32, 0.95);
-      margin-top: 8px;
+      margin-top: 6px;
     }
 
     .status {
@@ -160,28 +177,6 @@
       font-size: 13px;
       min-height: 18px;
       color: var(--text-muted);
-    }
-
-    .summary-row {
-      display: flex;
-      justify-content: space-between;
-      font-size: 14px;
-      margin-top: 6px;
-    }
-
-    .meal-item {
-      border-top: 1px solid rgba(148, 163, 255, 0.2);
-      padding-top: 6px;
-      margin-top: 6px;
-      font-size: 13px;
-    }
-
-    .meal-item strong {
-      font-size: 13px;
-    }
-
-    #templateSuggestion {
-      margin-top: 6px;
     }
 
     .portion-row {
@@ -226,26 +221,69 @@
       background: rgba(239, 68, 68, 0.15);
       color: #fecaca;
     }
+
+    /* Overlay resumen */
+    .overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(3, 7, 18, 0.95);
+      display: none;
+      justify-content: center;
+      align-items: flex-start;
+      padding: 18px 12px 28px;
+      z-index: 20;
+    }
+
+    .overlay-inner {
+      width: 100%;
+      max-width: 480px;
+      background: radial-gradient(circle at top left, #1c1f3c, #050816 65%);
+      border-radius: 22px;
+      padding: 16px 14px 20px;
+      border: 1px solid rgba(148, 163, 255, 0.3);
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.95);
+      max-height: 100%;
+      overflow-y: auto;
+    }
+
+    .summary-row {
+      display: flex;
+      justify-content: space-between;
+      font-size: 14px;
+      margin-top: 6px;
+    }
+
+    .meal-item {
+      border-top: 1px solid rgba(148, 163, 255, 0.2);
+      padding-top: 6px;
+      margin-top: 6px;
+      font-size: 13px;
+    }
+
+    .meal-item strong {
+      font-size: 13px;
+    }
   </style>
 </head>
 <body>
 <div class="app">
-  <h1>CaloriFlow</h1>
-  <div class="subtitle">
-    Agregá varios ítems a cada comida, usá ChatGPT la primera vez y la app aprende tus combinaciones.
-  </div>
+  <header>
+    <div>
+      <h1>CaloriFlow</h1>
+      <div class="subtitle">Registro diario rápido y simple.</div>
+    </div>
+    <div class="top-actions">
+      <button class="btn btn-secondary btn-small" id="btnSummary">
+        📊 Resumen
+      </button>
+    </div>
+  </header>
 
-  <!-- NUEVO: botón para mostrar/ocultar resumen -->
-  <button class="btn btn-secondary" id="btnToggleSummary">
-    📊 Resumen
-  </button>
-
-  <!-- Sección de comida -->
+  <!-- NUEVA COMIDA -->
   <div class="card">
     <h2>Nueva comida</h2>
-    <p>Podés agregar varios ítems al mismo desayuno, almuerzo, etc.</p>
 
-    <label for="mealType">Tipo de comida</label>
+    <label for="mealType">Tipo</label>
     <select id="mealType">
       <option value="Desayuno">Desayuno</option>
       <option value="Almuerzo">Almuerzo</option>
@@ -254,7 +292,7 @@
       <option value="Snack">Snack</option>
     </select>
 
-    <label>Cantidad, unidad y descripción del ítem</label>
+    <label>Ítem de la comida</label>
     <div class="portion-row">
       <input
         type="number"
@@ -274,84 +312,89 @@
     </div>
     <textarea
       id="itemDescription"
-      placeholder="Ej: café con leche, jugo de naranja, tostada con mermelada"
+      placeholder="Ej: café con leche, jugo, tostada con mermelada"
     ></textarea>
     <div class="small-helper">
-      Ej: “1 taza de café con leche”, “1 vaso de jugo de naranja”, “1 porción de tostada con mermelada”.
+      Podés agregar varios ítems al mismo desayuno/almuerzo, etc.
     </div>
 
     <button class="btn btn-secondary" id="btnAddItem">
-      ➕ Agregar ítem a la comida
+      ➕ Agregar ítem
     </button>
 
     <div class="items-list" id="itemsList">
-      <span class="small-helper">Todavía no agregaste ítems a esta comida.</span>
+      <span class="small-helper">Todavía no agregaste ítems.</span>
     </div>
 
     <div id="templateSuggestion" class="small-helper"></div>
-    <button class="btn btn-secondary" id="btnUseTemplate" style="display:none;">
-      📂 Usar valores guardados para esta combinación de ítems
+    <button class="btn btn-secondary btn-small" id="btnUseTemplate" style="display:none;">
+      📂 Usar valores aprendidos
     </button>
 
-    <button class="btn btn-primary" id="btnOpenChatGPT">
-      💬 Abrir en ChatGPT con toda la comida
+    <button class="btn btn-primary" id="btnOpenChatGPT" style="margin-top:10px;">
+      💬 Preguntar a ChatGPT por esta comida
     </button>
 
     <div class="status">
-      Tenés que estar logueado en <strong>chat.openai.com</strong>. La app arma el prompt por vos.
+      Se abre chat.openai.com con un prompt armado. Solo copiá el JSON que devuelva.
     </div>
   </div>
 
-  <!-- Importar JSON devuelto por ChatGPT y guardar -->
+  <!-- VALORES NUTRICIONALES -->
   <div class="card">
-    <h2>Importar e incorporar comida</h2>
-    <p>
-      Pedile a ChatGPT que te devuelva <strong>SÓLO un JSON</strong> con los valores totales
-      para la comida completa (todos los ítems juntos).
+    <h2>Valores de esta comida</h2>
+    <p style="margin-bottom:6px;">
+      Podés escribirlos a mano o pegarlos desde ChatGPT.
     </p>
-    <div class="badge">
-      {"calorias": 0, "azucares_g": 0, "grasas_g": 0, "proteinas_g": 0}
-    </div>
-
-    <label for="jsonChatGPT">Pegá aquí el JSON que te devolvió ChatGPT</label>
-    <textarea
-      id="jsonChatGPT"
-      placeholder='Ej: {"calorias": 520, "azucares_g": 32, "grasas_g": 18, "proteinas_g": 14}'
-    ></textarea>
-
-    <button class="btn btn-secondary" id="btnImportJson">
-      ⬇ Importar valores en los campos
-    </button>
 
     <div class="values-grid">
       <div>
         <label for="caloriesInput">Calorías (kcal)</label>
-        <input type="number" id="caloriesInput" placeholder="Ej: 520" />
+        <input type="number" id="caloriesInput" placeholder="Ej: 320" />
       </div>
       <div>
         <label for="sugarInput">Azúcares (g)</label>
-        <input type="number" id="sugarInput" placeholder="Ej: 32" />
+        <input type="number" id="sugarInput" placeholder="Ej: 12" />
       </div>
       <div>
         <label for="fatInput">Grasas (g)</label>
-        <input type="number" id="fatInput" placeholder="Ej: 18" />
+        <input type="number" id="fatInput" placeholder="Ej: 8" />
       </div>
       <div>
         <label for="proteinInput">Proteínas (g)</label>
-        <input type="number" id="proteinInput" placeholder="Ej: 14" />
+        <input type="number" id="proteinInput" placeholder="Ej: 10" />
       </div>
     </div>
 
+    <label for="jsonChatGPT" style="margin-top:10px;">JSON de ChatGPT (opcional)</label>
+    <textarea
+      id="jsonChatGPT"
+      placeholder='Ej: {"calorias": 320, "azucares_g": 12, "grasas_g": 8, "proteinas_g": 10}'
+    ></textarea>
+    <div class="badge">
+      {"calorias": 0, "azucares_g": 0, "grasas_g": 0, "proteinas_g": 0}
+    </div>
+
+    <button class="btn btn-secondary btn-small" id="btnImportJson" style="margin-top:8px;">
+      ⬇ Rellenar campos desde el JSON
+    </button>
+
     <button class="btn btn-primary" id="btnSaveMeal">
-      ✅ Guardar comida en el registro
+      ✅ Guardar comida
     </button>
 
     <div class="status" id="saveStatus"></div>
   </div>
+</div>
 
-  <!-- Resumen diario (AHORA ESCONDIDO POR DEFECTO) -->
-  <div class="card" id="summaryCard" style="display:none;">
-    <h2>Resumen de hoy</h2>
+<!-- OVERLAY RESUMEN -->
+<div class="overlay" id="summaryOverlay">
+  <div class="overlay-inner">
+    <button class="btn btn-secondary btn-small" id="btnCloseSummary">
+      ← Volver
+    </button>
+    <h2 style="margin:10px 0 4px;">Resumen de hoy</h2>
+
     <div id="summary">
       <div class="summary-row">
         <span>Calorías totales:</span>
@@ -371,7 +414,7 @@
       </div>
     </div>
 
-    <h3 style="margin-top:14px;font-size:15px;">Comidas de hoy</h3>
+    <h3 style="margin-top:14px;font-size:15px;">Comidas registradas</h3>
     <div id="mealsList">
       <span class="small-helper">Todavía no hay registros hoy.</span>
     </div>
@@ -390,8 +433,10 @@
   const itemsListEl = document.getElementById("itemsList");
   const templateSuggestionEl = document.getElementById("templateSuggestion");
   const btnUseTemplate = document.getElementById("btnUseTemplate");
-  const summaryCard = document.getElementById("summaryCard");
-  const btnToggleSummary = document.getElementById("btnToggleSummary");
+
+  const summaryOverlay = document.getElementById("summaryOverlay");
+  const btnSummary = document.getElementById("btnSummary");
+  const btnCloseSummary = document.getElementById("btnCloseSummary");
 
   function normalizeString(str) {
     return str
@@ -426,7 +471,7 @@
 
     if (currentItems.length === 0) {
       itemsListEl.innerHTML =
-        '<span class="small-helper">Todavía no agregaste ítems a esta comida.</span>';
+        '<span class="small-helper">Todavía no agregaste ítems.</span>';
       templateSuggestionEl.textContent = "";
       btnUseTemplate.style.display = "none";
       return;
@@ -441,7 +486,7 @@
 
       const btnDel = document.createElement("button");
       btnDel.textContent = "❌";
-      btnDel.title = "Quitar este ítem";
+      btnDel.title = "Quitar ítem";
       btnDel.onclick = () => {
         currentItems.splice(index, 1);
         renderItemsList();
@@ -462,7 +507,7 @@
     const description = itemDescriptionEl.value.trim();
 
     if (!description) {
-      alert("Escribí la descripción del ítem (por ejemplo: tostada con mermelada).");
+      alert("Escribí la descripción del ítem (ej: tostada con mermelada).");
       return;
     }
 
@@ -511,31 +556,27 @@
 
     if (t) {
       templateSuggestionEl.textContent =
-        "Ya tenemos guardados valores para esta combinación de ítems. Podés usarlos sin consultar a ChatGPT.";
+        "Esta combinación ya está aprendida. Podés rellenar los valores sin usar ChatGPT.";
       btnUseTemplate.style.display = "inline-flex";
 
       btnUseTemplate.onclick = () => {
-        document.getElementById("caloriesInput").value =
-          t.calorias ?? "";
-        document.getElementById("sugarInput").value =
-          t.azucares_g ?? "";
-        document.getElementById("fatInput").value =
-          t.grasas_g ?? "";
-        document.getElementById("proteinInput").value =
-          t.proteinas_g ?? "";
+        document.getElementById("caloriesInput").value = t.calorias ?? "";
+        document.getElementById("sugarInput").value = t.azucares_g ?? "";
+        document.getElementById("fatInput").value = t.grasas_g ?? "";
+        document.getElementById("proteinInput").value = t.proteinas_g ?? "";
       };
     } else {
       templateSuggestionEl.textContent =
-        "Esta combinación de ítems todavía no está aprendida. La primera vez podés usar ChatGPT.";
+        "Primera vez con esta combinación. Podés usar ChatGPT para estimar.";
       btnUseTemplate.style.display = "none";
     }
   }
 
-  // PROMPT MEJORADO: JSON sin bloques ``` y en una sola línea
+  // PROMPT para ChatGPT: intenta forzar JSON puro
   function buildPrompt() {
     const mealType = document.getElementById("mealType").value;
     if (currentItems.length === 0) {
-      alert("Primero agregá al menos un ítem a la comida.");
+      alert("Primero agregá al menos un ítem.");
       return null;
     }
 
@@ -546,33 +587,31 @@
     const itemsText = lines.join("\n");
 
     const prompt = `
-Eres un nutricionista experto.
+Eres un nutricionista.
 
-Analiza la siguiente comida COMPLETA y devuelve solo un JSON con los valores totales:
+Analiza la siguiente comida COMPLETA y devuelve los valores totales:
 
 Tipo de comida: ${mealType}
 
-La comida está compuesta por estos ítems:
+Ítems de la comida:
 ${itemsText}
 
-Quiero que estimes de forma realista para toda la comida en conjunto:
+Quiero que estimes para toda la comida en conjunto:
 - calorías totales (kcal)
 - gramos de azúcares
 - gramos de grasas
 - gramos de proteínas
 
-IMPORTANTE:
-- Responde SOLO un JSON válido, sin texto extra, sin comentarios, sin explicación.
-- NO uses bloques de código ni comillas invertidas (no pongas \`\`\`).
-- Escribe el JSON en UNA SOLA LÍNEA, sin saltos de línea.
-Usa exactamente este formato de claves:
-{
-  "calorias": 0,
-  "azucares_g": 0,
-  "grasas_g": 0,
-  "proteinas_g": 0
-}
-Completa los valores con números (pueden ser decimales).
+MUY IMPORTANTE:
+- Responde SOLO un JSON válido.
+- SIN explicaciones, SIN comentarios, SIN texto antes o después.
+- NO uses bloques de código ni \`\`\`.
+- Escribe el JSON en UNA SOLA LÍNEA.
+
+Formato exacto:
+{"calorias": 0, "azucares_g": 0, "grasas_g": 0, "proteinas_g": 0}
+
+Rellena los valores con números (pueden ser decimales).
 `;
     return prompt.trim();
   }
@@ -580,16 +619,22 @@ Completa los valores con números (pueden ser decimales).
   function openChatGPT() {
     const prompt = buildPrompt();
     if (!prompt) return;
-
     const url = "https://chat.openai.com/?q=" + encodeURIComponent(prompt);
     window.open(url, "_blank");
   }
 
+  // IMPORTACIÓN ROBUSTA: extrae el primer {...} aunque haya texto extra
   function importFromJson() {
-    const raw = document.getElementById("jsonChatGPT").value.trim();
+    let raw = document.getElementById("jsonChatGPT").value.trim();
     if (!raw) {
-      alert("Pegá el JSON que te devolvió ChatGPT.");
+      alert("Pegá algún texto devuelto por ChatGPT.");
       return;
+    }
+
+    // Si viene con explicaciones, buscamos el primer bloque { ... }
+    const match = raw.match(/\{[\s\S]*\}/);
+    if (match) {
+      raw = match[0];
     }
 
     try {
@@ -604,9 +649,9 @@ Completa los valores con números (pueden ser decimales).
       document.getElementById("proteinInput").value =
         data.proteinas_g ?? "";
 
-      alert("Valores importados.");
+      alert("Valores importados desde el JSON.");
     } catch (e) {
-      alert("El texto pegado no es un JSON válido. Revisá el formato.");
+      alert("No pude entender el JSON. Revisá que tenga formato válido.");
     }
   }
 
@@ -719,13 +764,13 @@ Completa los valores con números (pueden ser decimales).
     const status = document.getElementById("saveStatus");
 
     if (currentItems.length === 0) {
-      status.textContent = "Primero agregá al menos un ítem a la comida.";
+      status.textContent = "Agregá al menos un ítem.";
       status.style.color = "var(--danger)";
       return;
     }
 
     if (!cal && !azu && !gra && !pro) {
-      status.textContent = "Importá o cargá al menos un dato nutricional antes de guardar.";
+      status.textContent = "Cargá al menos un dato nutricional (o importalo).";
       status.style.color = "var(--danger)";
       return;
     }
@@ -752,38 +797,35 @@ Completa los valores con números (pueden ser decimales).
 
     try {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(all));
-      status.textContent = "Comida guardada en el registro.";
+      status.textContent = "Comida guardada.";
       status.style.color = "#4ade80";
 
       saveTemplateForCurrentItems(cal, azu, gra, pro);
       loadMeals();
       resetMealForm();
     } catch (e) {
-      status.textContent = "No se pudo guardar. Revisá espacio/permisos.";
+      status.textContent = "No se pudo guardar (revisá espacio/permisos).";
       status.style.color = "var(--danger)";
     }
   }
 
-  // Toggle del resumen
-  btnToggleSummary.addEventListener("click", () => {
-    const visible = summaryCard.style.display !== "none";
-    summaryCard.style.display = visible ? "none" : "block";
+  // Eventos resumen
+  btnSummary.addEventListener("click", () => {
+    loadMeals();
+    summaryOverlay.style.display = "flex";
   });
 
-  document
-    .getElementById("btnAddItem")
-    .addEventListener("click", addItem);
-  document
-    .getElementById("btnOpenChatGPT")
-    .addEventListener("click", openChatGPT);
-  document
-    .getElementById("btnImportJson")
-    .addEventListener("click", importFromJson);
-  document
-    .getElementById("btnSaveMeal")
-    .addEventListener("click", saveMeal);
+  btnCloseSummary.addEventListener("click", () => {
+    summaryOverlay.style.display = "none";
+  });
 
-  // Cargar resumen al abrir (aunque esté oculto visualmente)
+  // Eventos principales
+  document.getElementById("btnAddItem").addEventListener("click", addItem);
+  document.getElementById("btnOpenChatGPT").addEventListener("click", openChatGPT);
+  document.getElementById("btnImportJson").addEventListener("click", importFromJson);
+  document.getElementById("btnSaveMeal").addEventListener("click", saveMeal);
+
+  // Inicial
   loadMeals();
   renderItemsList();
 </script>
