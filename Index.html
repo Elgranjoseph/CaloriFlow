@@ -235,6 +235,11 @@
     Agregá varios ítems a cada comida, usá ChatGPT la primera vez y la app aprende tus combinaciones.
   </div>
 
+  <!-- NUEVO: botón para mostrar/ocultar resumen -->
+  <button class="btn btn-secondary" id="btnToggleSummary">
+    📊 Resumen
+  </button>
+
   <!-- Sección de comida -->
   <div class="card">
     <h2>Nueva comida</h2>
@@ -301,8 +306,8 @@
   <div class="card">
     <h2>Importar e incorporar comida</h2>
     <p>
-      Pedile a ChatGPT que te devuelva <strong>SÓLO un JSON</strong> con estos
-      campos para la comida completa:
+      Pedile a ChatGPT que te devuelva <strong>SÓLO un JSON</strong> con los valores totales
+      para la comida completa (todos los ítems juntos).
     </p>
     <div class="badge">
       {"calorias": 0, "azucares_g": 0, "grasas_g": 0, "proteinas_g": 0}
@@ -344,8 +349,8 @@
     <div class="status" id="saveStatus"></div>
   </div>
 
-  <!-- Resumen diario -->
-  <div class="card">
+  <!-- Resumen diario (AHORA ESCONDIDO POR DEFECTO) -->
+  <div class="card" id="summaryCard" style="display:none;">
     <h2>Resumen de hoy</h2>
     <div id="summary">
       <div class="summary-row">
@@ -385,6 +390,8 @@
   const itemsListEl = document.getElementById("itemsList");
   const templateSuggestionEl = document.getElementById("templateSuggestion");
   const btnUseTemplate = document.getElementById("btnUseTemplate");
+  const summaryCard = document.getElementById("summaryCard");
+  const btnToggleSummary = document.getElementById("btnToggleSummary");
 
   function normalizeString(str) {
     return str
@@ -524,6 +531,7 @@
     }
   }
 
+  // PROMPT MEJORADO: JSON sin bloques ``` y en una sola línea
   function buildPrompt() {
     const mealType = document.getElementById("mealType").value;
     if (currentItems.length === 0) {
@@ -554,7 +562,9 @@ Quiero que estimes de forma realista para toda la comida en conjunto:
 - gramos de proteínas
 
 IMPORTANTE:
-Responde SOLO un JSON válido, sin texto extra, sin comentarios, sin explicación.
+- Responde SOLO un JSON válido, sin texto extra, sin comentarios, sin explicación.
+- NO uses bloques de código ni comillas invertidas (no pongas \`\`\`).
+- Escribe el JSON en UNA SOLA LÍNEA, sin saltos de línea.
 Usa exactamente este formato de claves:
 {
   "calorias": 0,
@@ -686,20 +696,16 @@ Completa los valores con números (pueden ser decimales).
   }
 
   function resetMealForm() {
-    // limpiamos ítems
     currentItems = [];
     renderItemsList();
 
-    // limpiamos campos de macros
     document.getElementById("caloriesInput").value = "";
     document.getElementById("sugarInput").value = "";
     document.getElementById("fatInput").value = "";
     document.getElementById("proteinInput").value = "";
 
-    // limpiamos JSON
     document.getElementById("jsonChatGPT").value = "";
 
-    // limpiamos sugerencias
     templateSuggestionEl.textContent = "";
     btnUseTemplate.style.display = "none";
   }
@@ -749,17 +755,20 @@ Completa los valores con números (pueden ser decimales).
       status.textContent = "Comida guardada en el registro.";
       status.style.color = "#4ade80";
 
-      // entrenar plantilla
       saveTemplateForCurrentItems(cal, azu, gra, pro);
       loadMeals();
-
-      // limpiar formulario para la próxima comida
       resetMealForm();
     } catch (e) {
       status.textContent = "No se pudo guardar. Revisá espacio/permisos.";
       status.style.color = "var(--danger)";
     }
   }
+
+  // Toggle del resumen
+  btnToggleSummary.addEventListener("click", () => {
+    const visible = summaryCard.style.display !== "none";
+    summaryCard.style.display = visible ? "none" : "block";
+  });
 
   document
     .getElementById("btnAddItem")
@@ -774,7 +783,7 @@ Completa los valores con números (pueden ser decimales).
     .getElementById("btnSaveMeal")
     .addEventListener("click", saveMeal);
 
-  // Cargar resumen al abrir
+  // Cargar resumen al abrir (aunque esté oculto visualmente)
   loadMeals();
   renderItemsList();
 </script>
