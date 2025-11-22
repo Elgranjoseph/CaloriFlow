@@ -264,7 +264,8 @@
       font-size: 13px;
     }
 
-    /* Botón de agregar comida más visible */
+    /* Botones principales bien visibles y anchos */
+    #btnOpenChatGPT,
     #btnSaveMeal {
       width: 100%;
       margin-top: 12px;
@@ -323,7 +324,7 @@
       placeholder="Ej: café con leche, jugo, tostada con mermelada"
     ></textarea>
     <div class="small-helper">
-      Podés sumar varios ítems al mismo desayuno/almuerzo, etc.
+      Podés sumar varios ítems a la misma comida.
     </div>
 
     <button class="btn btn-secondary" id="btnAddItem">
@@ -337,21 +338,14 @@
       📂 Usar valores aprendidos
     </button>
 
-    <button class="btn btn-secondary" id="btnOpenChatGPT" style="margin-top:10px;width:100%;">
-      💬 Preguntar a ChatGPT por esta comida
+    <button class="btn btn-primary" id="btnOpenChatGPT">
+      💬 Preguntar a ChatGPT
     </button>
-
-    <div class="status">
-      Se abre chat.openai.com con un prompt armado. Solo copiá el JSON que devuelva.
-    </div>
   </div>
 
   <!-- VALORES NUTRICIONALES -->
   <div class="card">
     <h2>Valores de esta comida</h2>
-    <p style="margin-bottom:6px;">
-      Podés escribirlos a mano o pegar el JSON entero de ChatGPT.
-    </p>
 
     <div class="values-grid">
       <div>
@@ -372,14 +366,11 @@
       </div>
     </div>
 
-    <label for="jsonChatGPT" style="margin-top:10px;">JSON de ChatGPT (opcional)</label>
+    <label for="jsonChatGPT" style="margin-top:10px;">Resultado de ChatGPT (opcional)</label>
     <textarea
       id="jsonChatGPT"
-      placeholder='Pegá aquí la respuesta de ChatGPT, aunque tenga texto extra.'
+      placeholder="Pegá aquí el resultado de ChatGPT para esta comida."
     ></textarea>
-    <div class="badge">
-      Formato base: {"calorias": 0, "azucares_g": 0, "grasas_g": 0, "proteinas_g": 0}
-    </div>
 
     <button class="btn btn-primary" id="btnSaveMeal">
       ✅ Agregar comida
@@ -472,7 +463,6 @@
     itemsListEl.innerHTML = "";
 
     if (currentItems.length === 0) {
-      // nada de "todavía no agregaste ítems" para mantenerlo limpio
       return;
     }
 
@@ -622,7 +612,7 @@ Rellena los valores con números (pueden ser decimales).
     window.open(url, "_blank");
   }
 
-  // Importación silenciosa desde JSON (sin botón)
+  // Importación automática desde el texto pegado
   function tryAutoImportJson() {
     const calEl = document.getElementById("caloriesInput");
     const sugEl = document.getElementById("sugarInput");
@@ -634,7 +624,7 @@ Rellena los valores con números (pueden ser decimales).
       !calEl.value && !sugEl.value && !fatEl.value && !protEl.value;
 
     if (!allEmpty || !jsonText) {
-      return; // ya hay datos o no hay JSON
+      return;
     }
 
     let raw = jsonText;
@@ -650,7 +640,6 @@ Rellena los valores con números (pueden ser decimales).
       fatEl.value = data.grasas_g ?? "";
       protEl.value = data.proteinas_g ?? "";
     } catch (e) {
-      // Si falla, no molestamos al usuario; seguirá el flujo normal
       console.warn("JSON inválido, no se pudo importar automáticamente.");
     }
   }
@@ -765,7 +754,7 @@ Rellena los valores con números (pueden ser decimales).
       return;
     }
 
-    // Si los campos están vacíos y hay JSON, lo intentamos importar automáticamente.
+    // Si los campos están vacíos y hay texto pegado, importamos automáticamente
     tryAutoImportJson();
 
     const cal = Number(document.getElementById("caloriesInput").value || 0);
@@ -774,7 +763,7 @@ Rellena los valores con números (pueden ser decimales).
     const pro = Number(document.getElementById("proteinInput").value || 0);
 
     if (!cal && !azu && !gra && !pro) {
-      status.textContent = "Cargá algún dato nutricional (manual o desde JSON).";
+      status.textContent = "Cargá algún dato nutricional (manual o desde ChatGPT).";
       status.style.color = "var(--danger)";
       return;
     }
