@@ -151,13 +151,16 @@
     .top-actions {
       display: flex;
       gap: 8px;
+      align-items: center;
     }
 
-    .values-grid {
-      display: grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: 10px;
-      margin-top: 8px;
+    #btnSummary {
+      padding: 10px 18px;
+      font-size: 14px;
+      background: linear-gradient(135deg, #22c55e, #16a34a);
+      color: #022c22;
+      border: none;
+      box-shadow: 0 12px 24px rgba(0, 0, 0, 0.9);
     }
 
     .portion-row {
@@ -247,6 +250,11 @@
       margin-top: 6px;
     }
 
+    .summary-section-title {
+      margin-top: 14px;
+      font-size: 15px;
+    }
+
     .meal-item {
       border-top: 1px solid rgba(148, 163, 255, 0.2);
       padding-top: 6px;
@@ -294,6 +302,39 @@
       min-height: 18px;
       color: var(--text-muted);
     }
+
+    /* Metas y progreso */
+    .progress-row {
+      display: flex;
+      justify-content: space-between;
+      font-size: 13px;
+      margin-top: 4px;
+    }
+
+    .progress-bar {
+      margin-top: 4px;
+      width: 100%;
+      height: 6px;
+      border-radius: 999px;
+      background: rgba(15, 23, 42, 0.9);
+      overflow: hidden;
+    }
+
+    .progress-fill {
+      height: 100%;
+      border-radius: inherit;
+      background: linear-gradient(90deg, #22c55e, #16a34a);
+      width: 0%;
+      transition: width 0.2s ease-out;
+    }
+
+    .toggle-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 13px;
+      margin-top: 6px;
+    }
   </style>
 </head>
 <body>
@@ -304,8 +345,8 @@
       <div class="subtitle">Registro diario rápido y simple.</div>
     </div>
     <div class="top-actions">
-      <button class="btn btn-secondary btn-small" id="btnSummary">
-        📊 Resumen
+      <button class="btn" id="btnSummary">
+        📊 Ver resumen
       </button>
     </div>
   </header>
@@ -356,42 +397,23 @@
     <div class="items-list" id="itemsList"></div>
 
     <div id="templateSuggestion" class="small-helper"></div>
-    <button class="btn btn-secondary btn-small" id="btnUseTemplate" style="display:none;">
-      📂 Usar valores aprendidos
-    </button>
 
     <button class="btn btn-primary" id="btnOpenChatGPT">
       💬 Preguntar a ChatGPT
     </button>
   </div>
 
-  <!-- VALORES NUTRICIONALES -->
+  <!-- RESULTADO CHATGPT + GUARDAR -->
   <div class="card">
-    <h2>Valores de esta comida</h2>
-
-    <div class="values-grid">
-      <div>
-        <label for="caloriesInput">Calorías (kcal)</label>
-        <input type="number" id="caloriesInput" placeholder="Ej: 320" />
-      </div>
-      <div>
-        <label for="sugarInput">Azúcares (g)</label>
-        <input type="number" id="sugarInput" placeholder="Ej: 12" />
-      </div>
-      <div>
-        <label for="fatInput">Grasas (g)</label>
-        <input type="number" id="fatInput" placeholder="Ej: 8" />
-      </div>
-      <div>
-        <label for="proteinInput">Proteínas (g)</label>
-        <input type="number" id="proteinInput" placeholder="Ej: 10" />
-      </div>
-    </div>
+    <h2>Datos de la comida</h2>
+    <p class="small-helper">
+      Pegá el resultado de ChatGPT (el JSON) o, si ya registraste esta misma comida antes, podés guardar sin pegar nada.
+    </p>
 
     <label for="jsonChatGPT" style="margin-top:10px;">Resultado de ChatGPT (opcional)</label>
     <textarea
       id="jsonChatGPT"
-      placeholder="Pegá aquí el resultado de ChatGPT para esta comida."
+      placeholder='Pegá aquí el resultado de ChatGPT con el formato {"calorias": ..., "azucares_g": ..., "grasas_g": ..., "proteinas_g": ...}'
     ></textarea>
 
     <button class="btn btn-primary" id="btnSaveMeal">
@@ -399,6 +421,59 @@
     </button>
 
     <div class="status" id="saveStatus"></div>
+  </div>
+
+  <!-- METAS DIARIAS -->
+  <div class="card">
+    <h2>Metas diarias</h2>
+    <p class="small-helper">
+      Podés usar lo que te sugiera tu nutricionista o una IA y guardarlo acá.
+    </p>
+    <div class="portion-row">
+      <div style="flex:1;">
+        <label for="goalCal">Calorías (kcal)</label>
+        <input type="number" id="goalCal" placeholder="Ej: 2000" />
+      </div>
+      <div style="flex:1;">
+        <label for="goalProt">Proteínas (g)</label>
+        <input type="number" id="goalProt" placeholder="Ej: 70" />
+      </div>
+    </div>
+    <div class="portion-row">
+      <div style="flex:1;">
+        <label for="goalFat">Grasas (g)</label>
+        <input type="number" id="goalFat" placeholder="Ej: 60" />
+      </div>
+      <div style="flex:1;">
+        <label for="goalSugar">Azúcares (g)</label>
+        <input type="number" id="goalSugar" placeholder="Ej: 50" />
+      </div>
+    </div>
+
+    <button class="btn btn-secondary" id="btnSaveGoals" style="margin-top:10px;">
+      💾 Guardar metas
+    </button>
+    <div class="small-helper" id="goalsStatus"></div>
+  </div>
+
+  <!-- RECORDATORIO DE COMIDAS -->
+  <div class="card">
+    <h2>Recordatorio de comidas</h2>
+    <div class="toggle-row">
+      <input type="checkbox" id="reminderEnabled" />
+      <span>Activar recordatorio si pasa mucho tiempo sin registrar comidas.</span>
+    </div>
+
+    <label for="reminderInterval">Tiempo máximo sin registrar comida</label>
+    <select id="reminderInterval">
+      <option value="120">2 horas</option>
+      <option value="180">3 horas</option>
+      <option value="240">4 horas</option>
+    </select>
+
+    <div class="small-helper">
+      El recordatorio funciona mientras la app esté abierta o activa.
+    </div>
   </div>
 </div>
 
@@ -432,7 +507,34 @@
       </div>
     </div>
 
-    <h3 style="margin-top:14px;font-size:15px;">Comidas registradas</h3>
+    <h3 class="summary-section-title">Progreso vs metas</h3>
+    <div class="progress-row">
+      <span>Calorías</span>
+      <span id="progressCalText">0 / 0</span>
+    </div>
+    <div class="progress-bar"><div class="progress-fill" id="progressCalBar"></div></div>
+
+    <div class="progress-row">
+      <span>Azúcares (g)</span>
+      <span id="progressSugarText">0 / 0</span>
+    </div>
+    <div class="progress-bar"><div class="progress-fill" id="progressSugarBar"></div></div>
+
+    <div class="progress-row">
+      <span>Grasas (g)</span>
+      <span id="progressFatText">0 / 0</span>
+    </div>
+    <div class="progress-bar"><div class="progress-fill" id="progressFatBar"></div></div>
+
+    <div class="progress-row">
+      <span>Proteínas (g)</span>
+      <span id="progressProtText">0 / 0</span>
+    </div>
+    <div class="progress-bar"><div class="progress-fill" id="progressProtBar"></div></div>
+
+    <div class="small-helper" id="progressNote" style="margin-top:8px;"></div>
+
+    <h3 class="summary-section-title">Comidas registradas</h3>
     <div id="mealsList">
       <span class="small-helper">Todavía no hay registros hoy.</span>
     </div>
@@ -442,19 +544,31 @@
 <script>
   const STORAGE_KEY = "caloriflow_meals_v2";
   const TEMPLATES_KEY = "caloriflow_templates_v2";
+  const GOALS_KEY = "caloriflow_goals_v1";
+  const REMINDER_KEY = "caloriflow_reminder_v1";
 
   let currentItems = [];
+  let reminderTimer = null;
+  let lastMealTime = Date.now();
 
   const itemAmountEl = document.getElementById("itemAmount");
   const itemUnitEl = document.getElementById("itemUnit");
   const itemDescriptionEl = document.getElementById("itemDescription");
   const itemsListEl = document.getElementById("itemsList");
   const templateSuggestionEl = document.getElementById("templateSuggestion");
-  const btnUseTemplate = document.getElementById("btnUseTemplate");
 
   const summaryOverlay = document.getElementById("summaryOverlay");
   const btnSummary = document.getElementById("btnSummary");
   const btnCloseSummary = document.getElementById("btnCloseSummary");
+
+  const goalCalEl = document.getElementById("goalCal");
+  const goalProtEl = document.getElementById("goalProt");
+  const goalFatEl = document.getElementById("goalFat");
+  const goalSugarEl = document.getElementById("goalSugar");
+  const goalsStatusEl = document.getElementById("goalsStatus");
+
+  const reminderEnabledEl = document.getElementById("reminderEnabled");
+  const reminderIntervalEl = document.getElementById("reminderInterval");
 
   function normalizeString(str) {
     return str
@@ -504,7 +618,7 @@
       btnDel.onclick = () => {
         currentItems.splice(index, 1);
         renderItemsList();
-        checkTemplateForCurrentItems();
+        updateTemplateSuggestion();
       };
 
       row.appendChild(span);
@@ -512,7 +626,7 @@
       itemsListEl.appendChild(row);
     });
 
-    checkTemplateForCurrentItems();
+    updateTemplateSuggestion();
   }
 
   function addItem() {
@@ -532,7 +646,6 @@
     };
 
     currentItems.push(item);
-
     itemAmountEl.value = "";
     itemDescriptionEl.value = "";
 
@@ -564,29 +677,18 @@
     return templates[key] || null;
   }
 
-  function checkTemplateForCurrentItems() {
-    const t = getTemplateForCurrentItems();
+  function updateTemplateSuggestion() {
     if (!currentItems.length) {
       templateSuggestionEl.textContent = "";
-      btnUseTemplate.style.display = "none";
       return;
     }
-
+    const t = getTemplateForCurrentItems();
     if (t) {
       templateSuggestionEl.textContent =
-        "Esta combinación ya está aprendida. Podés rellenar los valores sin usar ChatGPT.";
-      btnUseTemplate.style.display = "inline-flex";
-
-      btnUseTemplate.onclick = () => {
-        document.getElementById("caloriesInput").value = t.calorias ?? "";
-        document.getElementById("sugarInput").value = t.azucares_g ?? "";
-        document.getElementById("fatInput").value = t.grasas_g ?? "";
-        document.getElementById("proteinInput").value = t.proteinas_g ?? "";
-      };
+        "Esta comida ya está aprendida. Si no pegás nada de ChatGPT, se usarán estos valores automáticamente.";
     } else {
       templateSuggestionEl.textContent =
-        "Primera vez con esta combinación. Podés usar ChatGPT para estimar.";
-      btnUseTemplate.style.display = "none";
+        "Primera vez con esta combinación. Podés usar ChatGPT para estimar los datos.";
     }
   }
 
@@ -640,35 +742,89 @@ Rellena los valores con números (pueden ser decimales).
     window.open(url, "_blank");
   }
 
-  function tryAutoImportJson() {
-    const calEl = document.getElementById("caloriesInput");
-    const sugEl = document.getElementById("sugarInput");
-    const fatEl = document.getElementById("fatInput");
-    const protEl = document.getElementById("proteinInput");
+  // Intenta parsear el JSON pegado. Devuelve objeto {calorias, azucares_g, grasas_g, proteinas_g} o null.
+  function parseFromJsonOrNull() {
     const jsonText = document.getElementById("jsonChatGPT").value.trim();
-
-    const allEmpty =
-      !calEl.value && !sugEl.value && !fatEl.value && !protEl.value;
-
-    if (!allEmpty || !jsonText) {
-      return;
-    }
+    if (!jsonText) return null;
 
     let raw = jsonText;
     const match = raw.match(/\{[\s\S]*\}/);
-    if (match) {
-      raw = match[0];
-    }
+    if (match) raw = match[0];
 
     try {
       const data = JSON.parse(raw);
-      calEl.value = data.calorias ?? "";
-      sugEl.value = data.azucares_g ?? "";
-      fatEl.value = data.grasas_g ?? "";
-      protEl.value = data.proteinas_g ?? "";
+      return {
+        calorias: Number(data.calorias || 0),
+        azucares_g: Number(data.azucares_g || 0),
+        grasas_g: Number(data.grasas_g || 0),
+        proteinas_g: Number(data.proteinas_g || 0)
+      };
     } catch (e) {
-      console.warn("JSON inválido, no se pudo importar automáticamente.");
+      console.warn("JSON inválido:", e);
+      return null;
     }
+  }
+
+  function loadGoals() {
+    try {
+      const raw = localStorage.getItem(GOALS_KEY);
+      if (!raw) {
+        return { cal: 2000, prot: 70, fat: 60, sugar: 50 };
+      }
+      const obj = JSON.parse(raw);
+      return {
+        cal: Number(obj.cal || 0),
+        prot: Number(obj.prot || 0),
+        fat: Number(obj.fat || 0),
+        sugar: Number(obj.sugar || 0)
+      };
+    } catch (e) {
+      console.warn("Error leyendo metas:", e);
+      return { cal: 2000, prot: 70, fat: 60, sugar: 50 };
+    }
+  }
+
+  function saveGoals(goals) {
+    try {
+      localStorage.setItem(GOALS_KEY, JSON.stringify(goals));
+    } catch (e) {
+      console.warn("Error guardando metas:", e);
+    }
+  }
+
+  function renderGoalsUI() {
+    const g = loadGoals();
+    goalCalEl.value = g.cal || "";
+    goalProtEl.value = g.prot || "";
+    goalFatEl.value = g.fat || "";
+    goalSugarEl.value = g.sugar || "";
+  }
+
+  function saveGoalsFromUI() {
+    const cal = Number(goalCalEl.value || 0);
+    const prot = Number(goalProtEl.value || 0);
+    const fat = Number(goalFatEl.value || 0);
+    const sugar = Number(goalSugarEl.value || 0);
+
+    const goals = { cal, prot, fat, sugar };
+    saveGoals(goals);
+    goalsStatusEl.textContent = "Metas guardadas.";
+    goalsStatusEl.style.color = "#4ade80";
+
+    setTimeout(() => {
+      goalsStatusEl.textContent = "";
+    }, 2000);
+  }
+
+  function setProgressBar(barEl, value, goal) {
+    if (!barEl) return;
+    if (!goal || goal <= 0) {
+      barEl.style.width = "0%";
+      return;
+    }
+    let pct = (value / goal) * 100;
+    if (pct > 150) pct = 150;
+    barEl.style.width = pct + "%";
   }
 
   function loadMeals() {
@@ -705,6 +861,32 @@ Rellena los valores con números (pueden ser decimales).
     document.getElementById("sumSugar").textContent = totals.sugar.toFixed(1);
     document.getElementById("sumFat").textContent = totals.fat.toFixed(1);
     document.getElementById("sumProtein").textContent = totals.prot.toFixed(1);
+
+    const goals = loadGoals();
+
+    const progressCalText = document.getElementById("progressCalText");
+    const progressSugarText = document.getElementById("progressSugarText");
+    const progressFatText = document.getElementById("progressFatText");
+    const progressProtText = document.getElementById("progressProtText");
+
+    progressCalText.textContent = `${totals.cal.toFixed(1)} / ${goals.cal || 0}`;
+    progressSugarText.textContent = `${totals.sugar.toFixed(1)} / ${goals.sugar || 0}`;
+    progressFatText.textContent = `${totals.fat.toFixed(1)} / ${goals.fat || 0}`;
+    progressProtText.textContent = `${totals.prot.toFixed(1)} / ${goals.prot || 0}`;
+
+    setProgressBar(document.getElementById("progressCalBar"), totals.cal, goals.cal);
+    setProgressBar(document.getElementById("progressSugarBar"), totals.sugar, goals.sugar);
+    setProgressBar(document.getElementById("progressFatBar"), totals.fat, goals.fat);
+    setProgressBar(document.getElementById("progressProtBar"), totals.prot, goals.prot);
+
+    const noteEl = document.getElementById("progressNote");
+    if (goals.cal && totals.cal > goals.cal * 1.1) {
+      noteEl.textContent = "Parece que ya superaste tu meta de calorías para hoy. Revisá si querés ajustar comidas posteriores.";
+    } else if (goals.cal && totals.cal < goals.cal * 0.5) {
+      noteEl.textContent = "Vas por debajo de la mitad de tu meta de calorías. Asegurate de no saltearte comidas importantes.";
+    } else {
+      noteEl.textContent = "";
+    }
 
     if (todaysMeals.length === 0) {
       list.innerHTML = '<span class="small-helper">Todavía no hay registros hoy.</span>';
@@ -801,22 +983,14 @@ Rellena los valores con números (pueden ser decimales).
     }
 
     saveTemplates(templates);
-    checkTemplateForCurrentItems();
+    updateTemplateSuggestion();
   }
 
   function resetMealForm() {
     currentItems = [];
     renderItemsList();
-
-    document.getElementById("caloriesInput").value = "";
-    document.getElementById("sugarInput").value = "";
-    document.getElementById("fatInput").value = "";
-    document.getElementById("proteinInput").value = "";
-
     document.getElementById("jsonChatGPT").value = "";
-
     templateSuggestionEl.textContent = "";
-    btnUseTemplate.style.display = "none";
   }
 
   function saveMeal() {
@@ -829,44 +1003,26 @@ Rellena los valores con números (pueden ser decimales).
       return;
     }
 
-    // 1) Si campos vacíos y hay JSON válido -> importar
-    tryAutoImportJson();
+    let parsed = parseFromJsonOrNull();
+    let cal = 0, azu = 0, gra = 0, pro = 0;
 
-    let calEl = document.getElementById("caloriesInput");
-    let sugEl = document.getElementById("sugarInput");
-    let fatEl = document.getElementById("fatInput");
-    let protEl = document.getElementById("proteinInput");
-
-    let calVal = calEl.value;
-    let sugVal = sugEl.value;
-    let fatVal = fatEl.value;
-    let protVal = protEl.value;
-
-    const allEmptyNow = !calVal && !sugVal && !fatVal && !protVal;
-
-    // 2) Si sigue todo vacío, intentamos usar template aprendido
-    if (allEmptyNow) {
+    if (parsed) {
+      cal = parsed.calorias;
+      azu = parsed.azucares_g;
+      gra = parsed.grasas_g;
+      pro = parsed.proteinas_g;
+    } else {
       const t = getTemplateForCurrentItems();
       if (t) {
-        calVal = t.calorias ?? "";
-        sugVal = t.azucares_g ?? "";
-        fatVal = t.grasas_g ?? "";
-        protVal = t.proteinas_g ?? "";
-
-        calEl.value = calVal;
-        sugEl.value = sugVal;
-        fatEl.value = fatVal;
-        protEl.value = protVal;
+        cal = t.calorias || 0;
+        azu = t.azucares_g || 0;
+        gra = t.grasas_g || 0;
+        pro = t.proteinas_g || 0;
       }
     }
 
-    const cal = Number(calVal || 0);
-    const azu = Number(sugVal || 0);
-    const gra = Number(fatVal || 0);
-    const pro = Number(protVal || 0);
-
     if (!cal && !azu && !gra && !pro) {
-      status.textContent = "Cargá algún dato nutricional (manual, ChatGPT o valores aprendidos).";
+      status.textContent = "Pegá el resultado de ChatGPT o usá una comida ya aprendida.";
       status.style.color = "var(--danger)";
       return;
     }
@@ -899,10 +1055,63 @@ Rellena los valores con números (pueden ser decimales).
       saveTemplateForCurrentItems(cal, azu, gra, pro);
       loadMeals();
       resetMealForm();
+
+      lastMealTime = Date.now();
     } catch (e) {
       status.textContent = "No se pudo guardar (revisá espacio/permisos).";
       status.style.color = "var(--danger)";
     }
+  }
+
+  function loadReminderSettings() {
+    try {
+      const raw = localStorage.getItem(REMINDER_KEY);
+      if (!raw) return { enabled: false, intervalMinutes: 180 };
+      const obj = JSON.parse(raw);
+      return {
+        enabled: !!obj.enabled,
+        intervalMinutes: Number(obj.intervalMinutes || 180)
+      };
+    } catch (e) {
+      console.warn("Error leyendo recordatorio:", e);
+      return { enabled: false, intervalMinutes: 180 };
+    }
+  }
+
+  function saveReminderSettings(settings) {
+    try {
+      localStorage.setItem(REMINDER_KEY, JSON.stringify(settings));
+    } catch (e) {
+      console.warn("Error guardando recordatorio:", e);
+    }
+  }
+
+  function setupReminderTimer() {
+    const settings = loadReminderSettings();
+
+    if (reminderTimer) {
+      clearInterval(reminderTimer);
+      reminderTimer = null;
+    }
+
+    if (!settings.enabled) return;
+
+    const intervalMs = 60 * 1000; // chequeo cada 1 minuto
+    reminderTimer = setInterval(() => {
+      const now = Date.now();
+      const diffMinutes = (now - lastMealTime) / (60 * 1000);
+      if (diffMinutes >= settings.intervalMinutes) {
+        alert("Recordatorio: revisá si comiste o registraste tu comida/colación.");
+        lastMealTime = Date.now();
+      }
+    }, intervalMs);
+  }
+
+  function initReminderUI() {
+    const settings = loadReminderSettings();
+    reminderEnabledEl.checked = settings.enabled;
+    reminderIntervalEl.value = String(settings.intervalMinutes);
+    setupReminderTimer();
   }
 
   btnSummary.addEventListener("click", () => {
@@ -917,7 +1126,28 @@ Rellena los valores con números (pueden ser decimales).
   document.getElementById("btnAddItem").addEventListener("click", addItem);
   document.getElementById("btnOpenChatGPT").addEventListener("click", openChatGPT);
   document.getElementById("btnSaveMeal").addEventListener("click", saveMeal);
+  document.getElementById("btnSaveGoals").addEventListener("click", saveGoalsFromUI);
 
+  reminderEnabledEl.addEventListener("change", () => {
+    const settings = {
+      enabled: reminderEnabledEl.checked,
+      intervalMinutes: Number(reminderIntervalEl.value || 180)
+    };
+    saveReminderSettings(settings);
+    setupReminderTimer();
+  });
+
+  reminderIntervalEl.addEventListener("change", () => {
+    const settings = {
+      enabled: reminderEnabledEl.checked,
+      intervalMinutes: Number(reminderIntervalEl.value || 180)
+    };
+    saveReminderSettings(settings);
+    setupReminderTimer();
+  });
+
+  renderGoalsUI();
+  initReminderUI();
   loadMeals();
   renderItemsList();
 </script>
