@@ -160,25 +160,6 @@
       margin-top: 8px;
     }
 
-    .badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      font-size: 11px;
-      padding: 4px 9px;
-      border-radius: 999px;
-      border: 1px solid rgba(148, 163, 255, 0.55);
-      background: rgba(8, 12, 32, 0.95);
-      margin-top: 6px;
-    }
-
-    .status {
-      margin-top: 8px;
-      font-size: 13px;
-      min-height: 18px;
-      color: var(--text-muted);
-    }
-
     .portion-row {
       display: flex;
       gap: 8px;
@@ -246,6 +227,19 @@
       overflow-y: auto;
     }
 
+    .overlay-back {
+      width: 100%;
+      display: flex;
+      justify-content: flex-start;
+      margin-bottom: 8px;
+    }
+
+    .overlay-back .btn {
+      width: auto;
+      padding-inline: 14px;
+      font-size: 13px;
+    }
+
     .summary-row {
       display: flex;
       justify-content: space-between;
@@ -260,17 +254,45 @@
       font-size: 13px;
     }
 
+    .meal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .meal-header-left {
+      flex: 1;
+    }
+
+    .meal-delete-btn {
+      border-radius: 999px;
+      border: none;
+      padding: 4px 10px;
+      font-size: 11px;
+      cursor: pointer;
+      background: rgba(239, 68, 68, 0.15);
+      color: #fecaca;
+      white-space: nowrap;
+    }
+
     .meal-item strong {
       font-size: 13px;
     }
 
-    /* Botones principales bien visibles y anchos */
     #btnOpenChatGPT,
     #btnSaveMeal {
       width: 100%;
       margin-top: 12px;
       font-size: 15px;
       padding: 12px 18px;
+    }
+
+    .status {
+      margin-top: 8px;
+      font-size: 13px;
+      min-height: 18px;
+      color: var(--text-muted);
     }
   </style>
 </head>
@@ -383,10 +405,13 @@
 <!-- OVERLAY RESUMEN -->
 <div class="overlay" id="summaryOverlay">
   <div class="overlay-inner">
-    <button class="btn btn-secondary btn-small" id="btnCloseSummary">
-      ← Volver
-    </button>
-    <h2 style="margin:10px 0 4px;">Resumen de hoy</h2>
+    <div class="overlay-back">
+      <button class="btn btn-secondary btn-small" id="btnCloseSummary">
+        ← Volver al registro
+      </button>
+    </div>
+
+    <h2 style="margin:4px 0 4px;">Resumen de hoy</h2>
 
     <div id="summary">
       <div class="summary-row">
@@ -532,16 +557,20 @@
     }
   }
 
-  function checkTemplateForCurrentItems() {
+  function getTemplateForCurrentItems() {
     const key = buildMealKey(currentItems);
-    if (!key) {
+    if (!key) return null;
+    const templates = loadTemplates();
+    return templates[key] || null;
+  }
+
+  function checkTemplateForCurrentItems() {
+    const t = getTemplateForCurrentItems();
+    if (!currentItems.length) {
       templateSuggestionEl.textContent = "";
       btnUseTemplate.style.display = "none";
       return;
     }
-
-    const templates = loadTemplates();
-    const t = templates[key];
 
     if (t) {
       templateSuggestionEl.textContent =
@@ -561,7 +590,6 @@
     }
   }
 
-  // PROMPT para ChatGPT
   function buildPrompt() {
     const mealType = document.getElementById("mealType").value;
     if (currentItems.length === 0) {
@@ -612,7 +640,6 @@ Rellena los valores con números (pueden ser decimales).
     window.open(url, "_blank");
   }
 
-  // Importación automática desde el texto pegado
   function tryAutoImportJson() {
     const calEl = document.getElementById("caloriesInput");
     const sugEl = document.getElementById("sugarInput");
@@ -656,48 +683,96 @@ Rellena los valores con números (pueden ser decimales).
     const today = new Date();
     const todayStr = today.toISOString().slice(0, 10);
 
-    const todaysMeals = all.filter(m => m.date.startsWith(todayStr));
-
-    const sumCal = todaysMeals.reduce((acc, m) => acc + (m.calorias || 0), 0);
-    const sumSugar = todaysMeals.reduce((acc, m) => acc + (m.azucares_g || 0), 0);
-    const sumFat = todaysMeals.reduce((acc, m) => acc + (m.grasas_g || 0), 0);
-    const sumProtein = todaysMeals.reduce((acc, m) => acc + (m.proteinas_g || 0), 0);
-
-    document.getElementById("sumCal").textContent = sumCal.toFixed(1);
-    document.getElementById("sumSugar").textContent = sumSugar.toFixed(1);
-    document.getElementById("sumFat").textContent = sumFat.toFixed(1);
-    document.getElementById("sumProtein").textContent = sumProtein.toFixed(1);
-
     const list = document.getElementById("mealsList");
     list.innerHTML = "";
+
+    let todaysMeals = [];
+    let totals = { cal: 0, sugar: 0, fat: 0, prot: 0 };
+
+    all.forEach((m, idx) => {
+      if (!m.date) return;
+      if (!m.date.startsWith(todayStr)) return;
+
+      todaysMeals.push({ meal: m, index: idx });
+
+      totals.cal += m.calorias || 0;
+      totals.sugar += m.azucares_g || 0;
+      totals.fat += m.grasas_g || 0;
+      totals.prot += m.proteinas_g || 0;
+    });
+
+    document.getElementById("sumCal").textContent = totals.cal.toFixed(1);
+    document.getElementById("sumSugar").textContent = totals.sugar.toFixed(1);
+    document.getElementById("sumFat").textContent = totals.fat.toFixed(1);
+    document.getElementById("sumProtein").textContent = totals.prot.toFixed(1);
 
     if (todaysMeals.length === 0) {
       list.innerHTML = '<span class="small-helper">Todavía no hay registros hoy.</span>';
       return;
     }
 
-    todaysMeals.forEach(m => {
+    todaysMeals.forEach(({ meal, index }) => {
       const div = document.createElement("div");
       div.className = "meal-item";
 
-      const itemsHtml = (m.items || [])
+      const itemsHtml = (meal.items || [])
         .map(i => "- " + formatItemText(i))
         .join("<br/>");
 
-      div.innerHTML = `
-        <strong>${m.tipo}</strong> · ${new Date(m.date).toLocaleTimeString()}
-        <br/>
-        ${itemsHtml || ""}
-        <br/>
+      const header = document.createElement("div");
+      header.className = "meal-header";
+
+      const left = document.createElement("div");
+      left.className = "meal-header-left";
+      left.innerHTML = `
+        <strong>${meal.tipo}</strong> · ${new Date(meal.date).toLocaleTimeString()}
+      `;
+
+      const btnDel = document.createElement("button");
+      btnDel.className = "meal-delete-btn";
+      btnDel.textContent = "🗑 Eliminar";
+      btnDel.onclick = () => deleteMeal(index);
+
+      header.appendChild(left);
+      header.appendChild(btnDel);
+
+      const body = document.createElement("div");
+      body.innerHTML = `
+        <div style="margin-top:4px;">${itemsHtml || ""}</div>
         <span class="small-helper">
-          ${m.calorias?.toFixed?.(1) || m.calorias || 0} kcal ·
-          ${m.proteinas_g?.toFixed?.(1) || m.proteinas_g || 0} g prot ·
-          ${m.grasas_g?.toFixed?.(1) || m.grasas_g || 0} g grasa ·
-          ${m.azucares_g?.toFixed?.(1) || m.azucares_g || 0} g azúcar
+          ${meal.calorias?.toFixed?.(1) || meal.calorias || 0} kcal ·
+          ${meal.proteinas_g?.toFixed?.(1) || meal.proteinas_g || 0} g prot ·
+          ${meal.grasas_g?.toFixed?.(1) || meal.grasas_g || 0} g grasa ·
+          ${meal.azucares_g?.toFixed?.(1) || meal.azucares_g || 0} g azúcar
         </span>
       `;
+
+      div.appendChild(header);
+      div.appendChild(body);
       list.appendChild(div);
     });
+  }
+
+  function deleteMeal(globalIndex) {
+    let all = [];
+    try {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if (raw) all = JSON.parse(raw);
+    } catch (e) {
+      console.warn("Error leyendo meals para borrar:", e);
+    }
+
+    if (globalIndex < 0 || globalIndex >= all.length) return;
+
+    all.splice(globalIndex, 1);
+
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(all));
+    } catch (e) {
+      console.warn("Error guardando meals tras borrar:", e);
+    }
+
+    loadMeals();
   }
 
   function saveTemplateForCurrentItems(cal, azu, gra, pro) {
@@ -754,16 +829,44 @@ Rellena los valores con números (pueden ser decimales).
       return;
     }
 
-    // Si los campos están vacíos y hay texto pegado, importamos automáticamente
+    // 1) Si campos vacíos y hay JSON válido -> importar
     tryAutoImportJson();
 
-    const cal = Number(document.getElementById("caloriesInput").value || 0);
-    const azu = Number(document.getElementById("sugarInput").value || 0);
-    const gra = Number(document.getElementById("fatInput").value || 0);
-    const pro = Number(document.getElementById("proteinInput").value || 0);
+    let calEl = document.getElementById("caloriesInput");
+    let sugEl = document.getElementById("sugarInput");
+    let fatEl = document.getElementById("fatInput");
+    let protEl = document.getElementById("proteinInput");
+
+    let calVal = calEl.value;
+    let sugVal = sugEl.value;
+    let fatVal = fatEl.value;
+    let protVal = protEl.value;
+
+    const allEmptyNow = !calVal && !sugVal && !fatVal && !protVal;
+
+    // 2) Si sigue todo vacío, intentamos usar template aprendido
+    if (allEmptyNow) {
+      const t = getTemplateForCurrentItems();
+      if (t) {
+        calVal = t.calorias ?? "";
+        sugVal = t.azucares_g ?? "";
+        fatVal = t.grasas_g ?? "";
+        protVal = t.proteinas_g ?? "";
+
+        calEl.value = calVal;
+        sugEl.value = sugVal;
+        fatEl.value = fatVal;
+        protEl.value = protVal;
+      }
+    }
+
+    const cal = Number(calVal || 0);
+    const azu = Number(sugVal || 0);
+    const gra = Number(fatVal || 0);
+    const pro = Number(protVal || 0);
 
     if (!cal && !azu && !gra && !pro) {
-      status.textContent = "Cargá algún dato nutricional (manual o desde ChatGPT).";
+      status.textContent = "Cargá algún dato nutricional (manual, ChatGPT o valores aprendidos).";
       status.style.color = "var(--danger)";
       return;
     }
@@ -802,7 +905,6 @@ Rellena los valores con números (pueden ser decimales).
     }
   }
 
-  // Eventos resumen
   btnSummary.addEventListener("click", () => {
     loadMeals();
     summaryOverlay.style.display = "flex";
@@ -812,12 +914,10 @@ Rellena los valores con números (pueden ser decimales).
     summaryOverlay.style.display = "none";
   });
 
-  // Eventos principales
   document.getElementById("btnAddItem").addEventListener("click", addItem);
   document.getElementById("btnOpenChatGPT").addEventListener("click", openChatGPT);
   document.getElementById("btnSaveMeal").addEventListener("click", saveMeal);
 
-  // Inicial
   loadMeals();
   renderItemsList();
 </script>
