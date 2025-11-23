@@ -212,8 +212,8 @@
 
     .back-btn {
       border: none;
-      background: rgba(255, 255, 255, 0.04);
-      color: var(--text-main);
+      background: var(--accent);
+      color: #ffffff;
       border-radius: 999px;
       padding: 6px 12px;
       display: inline-flex;
@@ -221,6 +221,7 @@
       gap: 6px;
       font-size: 13px;
       cursor: pointer;
+      box-shadow: 0 8px 18px rgba(255, 79, 216, 0.5);
     }
 
     .header-row h2 {
@@ -411,10 +412,6 @@
           </select>
           <input id="alimento-input" type="text" placeholder="Alimento" />
         </div>
-        <p class="helper-text">
-          Atajo opcional: completá cantidad, unidad y alimento (ej: 1 · taza · café)
-          y se arma automáticamente "1 taza de café".
-        </p>
       </div>
 
       <button id="btn-generar-prompt" class="btn btn-primary">
@@ -432,10 +429,6 @@
           id="json-chatgpt"
           placeholder='{"calorias":120,"azucares_g":10,"grasas_g":4,"proteinas_g":6}'
         ></textarea>
-        <p class="helper-text">
-          Pegá exactamente el JSON que te devolvió ChatGPT, en una sola línea,
-          con las claves: calorias, azucares_g, grasas_g, proteinas_g.
-        </p>
       </div>
 
       <button id="btn-agregar" class="btn btn-success">
@@ -913,17 +906,15 @@ Rellena los valores con números (pueden ser decimales).
       summaryContent
         .querySelectorAll("button.btn-danger")
         .forEach((btn) => {
-          btn.addEventListener("click", () => {
-            const index = Number(btn.getAttribute("data-idx"));
-            const logs2 = getLogs();
-            const arr = logs2[hoy] || [];
-            if (index >= 0 && index < arr.length) {
-              arr.splice(index, 1);
-              logs2[hoy] = arr;
-              setLogs(logs2);
-              renderSummary();
-            }
-          });
+          const index = Number(btn.getAttribute("data-idx"));
+          const logs2 = getLogs();
+          const arr = logs2[hoy] || [];
+          if (index >= 0 && index < arr.length) {
+            arr.splice(index, 1);
+            logs2[hoy] = arr;
+            setLogs(logs2);
+            renderSummary();
+          }
         });
     }
 
@@ -949,10 +940,13 @@ Rellena los valores con números (pueden ser decimales).
         </p>
       `;
 
-      entries.forEach(([descNorm, v]) => {
+      entries.forEach(([descNorm, v], idx) => {
         html += `
           <div class="db-item">
-            <div class="db-desc">${descNorm}</div>
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:2px;">
+              <div class="db-desc">${descNorm}</div>
+              <button class="btn btn-danger db-del" data-idx="${idx}">🗑 Eliminar</button>
+            </div>
             <div class="db-macros">
               ${v.calorias.toFixed(1)} kcal ·
               ${v.proteinas_g.toFixed(1)} g prot ·
@@ -964,6 +958,18 @@ Rellena los valores con números (pueden ser decimales).
       });
 
       dbContent.innerHTML = html;
+
+      dbContent.querySelectorAll("button.db-del").forEach((btn) => {
+        const idx = Number(btn.getAttribute("data-idx"));
+        const [key] = entries[idx];
+        const dbNow = getFoodDB();
+        delete dbNow[key];
+        btn.addEventListener("click", () => {
+          delete dbNow[key];
+          setFoodDB(dbNow);
+          renderDB();
+        });
+      });
     }
 
     setStatus("");
