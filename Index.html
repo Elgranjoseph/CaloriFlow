@@ -1,471 +1,116 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8" />
-  <title>CaloriFlow</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <style>
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    body {
-      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-      background: radial-gradient(circle at top, #1f2937, #020617);
-      color: #e5e7eb;
-      min-height: 100vh;
-    }
-    .app { max-width: 480px; margin: 0 auto; padding: 16px 12px 40px; }
-    h1 { font-size: 1.6rem; font-weight: 700; margin-bottom: 8px; }
-    .subtitle { font-size: 0.9rem; color: #9ca3af; margin-bottom: 18px; }
-    .card {
-      background: rgba(15, 23, 42, 0.96);
-      border-radius: 18px;
-      padding: 16px 14px 18px;
-      box-shadow: 0 18px 35px rgba(15,23,42,0.7);
-      border: 1px solid rgba(148, 163, 184, 0.15);
-    }
-    label {
-      font-size: 0.85rem;
-      color: #cbd5f5;
-      margin-bottom: 4px;
-      display: block;
-    }
-    select, textarea, input[type="text"], input[type="number"] {
-      width: 100%;
-      border-radius: 12px;
-      border: 1px solid rgba(148, 163, 184, 0.5);
-      background: rgba(15, 23, 42, 0.9);
-      padding: 10px 11px;
-      font-size: 0.92rem;
-      color: #e5e7eb;
-      outline: none;
-    }
-    textarea { min-height: 70px; resize: vertical; }
-    select:focus, textarea:focus, input:focus {
-      border-color: #6366f1;
-      box-shadow: 0 0 0 1px rgba(99, 102, 241, 0.7);
-    }
-    .field { margin-bottom: 10px; }
-
-    .quick-row {
-      display: grid;
-      grid-template-columns: 70px 110px 1fr;
-      gap: 6px;
-      margin-top: 4px;
-    }
-    .btn-row {
-      display: flex;
-      flex-direction: column;  /* apilados para que no se salgan de pantalla */
-      gap: 8px;
-      margin: 10px 0 4px;
-    }
-    button {
-      border: none;
-      border-radius: 999px;
-      padding: 11px 14px;
-      font-size: 0.94rem;
-      font-weight: 600;
-      cursor: pointer;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      gap: 6px;
-      transition: transform 0.08s ease, box-shadow 0.12s ease, background 0.12s ease;
-      white-space: nowrap;
-    }
-    button:active { transform: scale(0.97); }
-    .btn-primary {
-      width: 100%;
-      background: linear-gradient(135deg, #22c55e, #16a34a);
-      color: white;
-      box-shadow: 0 12px 24px rgba(34, 197, 94, 0.55);
-    }
-    .btn-secondary {
-      width: 100%;
-      background: rgba(30, 64, 175, 0.9);
-      color: #e5e7eb;
-      box-shadow: 0 12px 24px rgba(37, 99, 235, 0.5);
-    }
-    .btn-outline {
-      width: 100%;
-      margin-top: 10px;
-      background: transparent;
-      border-radius: 999px;
-      border: 1px solid rgba(148, 163, 184, 0.7);
-      color: #e5e7eb;
-    }
-    .btn-outline-small {
-      margin-top: 6px;
-      background: transparent;
-      border-radius: 999px;
-      border: 1px solid rgba(148, 163, 184, 0.6);
-      color: #e5e7eb;
-      font-size: 0.8rem;
-      padding: 6px 10px;
-      width: auto;
-    }
-    .btn-danger-outline {
-      width: 100%;
-      margin-top: 8px;
-      background: transparent;
-      border-radius: 999px;
-      border: 1px solid rgba(239, 68, 68, 0.7);
-      color: #fecaca;
-      font-size: 0.85rem;
-    }
-    .small-note { font-size: 0.78rem; color: #9ca3af; margin-top: 6px; line-height: 1.3; }
-    .tag-suggestion { font-size: 0.8rem; color: #22c55e; margin-top: 4px; }
-
-    .view { display: none; }
-    .view.active { display: block; }
-    .top-back-btn {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      margin-bottom: 14px;
-      padding: 7px 11px;
-      border-radius: 999px;
-      border: 1px solid rgba(148, 163, 184, 0.6);
-      background: rgba(15, 23, 42, 0.95);
-      font-size: 0.84rem;
-      color: #e5e7eb;
-    }
-    .summary-title { font-size: 1.4rem; margin-bottom: 10px; font-weight: 700; }
-    .summary-row {
-      display: flex;
-      justify-content: space-between;
-      font-size: 0.92rem;
-      margin-bottom: 4px;
-    }
-    .summary-row span:last-child { font-weight: 600; }
-    .section-title { margin-top: 14px; margin-bottom: 4px; font-size: 0.96rem; font-weight: 600; }
-    .progress-bar {
-      width: 100%; height: 5px; border-radius: 999px;
-      background: rgba(30, 64, 175, 0.4);
-      overflow: hidden; margin-top: 3px; margin-bottom: 4px;
-    }
-    .progress-fill {
-      height: 100%; width: 0%;
-      background: linear-gradient(90deg, #22c55e, #16a34a);
-      transition: width 0.25s ease;
-    }
-    .goal-row {
-      font-size: 0.82rem;
-      display: flex;
-      justify-content: space-between;
-      margin-bottom: 4px;
-      color: #cbd5f5;
-    }
-    .advice-text { font-size: 0.82rem; color: #9ca3af; margin-top: 8px; }
-    .meals-list { margin-top: 8px; border-top: 1px solid rgba(55, 65, 81, 0.8); padding-top: 8px; }
-    .meal-item { padding: 8px 0; border-bottom: 1px solid rgba(31, 41, 55, 0.9); }
-    .meal-header-row {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      font-size: 0.82rem;
-      margin-bottom: 2px;
-    }
-    .meal-header-row strong { font-size: 0.86rem; }
-    .meal-source {
-      font-size: 0.75rem;
-      color: #c4b5fd;
-      margin-left: 6px;
-    }
-    .meal-time { color: #9ca3af; }
-    .meal-desc { font-size: 0.9rem; margin-bottom: 2px; }
-    .meal-macros { font-size: 0.8rem; color: #cbd5f5; }
-    .btn-delete {
-      border-radius: 999px;
-      padding: 4px 9px;
-      font-size: 0.78rem;
-      background: rgba(239, 68, 68, 0.16);
-      color: #fecaca;
-      border: 1px solid rgba(239, 68, 68, 0.5);
-      display: inline-flex;
-      align-items: center;
-      gap: 4px;
-    }
-  </style>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>CaloriFlow</title>
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    background: #0d1117;
+    color: white;
+    margin: 0;
+    padding: 20px;
+  }
+  h1 {
+    text-align: center;
+  }
+  .container {
+    background: #161b22;
+    padding: 20px;
+    border-radius: 10px;
+    max-width: 600px;
+    margin: auto;
+  }
+  select, textarea, button, input {
+    width: 100%;
+    margin-top: 10px;
+    padding: 12px;
+    border-radius: 8px;
+    border: none;
+    font-size: 16px;
+  }
+  button {
+    cursor: pointer;
+    font-weight: bold;
+  }
+  .btn-prompt {
+    background: #4169e1;
+    color: white;
+  }
+  .btn-add {
+    background: #2ecc71;
+    color: black;
+    font-size: 18px;
+  }
+  .btn-summary {
+    background: #f1c40f;
+    color: black;
+    font-weight: bold;
+  }
+  .small-note {
+    font-size: 13px;
+    color: #9ca3af;
+    margin-top: 5px;
+  }
+</style>
 </head>
+
 <body>
-  <div class="app">
-    <!-- REGISTRO -->
-    <div id="view-registro" class="view active">
-      <h1>CaloriFlow</h1>
-      <div class="subtitle">Registro diario con memoria propia.</div>
+<h1>CaloriFlow</h1>
 
-      <div class="card">
-        <div class="field">
-          <label for="tipoComida">Tipo de comida</label>
-          <select id="tipoComida">
-            <option>Desayuno</option>
-            <option>Almuerzo</option>
-            <option>Merienda</option>
-            <option>Cena</option>
-            <option>Snack</option>
-          </select>
-        </div>
+<div class="container">
 
-        <div class="field">
-          <label for="itemsInput">¿Qué comiste?</label>
-          <textarea id="itemsInput" placeholder="Ej: 1 taza de Café con leche&#10;1 tostada con mermelada"></textarea>
-        </div>
+  <label>Tipo de comida</label>
+  <select id="tipoComida">
+    <option>Desayuno</option>
+    <option>Almuerzo</option>
+    <option>Cena</option>
+    <option>Merienda</option>
+    <option>Snack</option>
+  </select>
 
-        <!-- Atajo para cantidad + unidad -->
-        <div class="field">
-          <label>Atajo para agregar ítem (cantidad + unidad)</label>
-          <div class="quick-row">
-            <input type="number" id="quickQty" min="1" value="1" />
-            <select id="quickUnit">
-              <option value="taza">taza</option>
-              <option value="vaso">vaso</option>
-              <option value="plato">plato</option>
-              <option value="porcion">porción</option>
-              <option value="unidad">unidad</option>
-            </select>
-            <input type="text" id="quickName" placeholder="Café con leche" />
-          </div>
-          <button id="btnQuickAdd" type="button" class="btn-outline-small">➕ Añadir a la lista</button>
-        </div>
+  <label>¿Qué comiste?</label>
+  <textarea id="items" placeholder="Ej: 1 taza de café con leche"></textarea>
 
-        <div class="btn-row">
-          <button id="btnPrompt" type="button" class="btn-secondary">
-            🧠 Generar prompt para ChatGPT
-          </button>
-          <button id="btnAddMeal" type="button" class="btn-primary">
-            ✔️ Agregar comida
-          </button>
-        </div>
+  <button class="btn-prompt" id="btnPrompt">
+    🧠 Generar prompt para ChatGPT
+  </button>
 
-        <div class="field" style="margin-top:8px;">
-          <label for="gptJsonInput">Pega aquí el resultado de ChatGPT (JSON)</label>
-          <textarea id="gptJsonInput" placeholder='{"calorias":120,"azucares_g":10,"grasas_g":4,"proteinas_g":6}'></textarea>
-        </div>
+  <label>Pega aquí el resultado de ChatGPT (JSON)</label>
+  <textarea id="jsonInput" placeholder='{"calorias":120,"azucares_g":10,"grasas_g":4,"proteinas_g":6}'></textarea>
 
-        <div id="templateHint" class="tag-suggestion"></div>
+  <button class="btn-add" id="btnAdd">
+    ✔️ Agregar comida
+  </button>
 
-        <button id="btnResumen" type="button" class="btn-outline">
-          📊 Ver resumen de hoy
-        </button>
-        <button id="btnReset" type="button" class="btn-danger-outline">
-          🧹 Resetear base aprendida y comidas de hoy
-        </button>
-      </div>
+  <p id="statusMsg" class="small-note"></p>
 
-      <p class="small-note">
-        Si ya registraste una comida igual antes, podés dejar vacío el JSON y la app usará los valores que ya aprendió.
-      </p>
-    </div>
+  <button class="btn-summary" onclick="location.href='resumen.html'">
+    📊 Ver resumen de hoy
+  </button>
 
-    <!-- RESUMEN -->
-    <div id="view-resumen" class="view">
-      <button id="btnBack" type="button" class="top-back-btn">← Volver al registro</button>
+</div>
 
-      <div class="card">
-        <div class="summary-title">Resumen de hoy</div>
+<script>
+  // CARGAR BASE DE DATOS DE COMIDAS APRENDIDAS
+  let base = JSON.parse(localStorage.getItem("baseComidas") || "{}");
 
-        <div class="summary-row">
-          <span>Calorías totales:</span>
-          <span id="totalCalorias">0</span>
-        </div>
-        <div class="summary-row">
-          <span>Azúcares totales (g):</span>
-          <span id="totalAzucares">0</span>
-        </div>
-        <div class="summary-row">
-          <span>Grasas totales (g):</span>
-          <span id="totalGrasas">0</span>
-        </div>
-        <div class="summary-row">
-          <span>Proteínas totales (g):</span>
-          <span id="totalProteinas">0</span>
-        </div>
+  const tipoComidaSelect = document.getElementById("tipoComida");
+  const itemsInput = document.getElementById("items");
+  const jsonInput = document.getElementById("jsonInput");
+  const btnPrompt = document.getElementById("btnPrompt");
+  const btnAdd = document.getElementById("btnAdd");
+  const statusMsg = document.getElementById("statusMsg");
 
-        <div class="section-title">Progreso vs metas</div>
+  // ----------------------------
+  // GENERAR PROMPT PARA CHATGPT
+  // ----------------------------
+  btnPrompt.addEventListener("click", () => {
+    const tipo = tipoComidaSelect.value;
+    const items = itemsInput.value.trim();
 
-        <div class="goal-row">
-          <span>Calorías</span>
-          <span id="goalCaloriasLabel">0 / 0</span>
-        </div>
-        <div class="progress-bar"><div id="barCalorias" class="progress-fill"></div></div>
-
-        <div class="goal-row">
-          <span>Azúcares (g)</span>
-          <span id="goalAzucaresLabel">0 / 0</span>
-        </div>
-        <div class="progress-bar"><div id="barAzucares" class="progress-fill"></div></div>
-
-        <div class="goal-row">
-          <span>Grasas (g)</span>
-          <span id="goalGrasasLabel">0 / 0</span>
-        </div>
-        <div class="progress-bar"><div id="barGrasas" class="progress-fill"></div></div>
-
-        <div class="goal-row">
-          <span>Proteínas (g)</span>
-          <span id="goalProteinasLabel">0 / 0</span>
-        </div>
-        <div class="progress-bar"><div id="barProteinas" class="progress-fill"></div></div>
-
-        <p id="adviceText" class="advice-text"></p>
-
-        <div class="section-title">Comidas registradas</div>
-        <div id="mealsList" class="meals-list"></div>
-      </div>
-    </div>
-  </div>
-
-  <script>
-    const LS_MEALS_KEY = "caloriflow_meals_v4";
-    const LS_TEMPLATES_KEY = "caloriflow_templates_v4";
-    const LS_GOALS_KEY = "caloriflow_goals_v1";
-
-    function todayDateString() {
-      return new Date().toISOString().slice(0,10);
-    }
-    function normalizeText(str) {
-      if (!str) return "";
-      return str
-        .toLowerCase()
-        .normalize("NFD")
-        .replace(/[\u0300-\u036f]/g, "")
-        .replace(/\s+/g, " ")
-        .trim();
-    }
-    function buildMealKey(itemsArray) {
-      if (!itemsArray || !itemsArray.length) return "";
-      const normalized = itemsArray
-        .map(s => normalizeText(s))
-        .filter(s => s.length > 0)
-        .sort();
-      return normalized.join(" | ");
-    }
-    function loadJSON(key, fallback) {
-      try {
-        const raw = localStorage.getItem(key);
-        if (!raw) return fallback;
-        return JSON.parse(raw);
-      } catch { return fallback; }
-    }
-    function saveJSON(key, val) {
-      localStorage.setItem(key, JSON.stringify(val));
-    }
-
-    let mealsAll = loadJSON(LS_MEALS_KEY, []);
-    let templates = loadJSON(LS_TEMPLATES_KEY, {});
-    let goals = loadJSON(LS_GOALS_KEY, {
-      calorias: 2000,
-      azucares_g: 50,
-      grasas_g: 60,
-      proteinas_g: 70,
-    });
-
-    const viewRegistro = document.getElementById("view-registro");
-    const viewResumen  = document.getElementById("view-resumen");
-
-    const tipoComidaSelect = document.getElementById("tipoComida");
-    const itemsInput       = document.getElementById("itemsInput");
-    const gptJsonInput     = document.getElementById("gptJsonInput");
-    const btnPrompt        = document.getElementById("btnPrompt");
-    const btnAddMeal       = document.getElementById("btnAddMeal");
-    const btnResumen       = document.getElementById("btnResumen");
-    const btnBack          = document.getElementById("btnBack");
-    const btnReset         = document.getElementById("btnReset");
-    const templateHint     = document.getElementById("templateHint");
-
-    const quickQty   = document.getElementById("quickQty");
-    const quickUnit  = document.getElementById("quickUnit");
-    const quickName  = document.getElementById("quickName");
-    const btnQuickAdd= document.getElementById("btnQuickAdd");
-
-    const totalCaloriasEl  = document.getElementById("totalCalorias");
-    const totalAzucaresEl  = document.getElementById("totalAzucares");
-    const totalGrasasEl    = document.getElementById("totalGrasas");
-    const totalProteinasEl = document.getElementById("totalProteinas");
-
-    const barCalorias      = document.getElementById("barCalorias");
-    const barAzucares      = document.getElementById("barAzucares");
-    const barGrasas        = document.getElementById("barGrasas");
-    const barProteinas     = document.getElementById("barProteinas");
-
-    const goalCaloriasLabel  = document.getElementById("goalCaloriasLabel");
-    const goalAzucaresLabel  = document.getElementById("goalAzucaresLabel");
-    const goalGrasasLabel    = document.getElementById("goalGrasasLabel");
-    const goalProteinasLabel = document.getElementById("goalProteinasLabel");
-
-    const adviceText = document.getElementById("adviceText");
-    const mealsList  = document.getElementById("mealsList");
-
-    function getCurrentItemsArray() {
-      return itemsInput.value
-        .split("\n")
-        .map(s => s.trim())
-        .filter(s => s.length > 0);
-    }
-
-    function saveTemplateForCurrentItems(cal, azu, gra, pro) {
-      const items = getCurrentItemsArray();
-      const key = buildMealKey(items);
-      if (!key) return;
-      templates[key] = {
-        calorias: Number(cal) || 0,
-        azucares_g: Number(azu) || 0,
-        grasas_g: Number(gra) || 0,
-        proteinas_g: Number(pro) || 0,
-        updatedAt: new Date().toISOString(),
-      };
-      saveJSON(LS_TEMPLATES_KEY, templates);
-      updateTemplateSuggestion();
-    }
-
-    function getTemplateForCurrentItems() {
-      const items = getCurrentItemsArray();
-      const key = buildMealKey(items);
-      if (!key) return null;
-      return templates[key] || null;
-    }
-
-    function updateTemplateSuggestion() {
-      const tpl = getTemplateForCurrentItems();
-      if (!tpl) {
-        templateHint.textContent =
-          "ℹ️ Comida nueva para la app. Primero usá ChatGPT y guardá una vez.";
-      } else {
-        templateHint.textContent =
-          `✅ Aprendida: ${tpl.calorias} kcal · ${tpl.proteinas_g} g prot · ${tpl.grasas_g} g grasa · ${tpl.azucares_g} g azúcar`;
-      }
-    }
-
-    itemsInput.addEventListener("input", updateTemplateSuggestion);
-
-    // Atajo cantidad + unidad
-    btnQuickAdd.addEventListener("click", () => {
-      const qty = Number(quickQty.value) || 1;
-      const unit = quickUnit.value;
-      const name = (quickName.value || "").trim();
-      if (!name) {
-        alert("Escribí el nombre de la comida.");
-        return;
-      }
-      let line;
-      if (unit === "porcion" || unit === "unidad") {
-        line = `${qty} ${unit} ${name}`;
-      } else {
-        line = `${qty} ${unit} de ${name}`;
-      }
-      if (itemsInput.value.trim().length === 0) {
-        itemsInput.value = line;
-      } else {
-        itemsInput.value = itemsInput.value.trim() + "\n" + line;
-      }
-      quickName.value = "";
-      quickQty.value = 1;
-      updateTemplateSuggestion();
-    });
-
-    btnPrompt.addEventListener("click", () => {
-      const tipo = tipoComidaSelect.value;
-      const items = itemsInput.value.trim();
-      const prompt = `
+    const prompt = `
 Eres un nutricionista.
 
 Analiza la siguiente comida COMPLETA y devuelve los valores totales:
@@ -475,204 +120,80 @@ Tipo de comida: ${tipo}
 Ítems de la comida:
 ${items || "- (especifica la comida aquí)"}
 
-Quiero que estimes para toda la comida en conjunto:
+Quiero que estimes:
 - calorías totales (kcal)
 - gramos de azúcares
 - gramos de grasas
 - gramos de proteínas
 
-MUY IMPORTANTE:
+IMPORTANTE:
 - Responde SOLO un JSON válido.
-- SIN explicaciones, SIN comentarios, SIN texto antes o después.
+- SIN explicaciones, SIN comentarios.
 - NO uses bloques de código.
 
 Formato exacto:
-{"calorias": 0, "azucares_g": 0, "grasas_g": 0, "proteinas_g": 0}
+{"calorias":0,"azucares_g":0,"grasas_g":0,"proteinas_g":0}
 
-Rellena los valores con números (pueden ser decimales).`.trim();
+Rellena los valores con números (pueden ser decimales).`;
 
-      // Copia al portapapeles
-      if (navigator.clipboard && navigator.clipboard.writeText) {
-        navigator.clipboard.writeText(prompt).catch(() => {});
-      }
-      // Abre ChatGPT en una pestaña nueva
-      window.open("https://chatgpt.com", "_blank");
-      alert("Se copió el prompt. Pegalo en la conversación de ChatGPT que se abrió.");
-    });
+    navigator.clipboard.writeText(prompt).catch(()=>{});
 
-    btnAddMeal.addEventListener("click", () => {
-      const tipo = tipoComidaSelect.value;
-      const itemsArray = getCurrentItemsArray();
-      if (!itemsArray.length) {
-        alert("Escribe al menos una línea con lo que comiste.");
+    // ⚠️ ACÁ EL CAMBIO: usa chat.openai.com (funciona en tu celular)
+    window.open("https://chat.openai.com", "_blank");
+
+    alert("El prompt fue copiado. Pegalo directamente en tu ChatGPT.");
+  });
+
+  // -------------------------------------
+  // AGREGAR COMIDA Y GUARDAR EN MEMORIA
+  // -------------------------------------
+  btnAdd.addEventListener("click", () => {
+    const desc = itemsInput.value.trim();
+    if (!desc) {
+      statusMsg.textContent = "Escribí qué comiste antes de agregar.";
+      return;
+    }
+
+    // Si NO pegaste JSON, intento recuperar lo APRENDIDO
+    let obj = null;
+
+    if (jsonInput.value.trim() !== "") {
+      try {
+        obj = JSON.parse(jsonInput.value.trim());
+        base[desc] = obj;   // guardar aprendizaje
+        localStorage.setItem("baseComidas", JSON.stringify(base));
+      } catch {
+        statusMsg.textContent = "El JSON no es válido.";
         return;
       }
-
-      const jsonText = gptJsonInput.value.trim();
-      let datos = null;
-      let source = "";
-
-      if (jsonText) {
-        try {
-          const parsed = JSON.parse(jsonText);
-          const cal = Number(parsed.calorias) || 0;
-          const azu = Number(parsed.azucares_g) || 0;
-          const gra = Number(parsed.grasas_g) || 0;
-          const pro = Number(parsed.proteinas_g) || 0;
-          datos = { calorias: cal, azucares_g: azu, grasas_g: gra, proteinas_g: pro };
-          saveTemplateForCurrentItems(cal, azu, gra, pro);
-          source = "json";
-        } catch {
-          alert("El JSON de ChatGPT no es válido.");
-          return;
-        }
-      } else {
-        const tpl = getTemplateForCurrentItems();
-        if (!tpl) {
-          alert("Esta comida no está aún aprendida. Usá JSON al menos una vez.");
-          return;
-        }
-        datos = {
-          calorias: Number(tpl.calorias) || 0,
-          azucares_g: Number(tpl.azucares_g) || 0,
-          grasas_g: Number(tpl.grasas_g) || 0,
-          proteinas_g: Number(tpl.proteinas_g) || 0,
-        };
-        source = "memoria";
-      }
-
-      const now = new Date();
-      const meal = {
-        id: "m_" + now.getTime() + "_" + Math.random().toString(36).slice(2,7),
-        date: todayDateString(),
-        timestamp: now.toISOString(),
-        tipo,
-        descripcion: itemsArray.join(" · "),
-        source,
-        ...datos,
-      };
-
-      mealsAll.push(meal);
-      saveJSON(LS_MEALS_KEY, mealsAll);
-
-      gptJsonInput.value = "";
-      alert("Comida guardada.");
-      updateTemplateSuggestion();
-    });
-
-    btnResumen.addEventListener("click", () => showView("resumen"));
-    btnBack.addEventListener("click", () => showView("registro"));
-
-    btnReset.addEventListener("click", () => {
-      if (!confirm("¿Borrar comidas de hoy y base aprendida?")) return;
-      mealsAll = [];
-      templates = {};
-      saveJSON(LS_MEALS_KEY, mealsAll);
-      saveJSON(LS_TEMPLATES_KEY, templates);
-      updateTemplateSuggestion();
-      alert("Base interna reseteada.");
-    });
-
-    function getMealsForToday() {
-      const today = todayDateString();
-      return mealsAll.filter(m => (m.date || m.timestamp?.slice(0,10)) === today);
-    }
-
-    function showView(name) {
-      if (name === "registro") {
-        viewRegistro.classList.add("active");
-        viewResumen.classList.remove("active");
-      } else {
-        viewRegistro.classList.remove("active");
-        viewResumen.classList.add("active");
-        renderResumen();
-      }
-    }
-
-    function renderResumen() {
-      const mealsToday = getMealsForToday();
-
-      let tCal=0,tAz=0,tGr=0,tPr=0;
-      mealsToday.forEach(m => {
-        tCal += m.calorias || 0;
-        tAz  += m.azucares_g || 0;
-        tGr  += m.grasas_g || 0;
-        tPr  += m.proteinas_g || 0;
-      });
-
-      totalCaloriasEl.textContent = tCal.toFixed(1);
-      totalAzucaresEl.textContent = tAz.toFixed(1);
-      totalGrasasEl.textContent   = tGr.toFixed(1);
-      totalProteinasEl.textContent= tPr.toFixed(1);
-
-      goalCaloriasLabel.textContent  = `${tCal.toFixed(1)} / ${goals.calorias}`;
-      goalAzucaresLabel.textContent  = `${tAz.toFixed(1)} / ${goals.azucares_g}`;
-      goalGrasasLabel.textContent    = `${tGr.toFixed(1)} / ${goals.grasas_g}`;
-      goalProteinasLabel.textContent = `${tPr.toFixed(1)} / ${goals.proteinas_g}`;
-
-      function pct(v,g){ if(!g) return 0; return Math.max(0,Math.min(100,(v/g)*100)); }
-      barCalorias.style.width  = pct(tCal, goals.calorias)   + "%";
-      barAzucares.style.width  = pct(tAz, goals.azucares_g)  + "%";
-      barGrasas.style.width    = pct(tGr, goals.grasas_g)    + "%";
-      barProteinas.style.width = pct(tPr, goals.proteinas_g) + "%";
-
-      if (tCal < goals.calorias * 0.4) {
-        adviceText.textContent = "Vas por debajo de la mitad de tu meta calórica.";
-      } else if (tCal > goals.calorias * 1.1) {
-        adviceText.textContent = "Estás por encima de tu meta calórica diaria.";
-      } else {
-        adviceText.textContent = "Vas bastante alineado con tu meta.";
-      }
-
-      mealsList.innerHTML = "";
-      if (!mealsToday.length) {
-        mealsList.innerHTML =
-          '<p style="font-size:0.86rem;color:#9ca3af;">Todavía no registraste comidas hoy.</p>';
+    } else {
+      // no hay JSON → usar valores aprendidos
+      if (!base[desc]) {
+        statusMsg.textContent =
+          "Comida nueva: primero generá el JSON con ChatGPT.";
         return;
       }
-
-      for (const m of mealsToday) {
-        const div = document.createElement("div");
-        div.className = "meal-item";
-        const hora = new Date(m.timestamp).toLocaleTimeString([], {hour:"2-digit",minute:"2-digit"});
-        const fuente = m.source === "memoria" ? "[MEMORIA]" : "[JSON]";
-
-        div.innerHTML = `
-          <div class="meal-header-row">
-            <div>
-              <strong>${m.tipo}</strong>
-              <span class="meal-source">${fuente}</span>
-            </div>
-            <span class="meal-time">${hora}</span>
-          </div>
-          <div class="meal-desc">- ${m.descripcion}</div>
-          <div class="meal-macros">
-            ${m.calorias.toFixed(1)} kcal ·
-            ${m.proteinas_g.toFixed(1)} g prot ·
-            ${m.grasas_g.toFixed(1)} g grasa ·
-            ${m.azucares_g.toFixed(1)} g azúcar
-          </div>
-          <div style="margin-top:4px;">
-            <button type="button" class="btn-delete" data-id="${m.id}">
-              🗑 Eliminar
-            </button>
-          </div>
-        `;
-        mealsList.appendChild(div);
-      }
-
-      mealsList.querySelectorAll(".btn-delete").forEach(btn => {
-        btn.addEventListener("click", () => {
-          const id = btn.getAttribute("data-id");
-          if (!confirm("¿Eliminar esta comida?")) return;
-          mealsAll = mealsAll.filter(m => m.id !== id);
-          saveJSON(LS_MEALS_KEY, mealsAll);
-          renderResumen();
-        });
-      });
+      obj = base[desc];
     }
 
-    updateTemplateSuggestion();
-  </script>
+    let comidas = JSON.parse(localStorage.getItem("comidasHoy") || "[]");
+
+    comidas.push({
+      tipo: tipoComidaSelect.value,
+      descripcion: desc,
+      ...obj,
+      hora: new Date().toLocaleTimeString()
+    });
+
+    localStorage.setItem("comidasHoy", JSON.stringify(comidas));
+
+    statusMsg.textContent = "Comida guardada ✔️";
+
+    // limpiar inputs
+    itemsInput.value = "";
+    jsonInput.value = "";
+  });
+</script>
+
 </body>
 </html>
