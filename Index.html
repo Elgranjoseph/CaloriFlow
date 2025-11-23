@@ -138,6 +138,13 @@
       box-shadow: 0 10px 25px rgba(255, 200, 87, 0.5);
     }
 
+    .btn-secondary {
+      background: rgba(255, 255, 255, 0.06);
+      color: var(--text-main);
+      box-shadow: 0 6px 16px rgba(0, 0, 0, 0.5);
+      font-size: 14px;
+    }
+
     .btn-danger {
       background: rgba(255, 79, 106, 0.1);
       color: var(--danger);
@@ -191,11 +198,11 @@
       cursor: pointer;
     }
 
-    /* RESUMEN VIEW */
-
     .hidden {
       display: none;
     }
+
+    /* Resumen & DB */
 
     .header-row {
       display: flex;
@@ -325,6 +332,43 @@
       padding: 4px 8px;
     }
 
+    .db-item {
+      border-top: 1px solid rgba(255, 255, 255, 0.06);
+      padding-top: 8px;
+      margin-top: 8px;
+      font-size: 13px;
+    }
+
+    .db-desc {
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+
+    .db-macros {
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+
+    /* fila cantidad + unidad + alimento */
+
+    .unit-row {
+      display: flex;
+      gap: 6px;
+      margin-top: 4px;
+    }
+
+    .unit-row input[type="number"] {
+      max-width: 70px;
+    }
+
+    .unit-row select {
+      max-width: 110px;
+    }
+
+    .unit-row input[type="text"] {
+      flex: 1;
+    }
+
     @media (min-width: 480px) {
       .card {
         padding: 22px 22px 24px;
@@ -356,6 +400,21 @@
           id="descripcion-comida"
           placeholder="Ej: 1 taza de café con leche"
         ></textarea>
+        <div class="unit-row">
+          <input id="cantidad-input" type="number" min="0.1" step="0.1" placeholder="Cant." />
+          <select id="unidad-select">
+            <option value="taza">taza</option>
+            <option value="vaso">vaso</option>
+            <option value="plato">plato</option>
+            <option value="porción">porción</option>
+            <option value="unidad">unidad</option>
+          </select>
+          <input id="alimento-input" type="text" placeholder="Alimento" />
+        </div>
+        <p class="helper-text">
+          Atajo opcional: completá cantidad, unidad y alimento (ej: 1 · taza · café)
+          y se arma automáticamente "1 taza de café".
+        </p>
       </div>
 
       <button id="btn-generar-prompt" class="btn btn-primary">
@@ -363,8 +422,8 @@
         <span>Generar prompt para ChatGPT</span>
       </button>
       <p class="helper-text">
-        Se copiará el prompt al portapapeles y se abrirá ChatGPT. Pegás el
-        prompt, copiás el JSON y lo traés acá.
+        Se copiará el prompt al portapapeles y se abrirá ChatGPT. Solo pegás el
+        prompt, copiás el JSON de respuesta y lo traés acá.
       </p>
 
       <div class="field-group" style="margin-top: 12px;">
@@ -374,8 +433,8 @@
           placeholder='{"calorias":120,"azucares_g":10,"grasas_g":4,"proteinas_g":6}'
         ></textarea>
         <p class="helper-text">
-          Debe ser un JSON válido con las claves: calorias, azucares_g,
-          grasas_g, proteinas_g.
+          Pegá exactamente el JSON que te devolvió ChatGPT, en una sola línea,
+          con las claves: calorias, azucares_g, grasas_g, proteinas_g.
         </p>
       </div>
 
@@ -389,10 +448,15 @@
         <span>Ver resumen de hoy</span>
       </button>
 
+      <button id="btn-ver-db" class="btn btn-secondary">
+        <span class="emoji">📚</span>
+        <span>Ver base aprendida</span>
+      </button>
+
       <p id="status-text" class="status-text"></p>
 
       <div class="tiny-link">
-        Base y registro se guardan solo en este dispositivo.
+        Todo se guarda solo en este dispositivo.
         <button id="btn-reset">Resetear base aprendida y comidas de hoy</button>
       </div>
     </div>
@@ -400,24 +464,31 @@
     <!-- VISTA RESUMEN -->
     <div id="resumen-view" class="card hidden">
       <div class="header-row">
-        <button id="btn-volver" class="back-btn">
+        <button id="btn-volver-registro" class="back-btn">
           ← Volver al registro
         </button>
         <h2>Resumen de hoy</h2>
       </div>
 
-      <div id="summary-content">
-        <!-- Se rellena por JS -->
+      <div id="summary-content"></div>
+    </div>
+
+    <!-- VISTA BASE APRENDIDA -->
+    <div id="db-view" class="card hidden">
+      <div class="header-row">
+        <button id="btn-volver-registro-db" class="back-btn">
+          ← Volver al registro
+        </button>
+        <h2>Base aprendida</h2>
       </div>
+      <div id="db-content"></div>
     </div>
   </div>
 
   <script>
-    // --- Claves de almacenamiento ---
     const DB_KEY = "caloriflow_food_db_v1";
     const LOG_KEY = "caloriflow_daily_logs_v1";
 
-    // Metas diarias orientativas
     const DAILY_GOALS = {
       calorias: 2000,
       azucares_g: 50,
@@ -425,10 +496,9 @@
       proteinas_g: 70,
     };
 
-    // Utilidades de fecha
     function todayKey() {
       const d = new Date();
-      return d.toISOString().slice(0, 10); // YYYY-MM-DD
+      return d.toISOString().slice(0, 10);
     }
 
     function loadJSON(key, fallback) {
@@ -445,7 +515,6 @@
       localStorage.setItem(key, JSON.stringify(value));
     }
 
-    // Normalizar descripción para usar como clave
     function normalizeDescription(text) {
       return text
         .toLowerCase()
@@ -455,7 +524,6 @@
         .trim();
     }
 
-    // Obtener y guardar DB y logs
     function getFoodDB() {
       return loadJSON(DB_KEY, {});
     }
@@ -472,26 +540,53 @@
       saveJSON(LOG_KEY, logs);
     }
 
-    // --- ELEMENTOS DOM ---
+    // ELEMENTOS
     const registroView = document.getElementById("registro-view");
     const resumenView = document.getElementById("resumen-view");
+    const dbView = document.getElementById("db-view");
+
     const tipoComidaEl = document.getElementById("tipo-comida");
     const descEl = document.getElementById("descripcion-comida");
     const jsonEl = document.getElementById("json-chatgpt");
     const statusEl = document.getElementById("status-text");
+
+    const cantidadInput = document.getElementById("cantidad-input");
+    const unidadSelect = document.getElementById("unidad-select");
+    const alimentoInput = document.getElementById("alimento-input");
+
     const btnPrompt = document.getElementById("btn-generar-prompt");
     const btnAgregar = document.getElementById("btn-agregar");
     const btnVerResumen = document.getElementById("btn-ver-resumen");
+    const btnVerDB = document.getElementById("btn-ver-db");
     const btnReset = document.getElementById("btn-reset");
-    const btnVolver = document.getElementById("btn-volver");
+    const btnVolverRegistro = document.getElementById("btn-volver-registro");
+    const btnVolverRegistroDB = document.getElementById("btn-volver-registro-db");
+
     const summaryContent = document.getElementById("summary-content");
+    const dbContent = document.getElementById("db-content");
 
     function setStatus(message, isError = false) {
       statusEl.textContent = message || "";
       statusEl.className = "status-text " + (isError ? "status-error" : "status-ok");
     }
 
-    // --- Prompt para ChatGPT ---
+    // Atajo cantidad + unidad + alimento
+    function updateDescFromParts() {
+      const cantidad = (cantidadInput.value || "").trim();
+      const unidad = unidadSelect.value;
+      const alimento = (alimentoInput.value || "").trim();
+
+      if (!cantidad || !alimento) return;
+
+      const texto = `${cantidad} ${unidad} de ${alimento}`;
+      descEl.value = texto;
+    }
+
+    cantidadInput.addEventListener("input", updateDescFromParts);
+    unidadSelect.addEventListener("change", updateDescFromParts);
+    alimentoInput.addEventListener("input", updateDescFromParts);
+
+    // Prompt para ChatGPT
     btnPrompt.addEventListener("click", () => {
       const desc = descEl.value.trim();
       if (!desc) {
@@ -527,20 +622,16 @@ Formato exacto:
 Rellena los valores con números (pueden ser decimales).
 `.trim();
 
-      // Copiar al portapapeles (si se puede)
       if (navigator.clipboard && navigator.clipboard.writeText) {
         navigator.clipboard.writeText(prompt).catch(() => {});
       }
 
-      // Abrir ChatGPT en una pestaña nueva con el prompt en la query
-      const url =
-        "https://chat.openai.com/?q=" + encodeURIComponent(prompt);
+      const url = "https://chat.openai.com/?q=" + encodeURIComponent(prompt);
       window.open(url, "_blank");
 
       setStatus("Prompt copiado. Pegalo en ChatGPT, copiá el JSON y traelo acá.");
     });
 
-    // Parsear JSON de ChatGPT robustamente
     function parseNutritionJSON(raw) {
       if (!raw || !raw.trim()) return null;
       const text = raw.trim();
@@ -554,7 +645,7 @@ Rellena los valores con números (pueden ser decimales).
       try {
         data = JSON.parse(jsonPart);
       } catch (e) {
-        throw new Error("JSON inválido. Revisá que los valores sean números y la sintaxis esté bien.");
+        throw new Error("JSON inválido. Revisá que la sintaxis esté bien.");
       }
 
       const required = ["calorias", "azucares_g", "grasas_g", "proteinas_g"];
@@ -571,7 +662,7 @@ Rellena los valores con números (pueden ser decimales).
       return data;
     }
 
-    // --- Agregar comida ---
+    // Agregar comida
     btnAgregar.addEventListener("click", () => {
       const tipo = tipoComidaEl.value;
       const desc = descEl.value.trim();
@@ -590,17 +681,15 @@ Rellena los valores con números (pueden ser decimales).
       let valores;
 
       if (rawJSON) {
-        // Con JSON: aprendemos O actualizamos el valor exacto
         try {
           valores = parseNutritionJSON(rawJSON);
         } catch (e) {
           setStatus(e.message, true);
           return;
         }
-        db[normalized] = valores; // guardamos EXACTAMENTE lo que vino
+        db[normalized] = valores;
         setFoodDB(db);
       } else {
-        // Sin JSON: buscamos en la base aprendida
         if (!db[normalized]) {
           setStatus(
             "Comida nueva para la app. Primero usá ChatGPT una vez para que pueda aprenderla.",
@@ -608,7 +697,7 @@ Rellena los valores con números (pueden ser decimales).
           );
           return;
         }
-        valores = db[normalized]; // reutilizamos lo aprendido sin modificar
+        valores = db[normalized];
       }
 
       const now = new Date();
@@ -630,14 +719,15 @@ Rellena los valores con números (pueden ser decimales).
 
       setLogs(logs);
 
-      // Limpiar campos
       jsonEl.value = "";
       descEl.value = "";
+      cantidadInput.value = "";
+      alimentoInput.value = "";
 
       setStatus("Comida guardada en el registro de hoy.");
     });
 
-    // --- Resetear base y comidas de hoy ---
+    // Reset
     btnReset.addEventListener("click", () => {
       if (!confirm("¿Seguro que querés borrar la base aprendida y las comidas de hoy?")) {
         return;
@@ -650,21 +740,35 @@ Rellena los valores con números (pueden ser decimales).
       setStatus("Base aprendida y comidas de hoy reseteadas.");
     });
 
-    // --- Cambiar a vista resumen ---
+    // NAV: resumen
     btnVerResumen.addEventListener("click", () => {
       renderSummary();
       registroView.classList.add("hidden");
       resumenView.classList.remove("hidden");
+      dbView.classList.add("hidden");
       setStatus("");
     });
 
-    // Volver al registro
-    btnVolver.addEventListener("click", () => {
+    btnVolverRegistro.addEventListener("click", () => {
       resumenView.classList.add("hidden");
       registroView.classList.remove("hidden");
     });
 
-    // --- Render resumen ---
+    // NAV: base aprendida
+    btnVerDB.addEventListener("click", () => {
+      renderDB();
+      registroView.classList.add("hidden");
+      resumenView.classList.add("hidden");
+      dbView.classList.remove("hidden");
+      setStatus("");
+    });
+
+    btnVolverRegistroDB.addEventListener("click", () => {
+      dbView.classList.add("hidden");
+      registroView.classList.remove("hidden");
+    });
+
+    // Resumen
     function renderSummary() {
       const logs = getLogs();
       const hoy = todayKey();
@@ -806,7 +910,6 @@ Rellena los valores con números (pueden ser decimales).
 
       summaryContent.innerHTML = html;
 
-      // Listeners de eliminar
       summaryContent
         .querySelectorAll("button.btn-danger")
         .forEach((btn) => {
@@ -824,7 +927,45 @@ Rellena los valores con números (pueden ser decimales).
         });
     }
 
-    // Mensaje inicial vacío
+    // Vista base aprendida
+    function renderDB() {
+      const db = getFoodDB();
+      const entries = Object.entries(db);
+
+      if (!entries.length) {
+        dbContent.innerHTML = `
+          <p class="helper-text">
+            Aún no hay comidas aprendidas. Cada vez que pegues un JSON nuevo,
+            se irá guardando acá.
+          </p>
+        `;
+        return;
+      }
+
+      let html = `
+        <p class="helper-text" style="margin-bottom:8px;">
+          Esta es la base interna que la app usa cuando repetís una comida
+          sin pasar por ChatGPT.
+        </p>
+      `;
+
+      entries.forEach(([descNorm, v]) => {
+        html += `
+          <div class="db-item">
+            <div class="db-desc">${descNorm}</div>
+            <div class="db-macros">
+              ${v.calorias.toFixed(1)} kcal ·
+              ${v.proteinas_g.toFixed(1)} g prot ·
+              ${v.grasas_g.toFixed(1)} g grasa ·
+              ${v.azucares_g.toFixed(1)} g azúcar
+            </div>
+          </div>
+        `;
+      });
+
+      dbContent.innerHTML = html;
+    }
+
     setStatus("");
   </script>
 </body>
