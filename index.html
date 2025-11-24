@@ -157,6 +157,15 @@
       box-shadow: 0 8px 18px rgba(255, 152, 0, 0.45);
     }
 
+    .btn-meta {
+      background: #455a64;
+      color: #ffffff;
+      font-size: 0.9rem;
+      padding: 10px 14px;
+      box-shadow: 0 6px 16px rgba(69, 90, 100, 0.6);
+      margin-top: 8px;
+    }
+
     .btn:hover {
       filter: brightness(1.05);
       transform: translateY(-1px);
@@ -264,6 +273,25 @@
       color: var(--text-soft);
       text-align: center;
     }
+
+    .meta-box {
+      margin-top: 16px;
+      padding: 10px 12px;
+      border-radius: 18px;
+      background: #10132b;
+      font-size: 0.8rem;
+      color: var(--text-soft);
+    }
+
+    .meta-box label {
+      font-size: 0.8rem;
+      margin-top: 4px;
+    }
+
+    .meta-box input {
+      font-size: 0.9rem;
+      padding: 8px 10px;
+    }
   </style>
 </head>
 <body>
@@ -312,7 +340,7 @@
           🧠 <span>Generar prompt para ChatGPT</span>
         </button>
         <p class="hint mini">
-          Se copiará el prompt al portapapeles. Después abrís tu ChatGPT y lo pegás en la conversación que vos quieras.
+          El prompt se copia al portapapeles. Después abrís tu ChatGPT y lo pegás en la conversación que quieras.
         </p>
 
         <label for="jsonInput" style="margin-top:14px;">Pega aquí el resultado de ChatGPT (JSON)</label>
@@ -329,6 +357,34 @@
         <button class="btn btn-blue" id="btnBaseAprendida">
           📚 <span>Ver base aprendida</span>
         </button>
+
+        <!-- Metas diarias -->
+        <div class="meta-box">
+          <div class="section-title" style="margin-top:0;">Metas diarias (opcionales)</div>
+          <div class="row">
+            <div>
+              <label for="metaCalorias">Calorías</label>
+              <input id="metaCalorias" type="number" min="0" step="10" placeholder="2000">
+            </div>
+            <div>
+              <label for="metaAzucares">Azúcares (g)</label>
+              <input id="metaAzucares" type="number" min="0" step="1" placeholder="50">
+            </div>
+          </div>
+          <div class="row">
+            <div>
+              <label for="metaGrasas">Grasas (g)</label>
+              <input id="metaGrasas" type="number" min="0" step="1" placeholder="60">
+            </div>
+            <div>
+              <label for="metaProteinas">Proteínas (g)</label>
+              <input id="metaProteinas" type="number" min="0" step="1" placeholder="70">
+            </div>
+          </div>
+          <button class="btn btn-meta" id="btnGuardarMetas">
+            💾 Guardar metas
+          </button>
+        </div>
 
         <p class="footer-note">
           Todo se guarda solo en este dispositivo (memoria local).
@@ -357,7 +413,7 @@
         <button class="btn btn-back" id="btnVolverRegistro2">← Volver al registro</button>
         <h2 style="text-align:left;margin:4px 0 4px;">Base aprendida</h2>
         <p class="msg">
-          Cada vez que registrás una comida con JSON, se guarda aquí.  
+          Cada vez que registrás una comida con JSON, se guarda aquí.
           Si dejás el JSON vacío y escribís una comida igual, la app usa estos valores sin volver a preguntarle a la IA.
         </p>
         <div id="lista-base"></div>
@@ -369,13 +425,24 @@
     // --- Claves de almacenamiento ---
     const STORAGE_COMIDAS = "caloriflow_comidas_v3";
     const STORAGE_BASE = "caloriflow_base_v3";
+    const STORAGE_METAS = "caloriflow_metas_v1";
+
+    // Metas por defecto
+    const DEFAULT_METAS = {
+      calorias: 2000,
+      azucares_g: 50,
+      grasas_g: 60,
+      proteinas_g: 70
+    };
 
     let comidas = JSON.parse(localStorage.getItem(STORAGE_COMIDAS) || "[]");
     let baseAprendida = JSON.parse(localStorage.getItem(STORAGE_BASE) || "{}");
+    let metas = JSON.parse(localStorage.getItem(STORAGE_METAS) || "null") || { ...DEFAULT_METAS };
 
     function guardarEstado() {
       localStorage.setItem(STORAGE_COMIDAS, JSON.stringify(comidas));
       localStorage.setItem(STORAGE_BASE, JSON.stringify(baseAprendida));
+      localStorage.setItem(STORAGE_METAS, JSON.stringify(metas));
     }
 
     // --- Pantallas ---
@@ -487,14 +554,37 @@ Rellena los valores con números (pueden ser decimales) según tu mejor estimaci
       alert("Comida guardada.");
     });
 
-    // --- Resumen de hoy ---
-    const metas = {
-      calorias: 2000,
-      azucares_g: 50,
-      grasas_g: 60,
-      proteinas_g: 70
-    };
+    // --- Metas: cargar en inputs ---
+    function poblarMetasInputs() {
+      const c = document.getElementById("metaCalorias");
+      const a = document.getElementById("metaAzucares");
+      const g = document.getElementById("metaGrasas");
+      const p = document.getElementById("metaProteinas");
+      if (!c) return;
 
+      c.value = metas.calorias;
+      a.value = metas.azucares_g;
+      g.value = metas.grasas_g;
+      p.value = metas.proteinas_g;
+    }
+
+    document.getElementById("btnGuardarMetas").addEventListener("click", () => {
+      const c = Number(document.getElementById("metaCalorias").value) || metas.calorias;
+      const a = Number(document.getElementById("metaAzucares").value) || metas.azucares_g;
+      const g = Number(document.getElementById("metaGrasas").value) || metas.grasas_g;
+      const p = Number(document.getElementById("metaProteinas").value) || metas.proteinas_g;
+
+      metas = {
+        calorias: c,
+        azucares_g: a,
+        grasas_g: g,
+        proteinas_g: p
+      };
+      guardarEstado();
+      alert("Metas guardadas.");
+    });
+
+    // --- Resumen de hoy ---
     function esHoy(fechaISO) {
       const f = new Date(fechaISO);
       const hoy = new Date();
@@ -552,7 +642,7 @@ Rellena los valores con números (pueden ser decimales) según tu mejor estimaci
       filaNumero("Proteínas totales (g):", totales.proteinas_g);
 
       function barra(label, valor, meta, clave) {
-        const pct = Math.min(100, (valor / meta) * 100);
+        const pct = meta > 0 ? Math.min(100, (valor / meta) * 100) : 0;
 
         const wrap = document.createElement("div");
         wrap.innerHTML = `
@@ -671,6 +761,9 @@ Rellena los valores con números (pueden ser decimales) según tu mejor estimaci
     document.getElementById("btnVolverRegistro2").addEventListener("click", () => {
       mostrarPantalla("pantalla-registro");
     });
+
+    // Inicializar inputs de metas al cargar
+    poblarMetasInputs();
   </script>
 </body>
 </html>
