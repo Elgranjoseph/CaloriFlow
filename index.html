@@ -90,7 +90,26 @@
       grid-template-columns: 1fr 1.1fr 1.4fr;
       gap: 8px;
       margin-top: 12px;
-      margin-bottom: 12px;
+      margin-bottom: 4px;
+    }
+
+    .btn-mini {
+      margin-top: 6px;
+      border-radius: 999px;
+      border: 1px solid rgba(59, 130, 246, 0.8);
+      background: rgba(37, 99, 235, 0.15);
+      color: #bfdbfe;
+      font-size: 13px;
+      padding: 6px 10px;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      cursor: pointer;
+      transition: transform 0.06s ease, background 0.06s ease;
+    }
+    .btn-mini:active {
+      transform: scale(0.97);
+      background: rgba(37, 99, 235, 0.25);
     }
 
     .btn {
@@ -202,7 +221,7 @@
     }
 
     .totals {
-      font-size: 15px;
+      font-size: 14px;
       line-height: 1.6;
       margin-bottom: 16px;
     }
@@ -279,6 +298,57 @@
       font-size: 14px;
     }
 
+    /* barras de metas */
+    .goals-container {
+      margin-bottom: 14px;
+      font-size: 13px;
+      color: #e5e7eb;
+    }
+    .goals-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 6px;
+    }
+    .goals-title {
+      font-weight: 600;
+    }
+    .goals-edit {
+      border-radius: 999px;
+      border: 1px solid rgba(96, 165, 250, 0.9);
+      background: transparent;
+      color: #bfdbfe;
+      font-size: 11px;
+      padding: 3px 8px;
+      cursor: pointer;
+    }
+    .goals-edit:active {
+      transform: scale(0.97);
+      background: rgba(37, 99, 235, 0.2);
+    }
+    .progress-row {
+      margin-bottom: 6px;
+    }
+    .progress-label {
+      font-size: 12px;
+      margin-bottom: 2px;
+      display: flex;
+      justify-content: space-between;
+    }
+    .progress-bar {
+      width: 100%;
+      height: 6px;
+      border-radius: 999px;
+      background: rgba(55, 65, 81, 0.9);
+      overflow: hidden;
+    }
+    .progress-fill {
+      height: 100%;
+      border-radius: inherit;
+      background: linear-gradient(90deg, #22c55e, #16a34a);
+      width: 0%;
+    }
+
     @media (max-width: 480px) {
       .app-shell {
         padding: 20px 14px 26px;
@@ -293,6 +363,7 @@
 </head>
 <body>
   <div class="app-shell">
+    <!-- Pantalla principal -->
     <div id="screen-registro" class="screen active">
       <h1>CaloriFlow</h1>
       <div class="subtitle">Registro diario con memoria propia.</div>
@@ -336,6 +407,10 @@
           </div>
         </div>
 
+        <button id="add-part-btn" class="btn-mini">
+          ➕ Agregar a "¿Qué comiste?"
+        </button>
+
         <button id="prompt-btn" class="btn btn-primary">
           <span class="brain-icon">🧠</span>
           <span>Generar prompt para ChatGPT</span>
@@ -367,6 +442,7 @@
       </div>
     </div>
 
+    <!-- Pantalla resumen -->
     <div id="screen-resumen" class="screen">
       <button id="back-from-summary" class="btn-outline-back">
         <span class="arrow">←</span> Volver al registro
@@ -378,6 +454,8 @@
           Suma de todas las comidas registradas hoy.
         </div>
 
+        <div id="goals-block" class="goals-container"></div>
+
         <div id="totals" class="totals"></div>
 
         <div class="section-title">Comidas registradas</div>
@@ -385,6 +463,7 @@
       </div>
     </div>
 
+    <!-- Pantalla base aprendida -->
     <div id="screen-db" class="screen">
       <button id="back-from-db" class="btn-outline-back">
         <span class="arrow">←</span> Volver al registro
@@ -404,6 +483,7 @@
   <script>
     const STORAGE_MEALS_KEY = "caloriflow_meals_v2";
     const STORAGE_DB_KEY = "caloriflow_db_v2";
+    const STORAGE_GOALS_KEY = "caloriflow_goals_v1";
 
     function loadMeals() {
       try {
@@ -412,7 +492,6 @@
         return [];
       }
     }
-
     function saveMeals(meals) {
       localStorage.setItem(STORAGE_MEALS_KEY, JSON.stringify(meals));
     }
@@ -424,13 +503,24 @@
         return {};
       }
     }
-
     function saveDb(db) {
       localStorage.setItem(STORAGE_DB_KEY, JSON.stringify(db));
     }
 
+    function loadGoals() {
+      try {
+        return JSON.parse(localStorage.getItem(STORAGE_GOALS_KEY)) || null;
+      } catch {
+        return null;
+      }
+    }
+    function saveGoals(goals) {
+      localStorage.setItem(STORAGE_GOALS_KEY, JSON.stringify(goals));
+    }
+
     let meals = loadMeals();
     let learnedDb = loadDb();
+    let goals = loadGoals();
 
     const screenRegistro = document.getElementById("screen-registro");
     const screenResumen = document.getElementById("screen-resumen");
@@ -443,6 +533,7 @@
     const alimentoInput = document.getElementById("alimento");
     const jsonInput = document.getElementById("json-input");
 
+    const addPartBtn = document.getElementById("add-part-btn");
     const promptBtn = document.getElementById("prompt-btn");
     const addBtn = document.getElementById("add-btn");
     const summaryBtn = document.getElementById("summary-btn");
@@ -450,6 +541,7 @@
     const backFromSummaryBtn = document.getElementById("back-from-summary");
     const backFromDbBtn = document.getElementById("back-from-db");
 
+    const goalsBlock = document.getElementById("goals-block");
     const totalsDiv = document.getElementById("totals");
     const mealsListDiv = document.getElementById("meals-list");
     const dbListDiv = document.getElementById("db-list");
@@ -458,37 +550,37 @@
       screenRegistro.classList.remove("active");
       screenResumen.classList.remove("active");
       screenDb.classList.remove("active");
-
       screen.classList.add("active");
     }
 
-    function buildAutoDescription() {
-      const descBase = descripcionInput.value.trim();
-      const cant = cantidadInput.value.trim();
-      const porc = porcionInput.value.trim();
-      const alim = alimentoInput.value.trim();
-
+    // Botón + : agrega "cant porción de alimento" a ¿Qué comiste?
+    addPartBtn.addEventListener("click", () => {
+      const cant = (cantidadInput.value || "").trim();
+      const porc = (porcionInput.value || "").trim();
+      const alim = (alimentoInput.value || "").trim();
       if (!cant || !porc || !alim) {
-        return descBase;
+        alert("Completá Cantidad, Porción y Alimento para usar el +");
+        return;
       }
+      const parte = `${cant} ${porc} de ${alim}`;
+      const actual = descripcionInput.value.trim();
+      if (!actual) {
+        descripcionInput.value = parte;
+      } else {
+        descripcionInput.value = actual + " + " + parte;
+      }
+      // dejo los campos como estaban; si querés cambiar, cambiás manual
+    });
 
-      const descFromParts = `${cant} ${porc} de ${alim}`.trim();
-
-      if (!descBase) return descFromParts;
-      if (descBase.includes(descFromParts)) return descBase;
-      return `${descBase}, ${descFromParts}`;
-    }
-
+    // Prompt para ChatGPT
     promptBtn.addEventListener("click", async () => {
       const tipo = tipoInput.value;
-      const descripcion = buildAutoDescription() || descripcionInput.value.trim();
+      const descripcion = descripcionInput.value.trim();
 
       if (!descripcion) {
         alert("Primero escribí qué comiste.");
         return;
       }
-
-      descripcionInput.value = descripcion;
 
       const prompt = `
 Quiero que estimes calorías, azúcares (g), grasas (g) y proteínas (g) de esta comida:
@@ -527,6 +619,7 @@ Completa los valores con números (pueden ser decimales).`.trim();
       }
     }
 
+    // busca exacto o suma partes separadas por '+'
     function findMacrosFromDb(description) {
       const exact = description.trim();
       if (!exact) return null;
@@ -536,31 +629,24 @@ Completa los valores con números (pueden ser decimales).`.trim();
       }
 
       const parts = exact.split("+").map(p => p.trim()).filter(p => p.length > 0);
-
-      if (parts.length <= 1) {
-        return null;
-      }
+      if (parts.length <= 1) return null;
 
       let sum = { calorias: 0, azucares_g: 0, grasas_g: 0, proteinas_g: 0 };
 
       for (const part of parts) {
         const entry = learnedDb[part];
-        if (!entry) {
-          return null;
-        }
+        if (!entry) return null;
         sum.calorias += Number(entry.calorias) || 0;
         sum.azucares_g += Number(entry.azucares_g) || 0;
         sum.grasas_g += Number(entry.grasas_g) || 0;
         sum.proteinas_g += Number(entry.proteinas_g) || 0;
       }
-
       return sum;
     }
 
     addBtn.addEventListener("click", () => {
       const tipo = tipoInput.value;
-      const descripcionRaw = buildAutoDescription();
-      const descripcion = descripcionRaw || descripcionInput.value.trim();
+      const descripcion = descripcionInput.value.trim();
 
       if (!descripcion) {
         alert("Escribí qué comiste.");
@@ -605,12 +691,98 @@ Completa los valores con números (pueden ser decimales).`.trim();
       saveMeals(meals);
 
       jsonInput.value = "";
-      descripcionInput.value = "";
-      alimentoInput.value = "";
-      cantidadInput.value = "1";
-
+      // no borro la descripción, así podés reutilizarla si querés repetir
       alert("Comida guardada.");
     });
+
+    function renderGoalsBlock(total) {
+      goalsBlock.innerHTML = "";
+
+      const container = document.createElement("div");
+      container.className = "goals-inner";
+
+      const header = document.createElement("div");
+      header.className = "goals-header";
+
+      const title = document.createElement("div");
+      title.className = "goals-title";
+      title.textContent = "Metas diarias";
+
+      const editBtn = document.createElement("button");
+      editBtn.className = "goals-edit";
+      editBtn.textContent = "Editar metas";
+      editBtn.addEventListener("click", () => {
+        const gCal = prompt("Meta diaria de calorías (kcal):", goals?.calorias ?? "2000");
+        if (gCal === null) return;
+        const gAz = prompt("Meta diaria de azúcares (g):", goals?.azucares_g ?? "50");
+        if (gAz === null) return;
+        const gGr = prompt("Meta diaria de grasas (g):", goals?.grasas_g ?? "60");
+        if (gGr === null) return;
+        const gPr = prompt("Meta diaria de proteínas (g):", goals?.proteinas_g ?? "70");
+        if (gPr === null) return;
+
+        goals = {
+          calorias: Number(gCal) || 0,
+          azucares_g: Number(gAz) || 0,
+          grasas_g: Number(gGr) || 0,
+          proteinas_g: Number(gPr) || 0
+        };
+        saveGoals(goals);
+        renderSummary(); // recarga todo
+      });
+
+      header.appendChild(title);
+      header.appendChild(editBtn);
+      container.appendChild(header);
+
+      if (!goals) {
+        const p = document.createElement("div");
+        p.style.fontSize = "12px";
+        p.style.color = "#9ca3af";
+        p.textContent = "Aún no definiste metas. Tocá \"Editar metas\" para configurarlas.";
+        container.appendChild(p);
+        goalsBlock.appendChild(container);
+        return;
+      }
+
+      function createRow(labelText, totalVal, goalVal, unidad) {
+        const row = document.createElement("div");
+        row.className = "progress-row";
+
+        const label = document.createElement("div");
+        label.className = "progress-label";
+        const pct = goalVal > 0 ? ((totalVal / goalVal) * 100) : 0;
+        label.innerHTML =
+          `<span>${labelText}</span><span>${totalVal.toFixed(1)} / ${goalVal.toFixed(1)} ${unidad}</span>`;
+
+        const bar = document.createElement("div");
+        bar.className = "progress-bar";
+
+        const fill = document.createElement("div");
+        fill.className = "progress-fill";
+        fill.style.width = `${Math.min(100, pct)}%`;
+
+        bar.appendChild(fill);
+        row.appendChild(label);
+        row.appendChild(bar);
+        return row;
+      }
+
+      container.appendChild(
+        createRow("Calorías", total.calorias, goals.calorias || 0, "kcal")
+      );
+      container.appendChild(
+        createRow("Azúcares", total.azucares_g, goals.azucares_g || 0, "g")
+      );
+      container.appendChild(
+        createRow("Grasas", total.grasas_g, goals.grasas_g || 0, "g")
+      );
+      container.appendChild(
+        createRow("Proteínas", total.proteinas_g, goals.proteinas_g || 0, "g")
+      );
+
+      goalsBlock.appendChild(container);
+    }
 
     function renderSummary() {
       const today = new Date().toISOString().slice(0, 10);
@@ -624,11 +796,15 @@ Completa los valores con números (pueden ser decimales).`.trim();
         total.proteinas_g += m.proteinas_g;
       });
 
+      // metas
+      renderGoalsBlock(total);
+
       totalsDiv.innerHTML = `
-        Calorías totales: <strong>${total.calorias.toFixed(1)}</strong><br>
-        Azúcares totales (g): <strong>${total.azucares_g.toFixed(1)}</strong><br>
-        Grasas totales (g): <strong>${total.grasas_g.toFixed(1)}</strong><br>
-        Proteínas totales (g): <strong>${total.proteinas_g.toFixed(1)}</strong>
+        <strong>Totales de hoy</strong><br>
+        Calorías: ${total.calorias.toFixed(1)} kcal<br>
+        Azúcares: ${total.azucares_g.toFixed(1)} g<br>
+        Grasas: ${total.grasas_g.toFixed(1)} g<br>
+        Proteínas: ${total.proteinas_g.toFixed(1)} g
       `;
 
       mealsListDiv.innerHTML = "";
@@ -637,7 +813,7 @@ Completa los valores con números (pueden ser decimales).`.trim();
         return;
       }
 
-      todayMeals.forEach((m, index) => {
+      todayMeals.forEach(m => {
         const item = document.createElement("div");
         item.className = "meal-item";
 
@@ -672,9 +848,7 @@ Completa los valores con números (pueden ser decimales).`.trim();
         delBtn.innerHTML = `<span>🗑️</span> Eliminar`;
         delBtn.addEventListener("click", () => {
           if (!confirm("¿Eliminar esta comida del registro de hoy?")) return;
-          const globalIndex = meals.findIndex(
-            x => x === m
-          );
+          const globalIndex = meals.findIndex(x => x === m);
           if (globalIndex >= 0) {
             meals.splice(globalIndex, 1);
             saveMeals(meals);
