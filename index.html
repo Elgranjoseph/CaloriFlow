@@ -168,8 +168,9 @@
       filter: brightness(0.96);
     }
 
+    /* BOTÓN VOLVER CON COLOR VISIBLE */
     .btn-back {
-      background: var(--yellow-btn);       /* COLOR VISIBLE OTRA VEZ */
+      background: var(--yellow-btn);
       border-radius: 999px;
       border: none;
       color: #111827;
@@ -185,6 +186,11 @@
 
     .btn-back span.icon {
       font-size: 1rem;
+    }
+
+    .btn-back:active {
+      transform: scale(0.97);
+      filter: brightness(0.96);
     }
 
     .hint {
@@ -477,7 +483,6 @@
   </div>
 
   <script>
-    // --- utilidades de storage ---
     const STORAGE_COMIDAS = "caloriflow_comidas_v1";
     const STORAGE_BASE = "caloriflow_base_v1";
 
@@ -500,7 +505,6 @@
       }
     }
 
-    // --- elementos DOM ---
     const pantallaRegistro = document.getElementById("pantalla-registro");
     const pantallaResumen = document.getElementById("pantalla-resumen");
     const pantallaBase = document.getElementById("pantalla-base");
@@ -513,7 +517,7 @@
     const jsonChatEl = document.getElementById("jsonChat");
 
     const btnPrompt = document.getElementById("btnPrompt");
-       const btnAgregar = document.getElementById("btnAgregar");
+    const btnAgregar = document.getElementById("btnAgregar");
     const btnResumen = document.getElementById("btnResumen");
     const btnBaseAprendida = document.getElementById("btnBaseAprendida");
 
@@ -530,11 +534,9 @@
     const listaAprendidaEl = document.getElementById("listaAprendida");
     const textoSinAprendidaEl = document.getElementById("textoSinAprendida");
 
-    // --- datos en memoria ---
     let comidas = cargarJSON(STORAGE_COMIDAS, []);
     let baseAprendida = cargarJSON(STORAGE_BASE, []);
 
-    // --- helpers ---
     function normalizarDescripcion(txt) {
       return txt.trim().toLowerCase().replace(/\s+/g, " ");
     }
@@ -570,14 +572,25 @@
       document.getElementById(id).classList.remove("hidden");
     }
 
-    // --- atajo Cant / Porción / Alimento ---
+    // AT AJO: ahora agrega varios ítems
     function actualizarDescripcionDesdeAtajo() {
       const cant = cantEl.value.trim();
       const porc = porcionEl.value.trim();
       const ali = alimentoEl.value.trim();
-      // SOLO completar si el campo está vacío → así podés escribir varias cosas a mano
-      if (cant && porc && ali && descripcionEl.value.trim() === "") {
-        descripcionEl.value = `${cant} ${porc} de ${ali}`;
+
+      if (!cant || !ali) return;
+
+      const unidad = porc ? ` ${porc}` : "";
+      const snippet = `${cant}${unidad} de ${ali}`;
+      const current = descripcionEl.value.trim();
+
+      if (!current) {
+        descripcionEl.value = snippet;
+      } else {
+        // si ya está ese mismo snippet, no lo repite
+        if (!current.toLowerCase().includes(snippet.toLowerCase())) {
+          descripcionEl.value = current + ", " + snippet;
+        }
       }
     }
 
@@ -585,7 +598,6 @@
     porcionEl.addEventListener("change", actualizarDescripcionDesdeAtajo);
     alimentoEl.addEventListener("input", actualizarDescripcionDesdeAtajo);
 
-    // --- generar prompt para ChatGPT ---
     btnPrompt.addEventListener("click", async () => {
       const tipo = tipoComidaEl.value;
       const desc = descripcionEl.value.trim();
@@ -620,7 +632,6 @@ Responde SOLO un JSON VÁLIDO, en UNA sola línea, sin explicación extra, usand
       }
     });
 
-    // --- agregar comida ---
     btnAgregar.addEventListener("click", () => {
       const tipo = tipoComidaEl.value;
       const descripcion = descripcionEl.value.trim();
@@ -704,7 +715,6 @@ Responde SOLO un JSON VÁLIDO, en UNA sola línea, sin explicación extra, usand
       alert("Comida guardada.");
     });
 
-    // --- resumen de hoy ---
     btnResumen.addEventListener("click", () => {
       actualizarResumen();
       cambiarPantalla("pantalla-resumen");
@@ -789,7 +799,6 @@ Responde SOLO un JSON VÁLIDO, en UNA sola línea, sin explicación extra, usand
         });
     }
 
-    // --- base aprendida ---
     btnBaseAprendida.addEventListener("click", () => {
       actualizarBaseAprendidaUI();
       cambiarPantalla("pantalla-base");
@@ -842,7 +851,6 @@ Responde SOLO un JSON VÁLIDO, en UNA sola línea, sin explicación extra, usand
         });
     }
 
-    // --- volver al registro ---
     btnVolverRegistro1.addEventListener("click", () =>
       cambiarPantalla("pantalla-registro")
     );
