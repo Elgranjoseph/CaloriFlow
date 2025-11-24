@@ -118,6 +118,12 @@
       outline: none;
     }
 
+    /* Texto en mayúsculas para campos de texto */
+    input[type="text"],
+    textarea {
+      text-transform: uppercase;
+    }
+
     input:focus,
     select:focus,
     textarea:focus {
@@ -156,17 +162,20 @@
     }
 
     .btn-secondary {
-      background: linear-gradient(135deg, #facc15, #f97316);
+      background: linear-gradient(135deg, #fbbf24, #f97316);
       color: #111827;
     }
 
     .btn-ghost {
-      background: transparent;
+      width: 100%;
+      border-radius: 999px;
       border: 1px dashed #374151;
+      background: transparent;
       color: var(--text-muted);
       font-size: 13px;
-      padding: 7px 10px;
-      margin-top: 6px;
+      padding: 9px 12px;
+      margin-top: 10px;
+      cursor: pointer;
     }
 
     .hint {
@@ -203,6 +212,7 @@
     .sector-row input {
       padding: 7px 8px;
       font-size: 13px;
+      text-transform: none; /* números normales */
     }
 
     .sector-row button {
@@ -286,18 +296,6 @@
       cursor: pointer;
     }
 
-    .export-box {
-      margin-top: 10px;
-      font-size: 12px;
-      display: none; /* 🔒 ocultamos el JSON en pantalla */
-    }
-
-    .export-box textarea {
-      font-size: 11px;
-      min-height: 90px;
-      background: #020617dd;
-    }
-
     .footer-note {
       margin-top: 14px;
       font-size: 11px;
@@ -343,12 +341,20 @@
 
       <div style="margin-bottom: 8px">
         <label for="sitio">Sitio / nombre del predio</label>
-        <input id="sitio" type="text" placeholder="Ej: TORRE RUTA 5 KM 120" />
+        <input
+          id="sitio"
+          type="text"
+          placeholder="Ej: TORRE RUTA 5 KM 120"
+        />
       </div>
 
       <div style="margin-bottom: 8px">
         <label for="sigla">Sigla</label>
-        <input id="sigla" type="text" placeholder="Ej: R5K120-ANT" />
+        <input
+          id="sigla"
+          type="text"
+          placeholder="Ej: R5K120-ANT"
+        />
       </div>
 
       <div style="margin-bottom: 8px">
@@ -389,9 +395,12 @@
         Sectores del predio
         <span class="pill">largo × ancho</span>
       </h3>
+      <p class="hint">
+        Podés sumar varios rectángulos si el predio no es perfecto. La app
+        calcula el área total en m².
+      </p>
 
       <div class="sector-list" id="sector-list"></div>
-
       <button class="btn-ghost" onclick="agregarSector()">
         ➕ Agregar sector (rectángulo)
       </button>
@@ -414,20 +423,26 @@
       <input
         id="buscar-term"
         type="text"
-        placeholder="Ej: ROCHA, R5K120..."
+        placeholder="Ej: ROCHA, R5K120, MINAS..."
         oninput="renderListado()"
       />
-      <p class="hint" id="contador-predios"></p>
+      <p class="hint">
+        Se filtra en tiempo real mientras escribís.
+      </p>
 
       <div class="listado" id="lista-predios"></div>
+      <p class="hint" style="margin-top: 6px">
+        Los datos se guardan en este dispositivo usando
+        <strong>memoria local</strong>. No se envían a servidores.
+      </p>
     </section>
 
     <!-- EXPORTAR -->
     <section id="section-exportar">
       <h2 class="section-title">Exportar datos</h2>
 
-      <label for="export-depto">Departamento para exportar</label>
-      <select id="export-depto">
+      <label for="export-departamento">Departamento para exportar</label>
+      <select id="export-departamento">
         <option value="">Todos los departamentos</option>
         <option>Artigas</option>
         <option>Canelones</option>
@@ -450,22 +465,17 @@
         <option>Treinta y Tres</option>
       </select>
       <p class="hint">
-        Elegí un departamento o dejá "Todos los departamentos" para exportar todo.
+        Elegí un departamento o dejá "Todos los departamentos" para exportar
+        todo.
       </p>
 
       <button class="btn btn-secondary" onclick="descargarCSV()">
         ⬇️ Descargar CSV (para Excel)
       </button>
 
-      <button class="btn btn-ghost" onclick="copiarJSON()">
-        📋 Copiar JSON al portapapeles
+      <button class="btn-ghost" onclick="copiarTablaExcel()">
+        📋 Copiar tabla para Excel
       </button>
-
-      <!-- JSON oculto solo para vista previa interna -->
-      <div class="export-box">
-        <label for="export-json">Vista rápida del JSON</label>
-        <textarea id="export-json" readonly></textarea>
-      </div>
     </section>
 
     <p class="footer-note">
@@ -476,7 +486,6 @@
   <script>
     const STORAGE_KEY = "predios_antel_v1";
     let predios = [];
-    let predioEditandoId = null; // 🔁 para saber si estamos editando
 
     function cargarPredios() {
       try {
@@ -489,18 +498,6 @@
 
     function guardarPredios() {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(predios));
-      actualizarExportJSON();
-    }
-
-    function limpiarFormulario() {
-      document.getElementById("sitio").value = "";
-      document.getElementById("sigla").value = "";
-      document.getElementById("departamento").value = "";
-      document.getElementById("fecha").value = "";
-      const list = document.getElementById("sector-list");
-      list.innerHTML = "";
-      agregarSector();
-      predioEditandoId = null;
     }
 
     function showSection(name) {
@@ -514,36 +511,38 @@
           .classList.toggle("active", sec === name);
       });
 
-      if (name === "buscar") renderListado();
-      if (name === "exportar") actualizarExportJSON();
-      if (name === "nuevo" && predioEditandoId === null) {
-        // si entro a "Nuevo" sin estar editando nada, dejo formulario limpio
-        limpiarFormulario();
+      if (name === "buscar") {
+        renderListado();
       }
     }
 
     function agregarSector(l = "", a = "") {
       const list = document.getElementById("sector-list");
+
       const row = document.createElement("div");
       row.className = "sector-row";
 
-      const colL = document.createElement("div");
-      colL.style.flex = "1";
+      const colLargo = document.createElement("div");
+      colLargo.style.flex = "1";
       const inputL = document.createElement("input");
       inputL.type = "number";
+      inputL.min = "0";
+      inputL.step = "0.01";
       inputL.placeholder = "Largo (m)";
       inputL.value = l;
       inputL.oninput = actualizarAreaTotal;
-      colL.appendChild(inputL);
+      colLargo.appendChild(inputL);
 
-      const colA = document.createElement("div");
-      colA.style.flex = "1";
+      const colAncho = document.createElement("div");
+      colAncho.style.flex = "1";
       const inputA = document.createElement("input");
       inputA.type = "number";
+      inputA.min = "0";
+      inputA.step = "0.01";
       inputA.placeholder = "Ancho (m)";
       inputA.value = a;
       inputA.oninput = actualizarAreaTotal;
-      colA.appendChild(inputA);
+      colAncho.appendChild(inputA);
 
       const btnDel = document.createElement("button");
       btnDel.textContent = "✕";
@@ -552,8 +551,8 @@
         actualizarAreaTotal();
       };
 
-      row.appendChild(colL);
-      row.appendChild(colA);
+      row.appendChild(colLargo);
+      row.appendChild(colAncho);
       row.appendChild(btnDel);
 
       list.appendChild(row);
@@ -561,36 +560,34 @@
     }
 
     function obtenerSectores() {
-      const rows = [...document.querySelectorAll(".sector-row")];
+      const list = document.getElementById("sector-list");
+      const rows = Array.from(list.querySelectorAll(".sector-row"));
       return rows
         .map((row) => {
-          const [L, A] = row.querySelectorAll("input");
-          const largo = parseFloat(L.value);
-          const ancho = parseFloat(A.value);
-          if (largo > 0 && ancho > 0) {
-            return { largo, ancho, area: largo * ancho };
+          const [inputL, inputA] = row.querySelectorAll("input");
+          const largo = parseFloat((inputL.value || "").replace(",", "."));
+          const ancho = parseFloat((inputA.value || "").replace(",", "."));
+          if (isNaN(largo) || isNaN(ancho) || largo <= 0 || ancho <= 0) {
+            return null;
           }
-          return null;
+          return { largo, ancho, area: largo * ancho };
         })
         .filter(Boolean);
     }
 
     function actualizarAreaTotal() {
       const sectores = obtenerSectores();
-      const total = sectores.reduce((acc, s) => acc + s.area, 0);
+      const total = sectores.reduce((s, sec) => s + sec.area, 0);
       document.getElementById(
         "total-area"
       ).textContent = `Área total: ${total.toFixed(2)} m²`;
     }
 
     function guardarPredio() {
-      const sitio = document.getElementById("sitio").value.trim();
-      const sigla = document.getElementById("sigla").value.trim();
-      const departamento = document
-        .getElementById("departamento")
-        .value.trim();
+      let sitio = document.getElementById("sitio").value.trim();
+      let sigla = document.getElementById("sigla").value.trim();
+      const departamento = document.getElementById("departamento").value;
       const fecha = document.getElementById("fecha").value;
-
       const sectores = obtenerSectores();
       const msg = document.getElementById("msg-nuevo");
 
@@ -604,17 +601,19 @@
       }
 
       if (!sectores.length) {
-        msg.textContent = "Agregá al menos un sector válido.";
+        msg.textContent =
+          "Agregá al menos un sector con largo y ancho válidos.";
         msg.classList.add("msg-error");
         return;
       }
 
+      sitio = sitio.toUpperCase();
+      sigla = sigla.toUpperCase();
+
       const areaTotal = sectores.reduce((s, sec) => s + sec.area, 0);
-      const editando = predioEditandoId !== null;
-      const id = editando ? predioEditandoId : Date.now();
 
       const predio = {
-        id,
+        id: Date.now(),
         sitio,
         sigla,
         departamento,
@@ -623,35 +622,29 @@
         areaTotal,
       };
 
-      if (editando) {
-        const idx = predios.findIndex((p) => p.id === predioEditandoId);
-        if (idx !== -1) {
-          predios[idx] = predio;
-        }
-      } else {
-        predios.push(predio);
-      }
-
+      predios.push(predio);
       guardarPredios();
-      limpiarFormulario();
 
-      msg.textContent = editando
-        ? "Predio actualizado correctamente."
-        : "Predio guardado correctamente.";
+      // limpiar formulario
+      document.getElementById("sitio").value = "";
+      document.getElementById("sigla").value = "";
+      document.getElementById("departamento").value = "";
+      document.getElementById("fecha").value = "";
+      document.getElementById("sector-list").innerHTML = "";
+      agregarSector();
+      document.getElementById("total-area").textContent = "Área total: 0 m²";
+
+      msg.textContent = "Predio guardado correctamente.";
       msg.classList.add("msg-ok");
     }
 
     function renderListado() {
-      const cont = document.getElementById("lista-predios");
-      const contador = document.getElementById("contador-predios");
-      cont.innerHTML = "";
+      const container = document.getElementById("lista-predios");
+      container.innerHTML = "";
 
-      const total = predios.length;
-
-      if (!total) {
-        cont.innerHTML =
-          '<div class="predio-item">Todavía no hay predios guardados.</div>';
-        contador.textContent = "Total de predios: 0";
+      if (!predios.length) {
+        container.innerHTML =
+          '<div class="predio-item">Todavía no guardaste predios.</div>';
         return;
       }
 
@@ -669,11 +662,9 @@
         );
       });
 
-      contador.textContent = `Mostrando ${filtrados.length} de ${total} predios`;
-
       if (!filtrados.length) {
-        cont.innerHTML =
-          '<div class="predio-item">No se encontraron coincidencias.</div>';
+        container.innerHTML =
+          '<div class="predio-item">No se encontraron predios con ese filtro.</div>';
         return;
       }
 
@@ -688,162 +679,162 @@
           header.className = "predio-header";
 
           const left = document.createElement("div");
-          const s = document.createElement("div");
-          s.className = "predio-sitio";
-          s.textContent = p.sitio;
+          const sitioSpan = document.createElement("div");
+          sitioSpan.className = "predio-sitio";
+          sitioSpan.textContent = p.sitio;
 
           const meta = document.createElement("div");
           meta.className = "predio-meta";
           meta.textContent = [
-            `Sigla: ${p.sigla}`,
+            p.sigla ? `Sigla: ${p.sigla}` : "",
             p.departamento ? `Depto: ${p.departamento}` : "",
             p.fecha ? `Fecha: ${p.fecha}` : "",
           ]
             .filter(Boolean)
             .join(" · ");
 
-          left.appendChild(s);
+          left.appendChild(sitioSpan);
           left.appendChild(meta);
-
-          const btnBox = document.createElement("div");
-
-          const btnEdit = document.createElement("button");
-          btnEdit.className = "predio-delete-btn";
-          btnEdit.style.marginRight = "6px";
-          btnEdit.textContent = "Editar";
-          btnEdit.onclick = () => editarPredio(p.id);
 
           const btnDel = document.createElement("button");
           btnDel.className = "predio-delete-btn";
           btnDel.textContent = "Eliminar";
           btnDel.onclick = () => eliminarPredio(p.id);
 
-          btnBox.appendChild(btnEdit);
-          btnBox.appendChild(btnDel);
-
           header.appendChild(left);
-          header.appendChild(btnBox);
+          header.appendChild(btnDel);
 
-          const area = document.createElement("div");
-          area.className = "predio-area";
-          area.textContent = `Área total: ${p.areaTotal.toFixed(2)} m²`;
+          const areaDiv = document.createElement("div");
+          areaDiv.className = "predio-area";
+          areaDiv.textContent = `Área total: ${p.areaTotal.toFixed(2)} m²`;
 
           div.appendChild(header);
-          div.appendChild(area);
-          cont.appendChild(div);
+          div.appendChild(areaDiv);
+
+          container.appendChild(div);
         });
     }
 
-    function editarPredio(id) {
-      const p = predios.find((x) => x.id === id);
-      if (!p) return;
-
-      predioEditandoId = id;
-
-      document.getElementById("sitio").value = p.sitio;
-      document.getElementById("sigla").value = p.sigla;
-      document.getElementById("departamento").value = p.departamento || "";
-      document.getElementById("fecha").value = p.fecha || "";
-
-      const list = document.getElementById("sector-list");
-      list.innerHTML = "";
-      (p.sectores || []).forEach((sec) =>
-        agregarSector(sec.largo, sec.ancho)
-      );
-
-      showSection("nuevo");
-    }
-
     function eliminarPredio(id) {
-      if (!confirm("¿Seguro de eliminar este predio?")) return;
+      if (!confirm("¿Eliminar este predio?")) return;
       predios = predios.filter((p) => p.id !== id);
       guardarPredios();
       renderListado();
     }
 
-    function actualizarExportJSON() {
-      const textarea = document.getElementById("export-json");
-      if (textarea) {
-        textarea.value = JSON.stringify(predios, null, 2);
-      }
-    }
-
     function descargarCSV() {
-      const filtroDepto = document.getElementById("export-depto").value;
-      let lista = predios;
-
-      if (filtroDepto) {
-        lista = predios.filter(
-          (p) => (p.departamento || "") === filtroDepto
-        );
-      }
-
-      if (!lista.length) {
-        alert("No hay predios para exportar con ese filtro.");
+      if (!predios.length) {
+        alert("No hay predios para exportar.");
         return;
       }
 
-      const headers = [
+      const deptoSelect = document.getElementById("export-departamento");
+      const filtro = deptoSelect.value;
+
+      let prediosFiltrados = predios;
+      if (filtro) {
+        prediosFiltrados = predios.filter(
+          (p) => (p.departamento || "") === filtro
+        );
+      }
+
+      if (!prediosFiltrados.length) {
+        alert("No hay predios en ese departamento para exportar.");
+        return;
+      }
+
+      const encabezados = [
         "sitio",
         "sigla",
         "departamento",
         "fecha",
         "areaTotal_m2",
       ];
+      const filas = [encabezados.join(",")];
 
-      const filas = [headers.join(",")];
+      prediosFiltrados.forEach((p) => {
+        const row = [
+          `"${(p.sitio || "").replace(/"/g, '""')}"`,
+          `"${(p.sigla || "").replace(/"/g, '""')}"`,
+          `"${(p.departamento || "").replace(/"/g, '""')}"`,
+          `"${p.fecha || ""}"`,
+          p.areaTotal.toFixed(2),
+        ];
+        filas.push(row.join(","));
+      });
 
-      lista.forEach((p) => {
+      const csv = filas.join("\n");
+
+      try {
+        const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        const nombre =
+          "predios_" +
+          (filtro ? filtro.replace(/\s+/g, "_") : "todos") +
+          ".csv";
+        a.download = nombre;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+      } catch (e) {
+        // Si falla la descarga en WebView, seguimos
+      }
+    }
+
+    async function copiarTablaExcel() {
+      if (!predios.length) {
+        alert("No hay predios para copiar.");
+        return;
+      }
+
+      const deptoSelect = document.getElementById("export-departamento");
+      const filtro = deptoSelect.value;
+
+      let prediosFiltrados = predios;
+      if (filtro) {
+        prediosFiltrados = predios.filter(
+          (p) => (p.departamento || "") === filtro
+        );
+      }
+
+      if (!prediosFiltrados.length) {
+        alert("No hay predios en ese departamento para copiar.");
+        return;
+      }
+
+      const filas = ["SITIO\tSIGLA\tDEPARTAMENTO\tFECHA\tAREA_TOTAL_M2"];
+
+      prediosFiltrados.forEach((p) => {
         filas.push(
-          [
-            `"${(p.sitio || "").replace(/"/g, '""')}"`,
-            `"${(p.sigla || "").replace(/"/g, '""')}"`,
-            `"${(p.departamento || "").replace(/"/g, '""')}"`,
-            `"${p.fecha || ""}"`,
-            p.areaTotal.toFixed(2),
-          ].join(",")
+          `${(p.sitio || "").replace(/\t/g, " ")}\t` +
+            `${(p.sigla || "").replace(/\t/g, " ")}\t` +
+            `${(p.departamento || "").replace(/\t/g, " ")}\t` +
+            `${p.fecha || ""}\t` +
+            `${p.areaTotal.toFixed(2)}`
         );
       });
 
-      const blob = new Blob([filas.join("\n")], {
-        type: "text/csv;charset=utf-8;",
-      });
-      const url = URL.createObjectURL(blob);
+      const tsv = filas.join("\n");
 
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = filtroDepto
-        ? `predios_${filtroDepto}.csv`
-        : "predios_antel.csv";
-      a.click();
-
-      URL.revokeObjectURL(url);
-    }
-
-    function copiarJSON() {
-      navigator.clipboard
-        .writeText(JSON.stringify(predios, null, 2))
-        .then(() => alert("JSON copiado al portapapeles."))
-        .catch(() =>
-          alert("El navegador no permitió copiar automáticamente.")
+      try {
+        await navigator.clipboard.writeText(tsv);
+        alert(
+          "Tabla copiada al portapapeles.\n\n" +
+            "Abrí Excel o Google Sheets, seleccioná la celda A1 y pegá: las columnas se acomodan solas."
         );
+      } catch {
+        alert(
+          "No se pudo copiar al portapapeles (permisos del navegador). Probá usar la opción de CSV."
+        );
+      }
     }
 
-    // Inicialización
     cargarPredios();
     agregarSector();
-    actualizarExportJSON();
-
-    // 🔥 MAYÚSCULAS AUTOMÁTICAS EN INPUTS DE TEXTO Y TEXTAREAS
-    document.addEventListener("input", (e) => {
-      const el = e.target;
-      if (el.tagName === "INPUT" && el.type === "text") {
-        el.value = el.value.toUpperCase();
-      }
-      if (el.tagName === "TEXTAREA") {
-        el.value = el.value.toUpperCase();
-      }
-    });
+    actualizarAreaTotal();
   </script>
 </body>
 </html>
