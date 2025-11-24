@@ -169,10 +169,10 @@
     }
 
     .btn-back {
-      background: transparent;
+      background: var(--yellow-btn);       /* COLOR VISIBLE OTRA VEZ */
       border-radius: 999px;
-      border: 1px solid rgba(148, 163, 184, 0.5);
-      color: var(--text-main);
+      border: none;
+      color: #111827;
       padding: 8px 14px;
       display: inline-flex;
       align-items: center;
@@ -180,6 +180,7 @@
       margin-bottom: 14px;
       cursor: pointer;
       font-size: 0.9rem;
+      box-shadow: 0 8px 18px rgba(250, 204, 21, 0.45);
     }
 
     .btn-back span.icon {
@@ -348,11 +349,11 @@
         </label>
         <textarea
           id="descripcion"
-          placeholder="Ej: 1 tostada con mermelada, 1 taza de café con leche, 1 porción de fruta"
+          placeholder="Ej: 1 taza de café con leche"
         ></textarea>
       </div>
 
-      <!-- Atajo cantidad / porción / alimento (no cambia la UI general) -->
+      <!-- Atajo cantidad / porción / alimento -->
       <div class="row">
         <div class="col">
           <label for="cant">Cant.</label>
@@ -394,10 +395,7 @@
 
       <div class="field-group" style="margin-top: 14px;">
         <label for="jsonChat">Pega aquí el resultado de ChatGPT (JSON)</label>
-        <textarea
-          id="jsonChat"
-          placeholder='{"calorias":120,"azucares_g":10,"grasas_g":4,"proteinas_g":6}'
-        ></textarea>
+        <textarea id="jsonChat"></textarea>
       </div>
 
       <button id="btnAgregar" class="btn btn-green">
@@ -515,7 +513,7 @@
     const jsonChatEl = document.getElementById("jsonChat");
 
     const btnPrompt = document.getElementById("btnPrompt");
-    const btnAgregar = document.getElementById("btnAgregar");
+       const btnAgregar = document.getElementById("btnAgregar");
     const btnResumen = document.getElementById("btnResumen");
     const btnBaseAprendida = document.getElementById("btnBaseAprendida");
 
@@ -577,7 +575,8 @@
       const cant = cantEl.value.trim();
       const porc = porcionEl.value.trim();
       const ali = alimentoEl.value.trim();
-      if (cant && porc && ali) {
+      // SOLO completar si el campo está vacío → así podés escribir varias cosas a mano
+      if (cant && porc && ali && descripcionEl.value.trim() === "") {
         descripcionEl.value = `${cant} ${porc} de ${ali}`;
       }
     }
@@ -600,10 +599,10 @@
 Actúa como nutricionista. Estoy registrando lo que como.
 
 Tipo de comida: ${tipo}
-Descripción (puede tener varias cosas, separadas por comas o en líneas distintas):
+Descripción de la comida:
 "${desc}"
 
-Calcula los VALORES TOTALES para esa comida completa (todas las cosas juntas).
+Calcula los VALORES TOTALES para esa comida.
 Responde SOLO un JSON VÁLIDO, en UNA sola línea, sin explicación extra, usando EXACTAMENTE este formato de claves:
 {"calorias":0,"azucares_g":0,"grasas_g":0,"proteinas_g":0}
       `.trim();
@@ -614,7 +613,6 @@ Responde SOLO un JSON VÁLIDO, en UNA sola línea, sin explicación extra, usand
         console.error("No se pudo copiar al portapapeles", e);
       }
 
-      // Intento de abrir ChatGPT (en navegador funciona; en Appilix depende)
       try {
         window.open("https://chat.openai.com", "_blank");
       } catch (e) {
@@ -635,7 +633,6 @@ Responde SOLO un JSON VÁLIDO, en UNA sola línea, sin explicación extra, usand
 
       let macros = null;
 
-      // 1) si la descripción ya existe en la base aprendida, usamos eso
       const encontrada = buscarEnBase(descripcion);
       if (encontrada && !jsonStr) {
         macros = {
@@ -645,7 +642,6 @@ Responde SOLO un JSON VÁLIDO, en UNA sola línea, sin explicación extra, usand
           proteinas_g: encontrada.proteinas_g,
         };
       } else {
-        // 2) intentamos leer JSON pegado
         if (!jsonStr) {
           alert(
             "Pegá el JSON que te devolvió ChatGPT, o usá una descripción que ya hayas guardado antes."
@@ -679,7 +675,6 @@ Responde SOLO un JSON VÁLIDO, en UNA sola línea, sin explicación extra, usand
           return;
         }
 
-        // si vino JSON, actualizamos la base aprendida
         agregarABase(descripcion, macros);
       }
 
@@ -705,9 +700,7 @@ Responde SOLO un JSON VÁLIDO, en UNA sola línea, sin explicación extra, usand
       comidas.push(registro);
       guardarJSON(STORAGE_COMIDAS, comidas);
 
-      // limpiamos solo el JSON; la descripción la dejamos por si querés repetir
       jsonChatEl.value = "";
-
       alert("Comida guardada.");
     });
 
