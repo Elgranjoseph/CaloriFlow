@@ -1,0 +1,728 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <title>GeoPredios · Antel</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+
+    body {
+      background: radial-gradient(circle at top, #1f2933, #050816);
+      color: #f9fafb;
+      min-height: 100vh;
+    }
+
+    .app {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 16px;
+    }
+
+    header {
+      text-align: center;
+      margin-bottom: 16px;
+    }
+
+    header h1 {
+      font-size: 2rem;
+      margin-bottom: 4px;
+    }
+
+    header p {
+      font-size: 0.9rem;
+      color: #9ca3af;
+    }
+
+    .card {
+      background: rgba(15, 23, 42, 0.95);
+      border-radius: 16px;
+      padding: 16px;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+      margin-bottom: 16px;
+    }
+
+    .section-title {
+      font-size: 1.1rem;
+      margin-bottom: 8px;
+      font-weight: 600;
+    }
+
+    label {
+      display: block;
+      font-size: 0.9rem;
+      margin-bottom: 4px;
+    }
+
+    input[type="text"],
+    input[type="date"],
+    input[type="number"],
+    select,
+    textarea {
+      width: 100%;
+      padding: 10px 12px;
+      border-radius: 10px;
+      border: 1px solid #374151;
+      background: #020617;
+      color: #e5e7eb;
+      font-size: 0.95rem;
+      outline: none;
+    }
+
+    input::placeholder,
+    textarea::placeholder {
+      color: #6b7280;
+    }
+
+    textarea {
+      min-height: 60px;
+      resize: vertical;
+    }
+
+    .row {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+
+    .row > .col {
+      flex: 1;
+    }
+
+    .btn {
+      width: 100%;
+      padding: 12px;
+      border-radius: 999px;
+      border: none;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      margin-top: 8px;
+      transition: transform 0.08s ease, box-shadow 0.08s ease, opacity 0.15s ease;
+    }
+
+    .btn:active {
+      transform: translateY(1px) scale(0.99);
+      box-shadow: 0 6px 12px rgba(0, 0, 0, 0.4);
+      opacity: 0.9;
+    }
+
+    .btn-primary {
+      background: linear-gradient(90deg, #22c55e, #16a34a);
+      color: #022c22;
+      box-shadow: 0 12px 26px rgba(34, 197, 94, 0.35);
+    }
+
+    .btn-secondary {
+      background: linear-gradient(90deg, #facc15, #eab308);
+      color: #111827;
+      box-shadow: 0 12px 26px rgba(250, 204, 21, 0.35);
+    }
+
+    .btn-outline {
+      background: transparent;
+      border: 1px solid #4b5563;
+      color: #e5e7eb;
+    }
+
+    .btn-danger {
+      background: #b91c1c;
+      color: #fee2e2;
+    }
+
+    .btn-small {
+      padding: 6px 10px;
+      font-size: 0.8rem;
+      width: auto;
+      border-radius: 999px;
+    }
+
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 10px;
+      border-radius: 999px;
+      font-size: 0.75rem;
+      background: #111827;
+      color: #9ca3af;
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    .sections-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 12px;
+      margin-bottom: 4px;
+    }
+
+    .section-row {
+      border-radius: 12px;
+      border: 1px solid #1f2933;
+      background: rgba(15, 23, 42, 0.9);
+      padding: 8px 10px;
+      margin-bottom: 8px;
+    }
+
+    .section-row-top {
+      display: flex;
+      gap: 8px;
+      align-items: flex-end;
+    }
+
+    .section-row-bottom {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 4px;
+      font-size: 0.8rem;
+      color: #9ca3af;
+    }
+
+    .area-total {
+      margin-top: 6px;
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: #a5b4fc;
+    }
+
+    .tag {
+      display: inline-flex;
+      align-items: center;
+      padding: 3px 8px;
+      border-radius: 999px;
+      font-size: 0.7rem;
+      background: #111827;
+      color: #9ca3af;
+      margin-right: 4px;
+    }
+
+    .site-card {
+      border-radius: 14px;
+      padding: 10px 12px;
+      background: rgba(15, 23, 42, 0.92);
+      border: 1px solid #1f2933;
+      margin-bottom: 8px;
+    }
+
+    .site-card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 4px;
+    }
+
+    .site-name {
+      font-size: 0.95rem;
+      font-weight: 600;
+    }
+
+    .site-sigla {
+      font-size: 0.8rem;
+      color: #9ca3af;
+    }
+
+    .site-meta {
+      font-size: 0.8rem;
+      color: #9ca3af;
+      margin-bottom: 4px;
+    }
+
+    .site-actions {
+      display: flex;
+      gap: 6px;
+      margin-top: 4px;
+    }
+
+    .toolbar {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 10px;
+      flex-wrap: wrap;
+    }
+
+    .toolbar input,
+    .toolbar select {
+      flex: 1;
+    }
+
+    .toast {
+      position: fixed;
+      bottom: 16px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(22, 163, 74, 0.95);
+      color: #ecfdf5;
+      padding: 8px 14px;
+      border-radius: 999px;
+      font-size: 0.85rem;
+      box-shadow: 0 10px 24px rgba(0, 0, 0, 0.5);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.2s ease;
+      z-index: 20;
+    }
+
+    .toast.show {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    @media (max-width: 600px) {
+      header h1 {
+        font-size: 1.6rem;
+      }
+      .card {
+        padding: 12px;
+      }
+      .row {
+        flex-direction: column;
+      }
+      .section-row-top {
+        flex-direction: column;
+        align-items: stretch;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <header>
+      <h1>GeoPredios</h1>
+      <p>Registro de áreas de predios Antel por sitio y sigla.</p>
+    </header>
+
+    <!-- VISTA FORMULARIO -->
+    <section id="view-form" class="card">
+      <div class="section-title">Datos del sitio</div>
+      <div class="row">
+        <div class="col">
+          <label for="zonaSelect">Zona / Departamento</label>
+          <select id="zonaSelect">
+            <option value="">Seleccionar...</option>
+            <option>Artigas</option>
+            <option>Canelones</option>
+            <option>Cerro Largo</option>
+            <option>Colonia</option>
+            <option>Durazno</option>
+            <option>Flores</option>
+            <option>Florida</option>
+            <option>Lavalleja</option>
+            <option>Maldonado</option>
+            <option>Montevideo</option>
+            <option>Paysandú</option>
+            <option>Río Negro</option>
+            <option>Rivera</option>
+            <option>Rocha</option>
+            <option>Salto</option>
+            <option>San José</option>
+            <option>Soriano</option>
+            <option>Tacuarembó</option>
+            <option>Treinta y Tres</option>
+          </select>
+        </div>
+        <div class="col">
+          <label for="fechaInput">Fecha de medición</label>
+          <input type="date" id="fechaInput" />
+        </div>
+      </div>
+
+      <label for="sitioInput">Nombre del sitio</label>
+      <input id="sitioInput" type="text" placeholder="Ej: Ruta 8 km 230 · Predio Antel" />
+
+      <div class="row" style="margin-top:10px;">
+        <div class="col">
+          <label for="siglaInput">Sigla</label>
+          <input id="siglaInput" type="text" placeholder="Ej: ROCH-023" />
+        </div>
+        <div class="col">
+          <label for="notasInput">Notas (opcional)</label>
+          <input id="notasInput" type="text" placeholder="Ej: alambrado roto al fondo" />
+        </div>
+      </div>
+
+      <!-- Secciones -->
+      <div class="sections-header">
+        <span class="section-title" style="margin-bottom:0;">Secciones del predio (m)</span>
+        <button id="addSectionBtn" class="btn btn-small btn-outline">➕ Agregar sección</button>
+      </div>
+      <div id="sectionsContainer"></div>
+      <div id="areaTotalLabel" class="area-total">Área total: 0 m²</div>
+
+      <button id="saveSiteBtn" class="btn btn-primary">💾 Guardar sitio</button>
+      <button id="goToListBtn" class="btn btn-secondary">📋 Ver listado de sitios</button>
+
+      <input type="hidden" id="currentSiteId" />
+    </section>
+
+    <!-- VISTA LISTA -->
+    <section id="view-list" class="card hidden">
+      <div class="section-title">Listado de sitios</div>
+
+      <div class="toolbar">
+        <input id="searchInput" type="text" placeholder="Buscar por sitio o sigla..." />
+        <select id="filterZona">
+          <option value="">Todas las zonas</option>
+          <option>Artigas</option>
+          <option>Canelones</option>
+          <option>Cerro Largo</option>
+          <option>Colonia</option>
+          <option>Durazno</option>
+          <option>Flores</option>
+          <option>Florida</option>
+          <option>Lavalleja</option>
+          <option>Maldonado</option>
+          <option>Montevideo</option>
+          <option>Paysandú</option>
+          <option>Río Negro</option>
+          <option>Rivera</option>
+          <option>Rocha</option>
+          <option>Salto</option>
+          <option>San José</option>
+          <option>Soriano</option>
+          <option>Tacuarembó</option>
+          <option>Treinta y Tres</option>
+        </select>
+      </div>
+
+      <div id="sitesList"></div>
+
+      <button id="backToFormBtn" class="btn btn-secondary">⬅ Volver al formulario</button>
+    </section>
+
+    <div id="toast" class="toast">Guardado</div>
+  </div>
+
+  <script>
+    // --- Estado en memoria ---
+    const STORAGE_KEY = "geopredios_sites_v1";
+    let sites = [];
+
+    // --- Elementos DOM ---
+    const viewForm = document.getElementById("view-form");
+    const viewList = document.getElementById("view-list");
+
+    const zonaSelect = document.getElementById("zonaSelect");
+    const fechaInput = document.getElementById("fechaInput");
+    const sitioInput = document.getElementById("sitioInput");
+    const siglaInput = document.getElementById("siglaInput");
+    const notasInput = document.getElementById("notasInput");
+
+    const sectionsContainer = document.getElementById("sectionsContainer");
+    const addSectionBtn = document.getElementById("addSectionBtn");
+    const areaTotalLabel = document.getElementById("areaTotalLabel");
+
+    const saveSiteBtn = document.getElementById("saveSiteBtn");
+    const goToListBtn = document.getElementById("goToListBtn");
+    const backToFormBtn = document.getElementById("backToFormBtn");
+
+    const currentSiteIdInput = document.getElementById("currentSiteId");
+
+    const searchInput = document.getElementById("searchInput");
+    const filterZona = document.getElementById("filterZona");
+    const sitesList = document.getElementById("sitesList");
+
+    const toast = document.getElementById("toast");
+
+    // --- Utilidades ---
+    function showToast(msg, color) {
+      if (color) toast.style.background = color;
+      toast.textContent = msg;
+      toast.classList.add("show");
+      setTimeout(() => toast.classList.remove("show"), 2000);
+    }
+
+    function saveToStorage() {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(sites));
+    }
+
+    function loadFromStorage() {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if (!raw) {
+        sites = [];
+        return;
+      }
+      try {
+        sites = JSON.parse(raw) || [];
+      } catch (e) {
+        sites = [];
+      }
+    }
+
+    function switchView(name) {
+      if (name === "form") {
+        viewForm.classList.remove("hidden");
+        viewList.classList.add("hidden");
+      } else {
+        viewList.classList.remove("hidden");
+        viewForm.classList.add("hidden");
+      }
+    }
+
+    // --- Secciones ---
+    function createSectionRow(initial = { largo: "", ancho: "" }) {
+      const row = document.createElement("div");
+      row.className = "section-row";
+
+      row.innerHTML = `
+        <div class="section-row-top">
+          <div class="col">
+            <label>Largo (m)</label>
+            <input type="number" min="0" step="0.1" class="input-largo" placeholder="Ej: 20" />
+          </div>
+          <div class="col">
+            <label>Ancho (m)</label>
+            <input type="number" min="0" step="0.1" class="input-ancho" placeholder="Ej: 15" />
+          </div>
+        </div>
+        <div class="section-row-bottom">
+          <span class="pill">Área parcial: <span class="area-parcial">0</span> m²</span>
+          <button class="btn btn-small btn-danger btn-remove-section">Eliminar</button>
+        </div>
+      `;
+
+      const largoInput = row.querySelector(".input-largo");
+      const anchoInput = row.querySelector(".input-ancho");
+      const areaSpan = row.querySelector(".area-parcial");
+      const removeBtn = row.querySelector(".btn-remove-section");
+
+      largoInput.value = initial.largo || "";
+      anchoInput.value = initial.ancho || "";
+
+      function updateArea() {
+        const l = parseFloat(largoInput.value) || 0;
+        const a = parseFloat(anchoInput.value) || 0;
+        const area = l * a;
+        areaSpan.textContent = area.toFixed(2);
+        updateAreaTotal();
+      }
+
+      largoInput.addEventListener("input", updateArea);
+      anchoInput.addEventListener("input", updateArea);
+
+      removeBtn.addEventListener("click", () => {
+        sectionsContainer.removeChild(row);
+        updateAreaTotal();
+      });
+
+      // Calcular al iniciar si había valores
+      setTimeout(updateArea, 0);
+
+      return row;
+    }
+
+    function updateAreaTotal() {
+      let total = 0;
+      const rows = sectionsContainer.querySelectorAll(".section-row");
+      rows.forEach(row => {
+        const largo = parseFloat(row.querySelector(".input-largo").value) || 0;
+        const ancho = parseFloat(row.querySelector(".input-ancho").value) || 0;
+        total += largo * ancho;
+      });
+      areaTotalLabel.textContent = `Área total: ${total.toFixed(2)} m²`;
+      return total;
+    }
+
+    function clearForm() {
+      zonaSelect.value = "";
+      fechaInput.value = "";
+      sitioInput.value = "";
+      siglaInput.value = "";
+      notasInput.value = "";
+      currentSiteIdInput.value = "";
+      sectionsContainer.innerHTML = "";
+      addSectionRow(); // al menos una sección
+      updateAreaTotal();
+    }
+
+    function getSectionsFromForm() {
+      const sections = [];
+      const rows = sectionsContainer.querySelectorAll(".section-row");
+      rows.forEach(row => {
+        const largo = parseFloat(row.querySelector(".input-largo").value) || 0;
+        const ancho = parseFloat(row.querySelector(".input-ancho").value) || 0;
+        if (largo > 0 && ancho > 0) {
+          sections.push({
+            largo,
+            ancho,
+            area: largo * ancho
+          });
+        }
+      });
+      return sections;
+    }
+
+    function loadSiteIntoForm(site) {
+      zonaSelect.value = site.zona || "";
+      fechaInput.value = site.fecha || "";
+      sitioInput.value = site.sitio || "";
+      siglaInput.value = site.sigla || "";
+      notasInput.value = site.notas || "";
+      currentSiteIdInput.value = site.id || "";
+
+      sectionsContainer.innerHTML = "";
+      if (site.secciones && site.secciones.length) {
+        site.secciones.forEach(sec => {
+          const row = createSectionRow({ largo: sec.largo, ancho: sec.ancho });
+          sectionsContainer.appendChild(row);
+        });
+      } else {
+        addSectionRow();
+      }
+      updateAreaTotal();
+      switchView("form");
+    }
+
+    function addSectionRow() {
+      const row = createSectionRow();
+      sectionsContainer.appendChild(row);
+      updateAreaTotal();
+    }
+
+    // --- Listado ---
+    function renderSitesList() {
+      const term = (searchInput.value || "").toLowerCase();
+      const zonaFilter = filterZona.value || "";
+      sitesList.innerHTML = "";
+
+      const sorted = [...sites].sort((a, b) =>
+        (a.zona || "").localeCompare(b.zona || "") ||
+        (a.sitio || "").localeCompare(b.sitio || "")
+      );
+
+      const filtered = sorted.filter(site => {
+        const matchesZona = zonaFilter ? site.zona === zonaFilter : true;
+        const matchesTerm =
+          !term ||
+          (site.sitio && site.sitio.toLowerCase().includes(term)) ||
+          (site.sigla && site.sigla.toLowerCase().includes(term));
+        return matchesZona && matchesTerm;
+      });
+
+      if (!filtered.length) {
+        const p = document.createElement("p");
+        p.style.fontSize = "0.85rem";
+        p.style.color = "#9ca3af";
+        p.textContent = "No hay sitios cargados con esos criterios.";
+        sitesList.appendChild(p);
+        return;
+      }
+
+      filtered.forEach(site => {
+        const card = document.createElement("div");
+        card.className = "site-card";
+
+        const area = site.areaTotal || 0;
+        const fechaTxt = site.fecha || "sin fecha";
+
+        card.innerHTML = `
+          <div class="site-card-header">
+            <div>
+              <div class="site-name">${site.sitio || "(sin nombre)"}</div>
+              <div class="site-sigla">Sigla: ${site.sigla || "-"}</div>
+            </div>
+            <span class="tag">${site.zona || "Zona sin definir"}</span>
+          </div>
+          <div class="site-meta">
+            Área total: <strong>${area.toFixed(2)} m²</strong> · Medido: ${fechaTxt}
+          </div>
+          <div class="site-actions">
+            <button class="btn btn-small btn-outline btn-edit">Ver / Editar</button>
+            <button class="btn btn-small btn-danger btn-delete">Eliminar</button>
+          </div>
+        `;
+
+        card.querySelector(".btn-edit").addEventListener("click", () => {
+          loadSiteIntoForm(site);
+        });
+
+        card.querySelector(".btn-delete").addEventListener("click", () => {
+          const ok = confirm(
+            `¿Eliminar el sitio "${site.sitio}" (${site.sigla})? Esta acción no se puede deshacer.`
+          );
+          if (!ok) return;
+          sites = sites.filter(s => s.id !== site.id);
+          saveToStorage();
+          renderSitesList();
+          showToast("Sitio eliminado", "#b91c1c");
+        });
+
+        sitesList.appendChild(card);
+      });
+    }
+
+    // --- Eventos globales ---
+    addSectionBtn.addEventListener("click", () => addSectionRow());
+
+    saveSiteBtn.addEventListener("click", () => {
+      const sitio = sitioInput.value.trim();
+      const sigla = siglaInput.value.trim();
+      const zona = zonaSelect.value.trim();
+      const fecha = fechaInput.value;
+      const notas = notasInput.value.trim();
+      const secciones = getSectionsFromForm();
+      const areaTotal = secciones.reduce((sum, s) => sum + s.area, 0);
+
+      if (!sitio || !sigla) {
+        showToast("Sitio y sigla son obligatorios", "#b91c1c");
+        return;
+      }
+      if (!secciones.length) {
+        showToast("Agregá al menos una sección con largo y ancho", "#b91c1c");
+        return;
+      }
+
+      const id = currentSiteIdInput.value || `site_${Date.now()}`;
+
+      const newSite = {
+        id,
+        sitio,
+        sigla,
+        zona,
+        fecha,
+        notas,
+        secciones,
+        areaTotal
+      };
+
+      const existingIndex = sites.findIndex(s => s.id === id);
+      if (existingIndex >= 0) {
+        sites[existingIndex] = newSite;
+        showToast("Sitio actualizado", "#16a34a");
+      } else {
+        sites.push(newSite);
+        showToast("Sitio guardado", "#16a34a");
+      }
+
+      saveToStorage();
+      currentSiteIdInput.value = id;
+    });
+
+    goToListBtn.addEventListener("click", () => {
+      renderSitesList();
+      switchView("list");
+    });
+
+    backToFormBtn.addEventListener("click", () => {
+      switchView("form");
+    });
+
+    searchInput.addEventListener("input", renderSitesList);
+    filterZona.addEventListener("change", renderSitesList);
+
+    // --- Inicio ---
+    loadFromStorage();
+    clearForm();
+    renderSitesList();
+  </script>
+</body>
+</html>
