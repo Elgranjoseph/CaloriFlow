@@ -3,860 +3,782 @@
 <head>
   <meta charset="UTF-8" />
   <title>CaloriFlow</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <style>
-    :root {
-      --bg-main: #020617;
-      --card-bg: radial-gradient(circle at top, #1e293b, #020617);
-      --accent: #818cf8;
-      --accent-strong: #6366f1;
-      --text-main: #e5e7eb;
-      --text-soft: #9ca3af;
-      --danger: #ef4444;
-      --green-btn: #22c55e;
-      --yellow-btn: #facc15;
-      --blue-btn: #0ea5e9;
-    }
-
     * {
       box-sizing: border-box;
+    }
+    body {
       margin: 0;
-      padding: 0;
       font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
         sans-serif;
+      background: radial-gradient(circle at top, #151b3c 0, #050712 55%, #020308 100%);
+      color: #fff;
     }
-
-    body {
-      background: radial-gradient(circle at top, #111827 0, #020617 55%);
-      color: var(--text-main);
+    .app-shell {
       min-height: 100vh;
       display: flex;
       justify-content: center;
       align-items: flex-start;
-      padding: 16px;
+      padding: 24px 12px 40px;
     }
-
-    .app {
+    .card {
       width: 100%;
       max-width: 480px;
-      margin: 0 auto;
-    }
-
-    .card {
-      background: var(--card-bg);
+      background: rgba(5, 9, 30, 0.96);
       border-radius: 24px;
-      padding: 20px 18px 24px;
-      box-shadow: 0 25px 60px rgba(15, 23, 42, 0.9);
-      border: 1px solid rgba(148, 163, 184, 0.25);
+      padding: 20px 18px 28px;
+      box-shadow: 0 18px 40px rgba(0, 0, 0, 0.6);
+      border: 1px solid rgba(255, 255, 255, 0.04);
     }
-
     h1 {
       text-align: center;
-      font-size: 2.2rem;
-      letter-spacing: 0.04em;
-      margin-bottom: 4px;
-      color: #f9fafb;
+      margin: 4px 0 2px;
+      letter-spacing: 0.06em;
+      font-size: 30px;
     }
-
     .subtitle {
       text-align: center;
-      font-size: 0.9rem;
-      color: var(--text-soft);
-      margin-bottom: 18px;
+      font-size: 13px;
+      color: #c0c7ff;
+      margin-bottom: 20px;
     }
-
+    .section-title {
+      font-size: 14px;
+      margin: 14px 0 6px;
+      color: #d7ddff;
+    }
     label {
+      font-size: 13px;
+      color: #d7ddff;
       display: block;
-      font-size: 0.9rem;
-      margin-bottom: 6px;
-      color: var(--text-soft);
+      margin-bottom: 4px;
     }
-
     select,
     input[type="text"],
     input[type="number"],
     textarea {
       width: 100%;
-      border-radius: 12px;
-      border: 1px solid rgba(148, 163, 184, 0.45);
-      background: rgba(15, 23, 42, 0.9);
-      color: var(--text-main);
-      padding: 11px 12px;
-      font-size: 0.95rem;
+      border-radius: 14px;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      padding: 10px 12px;
+      background: rgba(9, 13, 40, 0.95);
+      color: #fff;
+      font-size: 15px;
       outline: none;
     }
-
+    textarea {
+      resize: vertical;
+      min-height: 72px;
+    }
     select:focus,
     input:focus,
     textarea:focus {
-      border-color: var(--accent);
-      box-shadow: 0 0 0 1px rgba(129, 140, 248, 0.8);
+      border-color: #7c8dff;
+      box-shadow: 0 0 0 1px rgba(124, 141, 255, 0.4);
     }
-
-    textarea {
-      min-height: 64px;
-      resize: vertical;
-    }
-
-    .field-group {
-      margin-bottom: 14px;
-    }
-
     .row {
       display: flex;
       gap: 10px;
-      margin-bottom: 10px;
+      margin-top: 8px;
     }
-
-    .row .col {
+    .row > div {
       flex: 1;
     }
-
     .btn {
       width: 100%;
-      border: none;
+      padding: 12px;
       border-radius: 999px;
-      padding: 14px 18px;
-      font-size: 1rem;
+      border: none;
+      font-size: 16px;
       font-weight: 600;
+      cursor: pointer;
+      margin-top: 12px;
       display: flex;
       align-items: center;
       justify-content: center;
       gap: 8px;
-      margin-top: 10px;
-      cursor: pointer;
-      transition: transform 0.08s ease-out, box-shadow 0.08s ease-out,
-        filter 0.08s ease-out;
-      color: #020617;
+      transition: transform 0.08s ease, box-shadow 0.08s ease, opacity 0.1s;
     }
-
-    .btn span.icon {
-      font-size: 1.15rem;
+    .btn:active {
+      transform: translateY(1px) scale(0.99);
+      box-shadow: none;
+      opacity: 0.92;
     }
-
     .btn-primary {
-      background: linear-gradient(135deg, #6366f1, #a855f7);
-      color: #f9fafb;
-      box-shadow: 0 12px 25px rgba(88, 28, 135, 0.65);
+      background: linear-gradient(135deg, #7b5cff, #c961ff);
+      color: white;
+      box-shadow: 0 10px 24px rgba(123, 92, 255, 0.6);
     }
-
-    .btn-primary:active {
-      transform: scale(0.97);
-      box-shadow: 0 6px 16px rgba(88, 28, 135, 0.8);
-      filter: brightness(0.96);
-    }
-
     .btn-green {
-      background: var(--green-btn);
-      box-shadow: 0 10px 22px rgba(34, 197, 94, 0.45);
+      background: linear-gradient(135deg, #21c36b, #2de38b);
+      color: #032313;
+      box-shadow: 0 10px 24px rgba(21, 186, 100, 0.55);
     }
-
     .btn-yellow {
-      background: var(--yellow-btn);
-      box-shadow: 0 10px 22px rgba(250, 204, 21, 0.45);
+      background: linear-gradient(135deg, #ffd54f, #ffb300);
+      color: #3b2a00;
+      box-shadow: 0 10px 24px rgba(255, 191, 0, 0.55);
     }
-
     .btn-blue {
-      background: var(--blue-btn);
-      box-shadow: 0 10px 22px rgba(14, 165, 233, 0.45);
+      background: linear-gradient(135deg, #42a5f5, #1e88e5);
+      color: #02121f;
+      box-shadow: 0 10px 24px rgba(33, 150, 243, 0.55);
     }
-
-    .btn-green:active,
-    .btn-yellow:active,
-    .btn-blue:active {
-      transform: scale(0.97);
-      filter: brightness(0.96);
-    }
-
-    /* BOTÓN VOLVER CON COLOR VISIBLE */
     .btn-back {
-      background: var(--yellow-btn);
+      background: linear-gradient(135deg, #ffb74d, #ff9800);
+      color: #2b1400;
+      padding: 9px 16px;
       border-radius: 999px;
-      border: none;
-      color: #111827;
-      padding: 8px 14px;
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      margin-bottom: 14px;
-      cursor: pointer;
-      font-size: 0.9rem;
-      box-shadow: 0 8px 18px rgba(250, 204, 21, 0.45);
+      font-size: 14px;
+      margin-bottom: 10px;
+      width: auto;
+      box-shadow: 0 8px 18px rgba(255, 152, 0, 0.5);
     }
-
-    .btn-back span.icon {
-      font-size: 1rem;
+    .btn-small {
+      padding: 8px 12px;
+      font-size: 13px;
+      border-radius: 999px;
+      width: auto;
     }
-
-    .btn-back:active {
-      transform: scale(0.97);
-      filter: brightness(0.96);
+    .btn-outline {
+      background: transparent;
+      border: 1px dashed rgba(255, 255, 255, 0.35);
+      color: #e0e4ff;
+      box-shadow: none;
     }
-
     .hint {
-      font-size: 0.8rem;
-      color: var(--text-soft);
+      font-size: 12px;
+      color: #a8b0ff;
       margin-top: 4px;
     }
-
+    .footer-note {
+      font-size: 11px;
+      color: #a0a7d7;
+      margin-top: 14px;
+      text-align: center;
+      opacity: 0.86;
+    }
     .hidden {
       display: none;
     }
 
-    /* Resumen */
-    .summary-title {
-      font-size: 1.4rem;
-      margin-bottom: 6px;
-    }
-
-    .summary-sub {
-      font-size: 0.95rem;
-      color: var(--text-soft);
-      margin-bottom: 12px;
-    }
-
-    .summary-box {
-      background: rgba(15, 23, 42, 0.95);
-      border-radius: 18px;
-      padding: 14px 14px 10px;
-      border: 1px solid rgba(148, 163, 184, 0.3);
-      margin-bottom: 14px;
-    }
-
-    .summary-row {
+    /* Lista de ítems de la comida */
+    .items-header {
       display: flex;
+      align-items: center;
       justify-content: space-between;
-      font-size: 0.95rem;
+      margin-top: 10px;
       margin-bottom: 4px;
     }
-
-    .summary-row strong {
-      color: #e5e7eb;
+    .items-header span {
+      font-size: 13px;
+      color: #d7ddff;
     }
-
-    .summary-list-title {
-      margin-top: 6px;
-      margin-bottom: 6px;
-      font-weight: 600;
+    .items-list {
+      margin-top: 4px;
+      max-height: 150px;
+      overflow-y: auto;
     }
-
-    .meal-item {
-      border-radius: 14px;
-      padding: 10px 10px;
-      background: rgba(15, 23, 42, 0.9);
-      border: 1px solid rgba(51, 65, 85, 0.8);
-      margin-bottom: 8px;
-    }
-
-    .meal-header {
+    .meal-item-card {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 4px;
-      font-size: 0.9rem;
+      background: rgba(15, 20, 60, 0.95);
+      border-radius: 14px;
+      padding: 6px 10px;
+      margin-top: 6px;
+      border: 1px solid rgba(255, 255, 255, 0.04);
+      font-size: 13px;
     }
-
-    .meal-type {
-      font-weight: 600;
+    .meal-item-card span {
+      flex: 1;
+      padding-right: 8px;
     }
-
-    .meal-time {
-      color: var(--text-soft);
-      font-size: 0.8rem;
-    }
-
-    .meal-desc {
-      font-size: 0.9rem;
-      margin-bottom: 4px;
-    }
-
-    .meal-macros {
-      font-size: 0.82rem;
-      color: var(--text-soft);
-    }
-
-    .btn-delete {
-      background: rgba(248, 113, 113, 0.16);
+    .meal-item-card button {
+      border: none;
       border-radius: 999px;
-      border: 1px solid rgba(248, 113, 113, 0.6);
-      color: #fecaca;
-      padding: 4px 10px;
-      font-size: 0.78rem;
+      padding: 4px 8px;
+      font-size: 12px;
       cursor: pointer;
-      display: inline-flex;
+      background: rgba(244, 67, 54, 0.16);
+      color: #ffcdd2;
+    }
+
+    /* Resumen */
+    .summary-block {
+      background: rgba(10, 15, 45, 0.95);
+      border-radius: 20px;
+      padding: 14px 14px 18px;
+      margin-top: 12px;
+      border: 1px solid rgba(255, 255, 255, 0.06);
+    }
+    .summary-title {
+      font-size: 22px;
+      margin-bottom: 6px;
+    }
+    .summary-row {
+      font-size: 14px;
+      margin: 2px 0;
+    }
+    .summary-row strong {
+      display: inline-block;
+      width: 140px;
+    }
+    .meal-entry {
+      border-top: 1px solid rgba(255, 255, 255, 0.06);
+      padding-top: 8px;
+      margin-top: 8px;
+      font-size: 13px;
+    }
+    .meal-entry-header {
+      display: flex;
+      justify-content: space-between;
       align-items: center;
-      gap: 4px;
+      margin-bottom: 2px;
+    }
+    .pill {
+      display: inline-block;
+      padding: 2px 9px;
+      border-radius: 999px;
+      font-size: 11px;
+      background: rgba(123, 92, 255, 0.24);
+      color: #e0e5ff;
+    }
+    .delete-small {
+      border: none;
+      border-radius: 999px;
+      padding: 4px 8px;
+      font-size: 11px;
+      background: rgba(244, 67, 54, 0.15);
+      color: #ffcdd2;
+      cursor: pointer;
     }
 
-    .btn-delete span.icon {
-      font-size: 0.9rem;
+    /* Base aprendida */
+    .base-entry {
+      border-top: 1px solid rgba(255, 255, 255, 0.06);
+      padding-top: 8px;
+      margin-top: 8px;
+      font-size: 13px;
+      display: flex;
+      justify-content: space-between;
+      gap: 8px;
+      align-items: center;
     }
-
-    .empty-text {
-      font-size: 0.9rem;
-      color: var(--text-soft);
-      text-align: center;
-      margin-top: 6px;
-    }
-
-    /* tabla base aprendida */
-    .learn-item {
-      border-radius: 14px;
-      padding: 10px;
-      background: rgba(15, 23, 42, 0.9);
-      border: 1px solid rgba(51, 65, 85, 0.85);
-      margin-bottom: 8px;
-      font-size: 0.9rem;
-    }
-
-    .learn-name {
-      font-weight: 600;
-      margin-bottom: 4px;
-    }
-
-    .learn-macros {
-      font-size: 0.82rem;
-      color: var(--text-soft);
-      margin-bottom: 4px;
-    }
-
-    @media (max-width: 400px) {
-      .card {
-        padding: 16px 14px 20px;
-      }
-
-      h1 {
-        font-size: 1.8rem;
-      }
+    .base-entry-info {
+      flex: 1;
     }
   </style>
 </head>
 <body>
-  <div class="app">
-    <!-- PANTALLA PRINCIPAL -->
-    <div id="pantalla-registro" class="card">
+  <div class="app-shell">
+    <div class="card" id="section-registro">
       <h1>CaloriFlow</h1>
-      <p class="subtitle">Registro diario con memoria propia.</p>
+      <div class="subtitle">Registro diario con memoria propia.</div>
 
-      <div class="field-group">
-        <label for="tipoComida">Tipo de comida</label>
-        <select id="tipoComida">
-          <option>Desayuno</option>
-          <option>Almuerzo</option>
-          <option>Merienda</option>
-          <option>Cena</option>
-          <option>Snack</option>
-        </select>
-      </div>
+      <div class="section-title">Tipo de comida</div>
+      <select id="tipoComida">
+        <option>Desayuno</option>
+        <option>Almuerzo</option>
+        <option>Merienda</option>
+        <option>Cena</option>
+        <option>Snack</option>
+      </select>
 
-      <div class="field-group">
-        <label for="descripcion">
-          ¿Qué comiste?
-        </label>
-        <textarea
-          id="descripcion"
-          placeholder="Ej: 1 taza de café con leche"
-        ></textarea>
-      </div>
+      <div class="section-title">¿Qué comiste?</div>
+      <textarea id="descripcion" placeholder="Ej: 1 taza de café con leche"></textarea>
 
-      <!-- Atajo cantidad / porción / alimento -->
+      <!-- Fila cantidad / porción / alimento -->
       <div class="row">
-        <div class="col">
-          <label for="cant">Cant.</label>
-          <input
-            type="number"
-            id="cant"
-            min="1"
-            step="1"
-            inputmode="numeric"
-            value="1"
-          />
+        <div>
+          <label for="cantidad">Cant.</label>
+          <input type="number" id="cantidad" min="1" value="1" />
         </div>
-        <div class="col">
+        <div>
           <label for="porcion">Porción</label>
           <select id="porcion">
-            <option value="">(sin)</option>
             <option value="taza">taza</option>
             <option value="vaso">vaso</option>
-            <option value="rebanada">rebanada</option>
             <option value="unidad">unidad</option>
             <option value="porción">porción</option>
-            <option value="plato">plato</option>
+            <option value="rebanada">rebanada</option>
+            <option value="cucharada">cucharada</option>
+            <option value="cucharadita">cucharadita</option>
           </select>
         </div>
-        <div class="col">
+        <div>
           <label for="alimento">Alimento</label>
           <input
             type="text"
             id="alimento"
-            placeholder="café con leche, tostada..."
+            placeholder="Café, tostada, fruta..."
           />
         </div>
       </div>
 
-      <button id="btnPrompt" class="btn btn-primary">
-        <span class="icon">🧠</span>
-        <span>Generar prompt para ChatGPT</span>
-      </button>
-
-      <div class="field-group" style="margin-top: 14px;">
-        <label for="jsonChat">Pega aquí el resultado de ChatGPT (JSON)</label>
-        <textarea id="jsonChat"></textarea>
+      <!-- Cabecera y botón para ítems -->
+      <div class="items-header">
+        <span>Ítems en esta comida</span>
+        <button class="btn btn-small btn-outline" id="btnAgregarItem">
+          ➕ Añadir ítem
+        </button>
       </div>
+      <div class="items-list" id="listaItems"></div>
 
-      <button id="btnAgregar" class="btn btn-green">
-        <span class="icon">✅</span>
-        <span>Agregar comida</span>
+      <button class="btn btn-primary" id="btnPrompt">
+        🧠 Generar prompt para ChatGPT
       </button>
 
-      <button id="btnResumen" class="btn btn-yellow">
-        <span class="icon">📊</span>
-        <span>Ver resumen de hoy</span>
+      <div class="section-title" style="margin-top: 14px;">
+        Pega aquí el resultado de ChatGPT (JSON)
+      </div>
+      <textarea
+        id="jsonInput"
+        placeholder='Pega aquí el resultado de ChatGPT (JSON)'
+      ></textarea>
+
+      <button class="btn btn-green" id="btnAgregarComida">
+        ✅ Agregar comida
       </button>
 
-      <button id="btnBaseAprendida" class="btn btn-blue">
-        <span class="icon">📚</span>
-        <span>Ver base aprendida</span>
+      <button class="btn btn-yellow" id="btnVerResumen">
+        📊 Ver resumen de hoy
       </button>
 
-      <p class="hint" style="margin-top: 10px;">
+      <button class="btn btn-blue" id="btnVerBase">
+        📚 Ver base aprendida
+      </button>
+
+      <div class="footer-note">
         Todo se guarda solo en este dispositivo usando memoria local.
-      </p>
+      </div>
     </div>
 
-    <!-- PANTALLA RESUMEN -->
-    <div id="pantalla-resumen" class="card hidden">
-      <button id="btnVolverRegistro1" class="btn-back">
-        <span class="icon">←</span>
-        <span>Volver al registro</span>
+    <!-- Sección Resumen -->
+    <div class="card hidden" id="section-resumen">
+      <button class="btn-back" id="btnVolverRegistroDesdeResumen">
+        ← Volver al registro
       </button>
-
       <h2 class="summary-title">Resumen de hoy</h2>
-      <p class="summary-sub">
+      <p style="font-size: 13px; color: #c3c8ff; margin-top: 0;">
         Suma de todas las comidas registradas hoy.
       </p>
 
-      <div class="summary-box" id="boxTotales">
+      <div class="summary-block">
         <div class="summary-row">
-          <span>Calorías totales:</span>
-          <strong id="totCalorias">0</strong>
+          <strong>Calorías totales:</strong>
+          <span id="totalCalorias">0</span>
         </div>
         <div class="summary-row">
-          <span>Azúcares totales (g):</span>
-          <strong id="totAzucares">0</strong>
+          <strong>Azúcares totales (g):</strong>
+          <span id="totalAzucares">0</span>
         </div>
         <div class="summary-row">
-          <span>Grasas totales (g):</span>
-          <strong id="totGrasas">0</strong>
+          <strong>Grasas totales (g):</strong>
+          <span id="totalGrasas">0</span>
         </div>
         <div class="summary-row">
-          <span>Proteínas totales (g):</span>
-          <strong id="totProteinas">0</strong>
+          <strong>Proteínas totales (g):</strong>
+          <span id="totalProteinas">0</span>
+        </div>
+
+        <div style="margin-top: 12px; font-size: 14px; font-weight: 600;">
+          Comidas registradas
+        </div>
+        <div id="listaComidasHoy" style="margin-top: 4px;">
+          Todavía no registraste comidas hoy.
         </div>
       </div>
-
-      <p class="summary-list-title">Comidas registradas</p>
-      <div id="listaComidas"></div>
-      <p id="textoSinComidas" class="empty-text hidden">
-        Todavía no registraste comidas hoy.
-      </p>
     </div>
 
-    <!-- PANTALLA BASE APRENDIDA -->
-    <div id="pantalla-base" class="card hidden">
-      <button id="btnVolverRegistro2" class="btn-back">
-        <span class="icon">←</span>
-        <span>Volver al registro</span>
+    <!-- Sección Base aprendida -->
+    <div class="card hidden" id="section-base">
+      <button class="btn-back" id="btnVolverRegistroDesdeBase">
+        ← Volver al registro
       </button>
-
       <h2 class="summary-title">Base aprendida</h2>
-      <p class="summary-sub">
-        Comidas que la app ya conoce. Si volvés a usar la misma descripción,
-        se toman estos valores sin preguntarle a ChatGPT.
+      <p style="font-size: 13px; color: #c3c8ff; margin-top: 0;">
+        Comidas que la app ya conoce. Si repetís una descripción, usará estos
+        valores sin pedir de nuevo a ChatGPT.
       </p>
 
-      <div id="listaAprendida"></div>
-      <p id="textoSinAprendida" class="empty-text hidden">
-        Todavía no hay comidas aprendidas.
-      </p>
+      <div class="summary-block">
+        <div id="listaBaseAprendida">
+          Todavía no hay comidas aprendidas.
+        </div>
+      </div>
     </div>
   </div>
 
   <script>
-    const STORAGE_COMIDAS = "caloriflow_comidas_v1";
-    const STORAGE_BASE = "caloriflow_base_v1";
+    const STORAGE_KEY = "caloriflow_v3";
 
-    function cargarJSON(key, defaultValue) {
+    let state = {
+      comidas: [],
+      baseAprendida: {},
+    };
+
+    let currentItems = []; // ítems de la comida en construcción
+
+    function todayISO() {
+      const d = new Date();
+      return d.toISOString().slice(0, 10);
+    }
+
+    function loadState() {
       try {
-        const raw = localStorage.getItem(key);
-        if (!raw) return defaultValue;
-        return JSON.parse(raw);
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if (raw) {
+          const parsed = JSON.parse(raw);
+          if (parsed && Array.isArray(parsed.comidas) && parsed.baseAprendida) {
+            state = parsed;
+          }
+        }
       } catch (e) {
-        console.error("Error leyendo localStorage", key, e);
-        return defaultValue;
+        console.error("Error al leer storage", e);
       }
     }
 
-    function guardarJSON(key, value) {
-      try {
-        localStorage.setItem(key, JSON.stringify(value));
-      } catch (e) {
-        console.error("Error guardando localStorage", key, e);
-      }
+    function saveState() {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
     }
 
-    const pantallaRegistro = document.getElementById("pantalla-registro");
-    const pantallaResumen = document.getElementById("pantalla-resumen");
-    const pantallaBase = document.getElementById("pantalla-base");
-
-    const tipoComidaEl = document.getElementById("tipoComida");
-    const descripcionEl = document.getElementById("descripcion");
-    const cantEl = document.getElementById("cant");
-    const porcionEl = document.getElementById("porcion");
-    const alimentoEl = document.getElementById("alimento");
-    const jsonChatEl = document.getElementById("jsonChat");
-
-    const btnPrompt = document.getElementById("btnPrompt");
-    const btnAgregar = document.getElementById("btnAgregar");
-    const btnResumen = document.getElementById("btnResumen");
-    const btnBaseAprendida = document.getElementById("btnBaseAprendida");
-
-    const btnVolverRegistro1 = document.getElementById("btnVolverRegistro1");
-    const btnVolverRegistro2 = document.getElementById("btnVolverRegistro2");
-
-    const totCaloriasEl = document.getElementById("totCalorias");
-    const totAzucaresEl = document.getElementById("totAzucares");
-    const totGrasasEl = document.getElementById("totGrasas");
-    const totProteinasEl = document.getElementById("totProteinas");
-    const listaComidasEl = document.getElementById("listaComidas");
-    const textoSinComidasEl = document.getElementById("textoSinComidas");
-
-    const listaAprendidaEl = document.getElementById("listaAprendida");
-    const textoSinAprendidaEl = document.getElementById("textoSinAprendida");
-
-    let comidas = cargarJSON(STORAGE_COMIDAS, []);
-    let baseAprendida = cargarJSON(STORAGE_BASE, []);
-
-    function normalizarDescripcion(txt) {
-      return txt.trim().toLowerCase().replace(/\s+/g, " ");
-    }
-
-    function buscarEnBase(descripcion) {
-      const clave = normalizarDescripcion(descripcion);
-      return baseAprendida.find((c) => c.clave === clave);
-    }
-
-    function agregarABase(descripcion, macros) {
-      const clave = normalizarDescripcion(descripcion);
-      const existenteIndex = baseAprendida.findIndex((c) => c.clave === clave);
-      const nuevo = {
-        clave,
-        descripcion: descripcion.trim(),
-        calorias: macros.calorias,
-        azucares_g: macros.azucares_g,
-        grasas_g: macros.grasas_g,
-        proteinas_g: macros.proteinas_g,
-      };
-      if (existenteIndex >= 0) {
-        baseAprendida[existenteIndex] = nuevo;
-      } else {
-        baseAprendida.push(nuevo);
-      }
-      guardarJSON(STORAGE_BASE, baseAprendida);
-    }
-
-    function cambiarPantalla(id) {
-      pantallaRegistro.classList.add("hidden");
-      pantallaResumen.classList.add("hidden");
-      pantallaBase.classList.add("hidden");
+    function showSection(id) {
+      document.getElementById("section-registro").classList.add("hidden");
+      document.getElementById("section-resumen").classList.add("hidden");
+      document.getElementById("section-base").classList.add("hidden");
       document.getElementById(id).classList.remove("hidden");
     }
 
-    // AT AJO: ahora agrega varios ítems
-    function actualizarDescripcionDesdeAtajo() {
-      const cant = cantEl.value.trim();
-      const porc = porcionEl.value.trim();
-      const ali = alimentoEl.value.trim();
-
-      if (!cant || !ali) return;
-
-      const unidad = porc ? ` ${porc}` : "";
-      const snippet = `${cant}${unidad} de ${ali}`;
-      const current = descripcionEl.value.trim();
-
-      if (!current) {
-        descripcionEl.value = snippet;
-      } else {
-        // si ya está ese mismo snippet, no lo repite
-        if (!current.toLowerCase().includes(snippet.toLowerCase())) {
-          descripcionEl.value = current + ", " + snippet;
-        }
-      }
+    function normalizarDescripcion(texto) {
+      return texto.trim().toLowerCase();
     }
 
-    cantEl.addEventListener("input", actualizarDescripcionDesdeAtajo);
-    porcionEl.addEventListener("change", actualizarDescripcionDesdeAtajo);
-    alimentoEl.addEventListener("input", actualizarDescripcionDesdeAtajo);
-
-    btnPrompt.addEventListener("click", async () => {
-      const tipo = tipoComidaEl.value;
-      const desc = descripcionEl.value.trim();
-
-      if (!desc) {
-        alert("Escribí qué comiste antes de generar el prompt.");
+    // ---------- ÍTEMS DE LA COMIDA ----------
+    function renderItems() {
+      const cont = document.getElementById("listaItems");
+      cont.innerHTML = "";
+      if (currentItems.length === 0) {
+        cont.innerHTML =
+          '<div class="hint">Todavía no agregaste ítems a esta comida.</div>';
         return;
       }
-
-      const prompt = `
-Actúa como nutricionista. Estoy registrando lo que como.
-
-Tipo de comida: ${tipo}
-Descripción de la comida:
-"${desc}"
-
-Calcula los VALORES TOTALES para esa comida.
-Responde SOLO un JSON VÁLIDO, en UNA sola línea, sin explicación extra, usando EXACTAMENTE este formato de claves:
-{"calorias":0,"azucares_g":0,"grasas_g":0,"proteinas_g":0}
-      `.trim();
-
-      try {
-        await navigator.clipboard.writeText(prompt);
-      } catch (e) {
-        console.error("No se pudo copiar al portapapeles", e);
-      }
-
-      try {
-        window.open("https://chat.openai.com", "_blank");
-      } catch (e) {
-        console.error("No se pudo abrir ChatGPT automáticamente", e);
-      }
-    });
-
-    btnAgregar.addEventListener("click", () => {
-      const tipo = tipoComidaEl.value;
-      const descripcion = descripcionEl.value.trim();
-      const jsonStr = jsonChatEl.value.trim();
-
-      if (!descripcion) {
-        alert("Escribí una descripción de la comida.");
-        return;
-      }
-
-      let macros = null;
-
-      const encontrada = buscarEnBase(descripcion);
-      if (encontrada && !jsonStr) {
-        macros = {
-          calorias: encontrada.calorias,
-          azucares_g: encontrada.azucares_g,
-          grasas_g: encontrada.grasas_g,
-          proteinas_g: encontrada.proteinas_g,
+      currentItems.forEach((item, index) => {
+        const div = document.createElement("div");
+        div.className = "meal-item-card";
+        const span = document.createElement("span");
+        span.textContent = item.texto;
+        const btn = document.createElement("button");
+        btn.textContent = "Eliminar";
+        btn.onclick = () => {
+          currentItems.splice(index, 1);
+          actualizarDescripcionDesdeItems();
+          renderItems();
         };
-      } else {
-        if (!jsonStr) {
-          alert(
-            "Pegá el JSON que te devolvió ChatGPT, o usá una descripción que ya hayas guardado antes."
-          );
-          return;
-        }
-        try {
-          const parsed = JSON.parse(jsonStr);
-          const reqKeys = [
-            "calorias",
-            "azucares_g",
-            "grasas_g",
-            "proteinas_g",
-          ];
-          for (const k of reqKeys) {
-            if (typeof parsed[k] !== "number") {
-              throw new Error("Campo faltante: " + k);
-            }
-          }
-          macros = {
-            calorias: parsed.calorias,
-            azucares_g: parsed.azucares_g,
-            grasas_g: parsed.grasas_g,
-            proteinas_g: parsed.proteinas_g,
-          };
-        } catch (e) {
-          console.error(e);
-          alert(
-            "El JSON pegado no es válido. Asegurate de que ChatGPT responda SOLO algo como: {\"calorias\":120,\"azucares_g\":10,\"grasas_g\":4,\"proteinas_g\":6}"
-          );
-          return;
-        }
+        div.appendChild(span);
+        div.appendChild(btn);
+        cont.appendChild(div);
+      });
+    }
 
-        agregarABase(descripcion, macros);
+    function actualizarDescripcionDesdeItems() {
+      const descripcionInput = document.getElementById("descripcion");
+      if (currentItems.length === 0) return; // no tocar si se vacía, dejo al usuario escribir a mano
+      const texto = currentItems.map((i) => i.texto).join(" + ");
+      descripcionInput.value = texto;
+    }
+
+    function agregarItemActual() {
+      const cant = document.getElementById("cantidad").value.trim();
+      const porcion = document.getElementById("porcion").value;
+      const alimento = document.getElementById("alimento").value.trim();
+
+      if (!alimento) {
+        alert("Escribí el alimento para poder agregar el ítem.");
+        return;
       }
 
-      const ahora = new Date();
-      const hora = ahora.toLocaleTimeString("es-UY", {
-        hour: "2-digit",
-        minute: "2-digit",
-        second: "2-digit",
+      const cantidadNum = cant === "" ? 1 : Number(cant);
+      const cantidadValida = !isNaN(cantidadNum) && cantidadNum > 0 ? cantidadNum : 1;
+
+      let texto = `${cantidadValida} ${porcion}`;
+      if (alimento) {
+        texto += ` de ${alimento}`;
+      }
+
+      currentItems.push({ cantidad: cantidadValida, porcion, alimento, texto });
+      document.getElementById("alimento").value = "";
+      actualizarDescripcionDesdeItems();
+      renderItems();
+    }
+
+    // ---------- RESUMEN ----------
+    function renderResumenHoy() {
+      const hoy = todayISO();
+      const comidasHoy = state.comidas.filter((c) => c.fecha === hoy);
+
+      let tCal = 0,
+        tAz = 0,
+        tGr = 0,
+        tPr = 0;
+      comidasHoy.forEach((c) => {
+        tCal += c.calorias || 0;
+        tAz += c.azucares_g || 0;
+        tGr += c.grasas_g || 0;
+        tPr += c.proteinas_g || 0;
       });
 
-      const registro = {
-        id: Date.now(),
-        fecha: ahora.toISOString().slice(0, 10),
-        tipo,
-        descripcion,
-        hora,
-        calorias: macros.calorias,
-        azucares_g: macros.azucares_g,
-        grasas_g: macros.grasas_g,
-        proteinas_g: macros.proteinas_g,
-      };
+      document.getElementById("totalCalorias").textContent = tCal.toFixed(1);
+      document.getElementById("totalAzucares").textContent = tAz.toFixed(1);
+      document.getElementById("totalGrasas").textContent = tGr.toFixed(1);
+      document.getElementById("totalProteinas").textContent = tPr.toFixed(1);
 
-      comidas.push(registro);
-      guardarJSON(STORAGE_COMIDAS, comidas);
-
-      jsonChatEl.value = "";
-      alert("Comida guardada.");
-    });
-
-    btnResumen.addEventListener("click", () => {
-      actualizarResumen();
-      cambiarPantalla("pantalla-resumen");
-    });
-
-    function actualizarResumen() {
-      const hoy = new Date().toISOString().slice(0, 10);
-      const deHoy = comidas.filter((c) => c.fecha === hoy);
-
-      if (deHoy.length === 0) {
-        totCaloriasEl.textContent = "0";
-        totAzucaresEl.textContent = "0";
-        totGrasasEl.textContent = "0";
-        totProteinasEl.textContent = "0";
-        listaComidasEl.innerHTML = "";
-        textoSinComidasEl.classList.remove("hidden");
+      const cont = document.getElementById("listaComidasHoy");
+      cont.innerHTML = "";
+      if (comidasHoy.length === 0) {
+        cont.textContent = "Todavía no registraste comidas hoy.";
         return;
       }
 
-      textoSinComidasEl.classList.add("hidden");
-
-      const totales = deHoy.reduce(
-        (acc, c) => {
-          acc.calorias += c.calorias;
-          acc.azucares_g += c.azucares_g;
-          acc.grasas_g += c.grasas_g;
-          acc.proteinas_g += c.proteinas_g;
-          return acc;
-        },
-        { calorias: 0, azucares_g: 0, grasas_g: 0, proteinas_g: 0 }
-      );
-
-      totCaloriasEl.textContent = totales.calorias.toFixed(1);
-      totAzucaresEl.textContent = totales.azucares_g.toFixed(1);
-      totGrasasEl.textContent = totales.grasas_g.toFixed(1);
-      totProteinasEl.textContent = totales.proteinas_g.toFixed(1);
-
-      listaComidasEl.innerHTML = "";
-      deHoy
+      comidasHoy
         .slice()
-        .reverse()
+        .sort((a, b) => a.timestamp - b.timestamp)
         .forEach((c) => {
           const div = document.createElement("div");
-          div.className = "meal-item";
+          div.className = "meal-entry";
 
           const header = document.createElement("div");
-          header.className = "meal-header";
+          header.className = "meal-entry-header";
 
           const left = document.createElement("div");
-          left.innerHTML = `<span class="meal-type">${c.tipo}</span> · <span class="meal-time">${c.hora}</span>`;
+          left.innerHTML = `<span class="pill">${c.tipo}</span> · <span style="font-size:11px;opacity:.8">${c.hora}</span>`;
 
           const btnDel = document.createElement("button");
-          btnDel.className = "btn-delete";
-          btnDel.innerHTML = `<span class="icon">🗑️</span><span>Eliminar</span>`;
-          btnDel.addEventListener("click", () => {
-            if (!confirm("¿Eliminar esta comida del registro de hoy?")) return;
-            comidas = comidas.filter((x) => x.id !== c.id);
-            guardarJSON(STORAGE_COMIDAS, comidas);
-            actualizarResumen();
-          });
+          btnDel.className = "delete-small";
+          btnDel.textContent = "Eliminar";
+          btnDel.onclick = () => {
+            state.comidas = state.comidas.filter((x) => x.id !== c.id);
+            saveState();
+            renderResumenHoy();
+          };
 
           header.appendChild(left);
           header.appendChild(btnDel);
 
           const desc = document.createElement("div");
-          desc.className = "meal-desc";
-          desc.textContent = "- " + c.descripcion;
+          desc.textContent = c.descripcion;
 
           const macros = document.createElement("div");
-          macros.className = "meal-macros";
-          macros.textContent =
-            `${c.calorias.toFixed(1)} kcal · ` +
-            `${c.proteinas_g.toFixed(1)} g prot · ` +
-            `${c.grasas_g.toFixed(1)} g grasa · ` +
-            `${c.azucares_g.toFixed(1)} g azúcar`;
+          macros.style.fontSize = "12px";
+          macros.style.marginTop = "2px";
+          macros.style.opacity = "0.9";
+          macros.textContent = `${c.calorias.toFixed(
+            1
+          )} kcal · ${c.proteinas_g.toFixed(
+            1
+          )} g prot · ${c.grasas_g.toFixed(
+            1
+          )} g grasa · ${c.azucares_g.toFixed(1)} g azúcar`;
 
           div.appendChild(header);
           div.appendChild(desc);
           div.appendChild(macros);
 
-          listaComidasEl.appendChild(div);
+          cont.appendChild(div);
         });
     }
 
-    btnBaseAprendida.addEventListener("click", () => {
-      actualizarBaseAprendidaUI();
-      cambiarPantalla("pantalla-base");
-    });
-
-    function actualizarBaseAprendidaUI() {
-      listaAprendidaEl.innerHTML = "";
-
-      if (baseAprendida.length === 0) {
-        textoSinAprendidaEl.classList.remove("hidden");
+    // ---------- BASE APRENDIDA ----------
+    function renderBaseAprendida() {
+      const cont = document.getElementById("listaBaseAprendida");
+      const claves = Object.keys(state.baseAprendida);
+      cont.innerHTML = "";
+      if (claves.length === 0) {
+        cont.textContent = "Todavía no hay comidas aprendidas.";
         return;
       }
 
-      textoSinAprendidaEl.classList.add("hidden");
-
-      baseAprendida
+      claves
         .slice()
-        .sort((a, b) => a.descripcion.localeCompare(b.descripcion))
-        .forEach((item, idx) => {
+        .sort((a, b) => a.localeCompare(b))
+        .forEach((clave) => {
+          const datos = state.baseAprendida[clave];
           const div = document.createElement("div");
-          div.className = "learn-item";
+          div.className = "base-entry";
 
-          const name = document.createElement("div");
-          name.className = "learn-name";
-          name.textContent = item.descripcion;
-
-          const macros = document.createElement("div");
-          macros.className = "learn-macros";
-          macros.textContent =
-            `${item.calorias.toFixed(1)} kcal · ` +
-            `${item.proteinas_g.toFixed(1)} g prot · ` +
-            `${item.grasas_g.toFixed(1)} g grasa · ` +
-            `${item.azucares_g.toFixed(1)} g azúcar`;
+          const info = document.createElement("div");
+          info.className = "base-entry-info";
+          info.innerHTML = `<strong>${clave}</strong><br>${datos.calorias.toFixed(
+            1
+          )} kcal · ${datos.proteinas_g.toFixed(
+            1
+          )} g prot · ${datos.grasas_g.toFixed(
+            1
+          )} g grasa · ${datos.azucares_g.toFixed(1)} g azúcar`;
 
           const btnDel = document.createElement("button");
-          btnDel.className = "btn-delete";
-          btnDel.innerHTML = `<span class="icon">🗑️</span><span>Eliminar</span>`;
-          btnDel.addEventListener("click", () => {
-            if (!confirm("¿Eliminar esta comida de la base aprendida?")) return;
-            baseAprendida.splice(idx, 1);
-            guardarJSON(STORAGE_BASE, baseAprendida);
-            actualizarBaseAprendidaUI();
-          });
+          btnDel.className = "delete-small";
+          btnDel.textContent = "Eliminar";
+          btnDel.onclick = () => {
+            if (confirm("¿Seguro que querés borrar esta comida aprendida?")) {
+              delete state.baseAprendida[clave];
+              saveState();
+              renderBaseAprendida();
+            }
+          };
 
-          div.appendChild(name);
-          div.appendChild(macros);
+          div.appendChild(info);
           div.appendChild(btnDel);
-
-          listaAprendidaEl.appendChild(div);
+          cont.appendChild(div);
         });
     }
 
-    btnVolverRegistro1.addEventListener("click", () =>
-      cambiarPantalla("pantalla-registro")
-    );
-    btnVolverRegistro2.addEventListener("click", () =>
-      cambiarPantalla("pantalla-registro")
-    );
+    // ---------- EVENTOS PRINCIPALES ----------
+    document.addEventListener("DOMContentLoaded", () => {
+      loadState();
+      renderItems();
+
+      document
+        .getElementById("btnAgregarItem")
+        .addEventListener("click", agregarItemActual);
+
+      document.getElementById("btnPrompt").addEventListener("click", () => {
+        const tipo = document.getElementById("tipoComida").value;
+        const desc = document.getElementById("descripcion").value.trim();
+        if (!desc) {
+          alert("Escribí qué comiste (o agregá ítems) antes de generar el prompt.");
+          return;
+        }
+
+        const prompt = `
+Estoy construyendo una app personal de registro nutricional.
+
+Dame una estimación aproximada para la siguiente comida:
+
+Tipo de comida: ${tipo}
+Descripción detallada: ${desc}
+
+Responde SOLO un JSON válido, en una sola línea, sin ningún texto extra, sin comentarios, sin explicaciones.
+Usa exactamente estas claves numéricas (pueden ser decimales):
+
+{"calorias": 0, "azucares_g": 0, "grasas_g": 0, "proteinas_g": 0}
+`.trim();
+
+        navigator.clipboard
+          .writeText(prompt)
+          .then(() => {
+            alert(
+              "Prompt copiado al portapapeles. Abrí tu ChatGPT y pegalo en la conversación que quieras."
+            );
+          })
+          .catch(() => {
+            alert(
+              "No se pudo copiar automáticamente. Si querés, copiá el texto manualmente."
+            );
+          });
+      });
+
+      document
+        .getElementById("btnAgregarComida")
+        .addEventListener("click", () => {
+          const tipo = document.getElementById("tipoComida").value;
+          const descripcion = document
+            .getElementById("descripcion")
+            .value.trim();
+          const jsonText = document.getElementById("jsonInput").value.trim();
+
+          if (!descripcion) {
+            alert("Escribí qué comiste antes de guardar la comida.");
+            return;
+          }
+
+          const clave = normalizarDescripcion(descripcion);
+          let datos;
+
+          if (jsonText) {
+            try {
+              const obj = JSON.parse(jsonText);
+              const c = Number(obj.calorias);
+              const a = Number(obj.azucares_g);
+              const g = Number(obj.grasas_g);
+              const p = Number(obj.proteinas_g);
+              if (
+                [c, a, g, p].some(
+                  (v) => typeof v !== "number" || !isFinite(v)
+                )
+              ) {
+                throw new Error("Valores inválidos");
+              }
+              datos = {
+                calorias: c,
+                azucares_g: a,
+                grasas_g: g,
+                proteinas_g: p,
+              };
+              // Aprender / actualizar base
+              state.baseAprendida[clave] = datos;
+            } catch (e) {
+              alert(
+                "El JSON no es válido. Verificá que tenga solo las claves calorias, azucares_g, grasas_g, proteinas_g."
+              );
+              return;
+            }
+          } else {
+            // Sin JSON: intentar usar lo aprendido
+            if (state.baseAprendida[clave]) {
+              datos = state.baseAprendida[clave];
+            } else {
+              alert(
+                "Para esta descripción todavía no tengo datos. Usá ChatGPT una vez y pegá el JSON."
+              );
+              return;
+            }
+          }
+
+          const ahora = new Date();
+          const comida = {
+            id: Date.now() + Math.random(),
+            tipo,
+            descripcion,
+            fecha: todayISO(),
+            hora: ahora.toLocaleTimeString(),
+            timestamp: ahora.getTime(),
+            ...datos,
+          };
+
+          state.comidas.push(comida);
+          saveState();
+
+          // limpiar campos para la próxima comida
+          document.getElementById("jsonInput").value = "";
+          document.getElementById("descripcion").value = "";
+          currentItems = [];
+          renderItems();
+
+          alert("Comida guardada.");
+        });
+
+      document
+        .getElementById("btnVerResumen")
+        .addEventListener("click", () => {
+          renderResumenHoy();
+          showSection("section-resumen");
+        });
+
+      document.getElementById("btnVerBase").addEventListener("click", () => {
+        renderBaseAprendida();
+        showSection("section-base");
+      });
+
+      document
+        .getElementById("btnVolverRegistroDesdeResumen")
+        .addEventListener("click", () => showSection("section-registro"));
+
+      document
+        .getElementById("btnVolverRegistroDesdeBase")
+        .addEventListener("click", () => showSection("section-registro"));
+    });
   </script>
 </body>
 </html>
