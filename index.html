@@ -5,13 +5,10 @@
   <title>CaloriFlow</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <style>
-    * {
-      box-sizing: border-box;
-    }
+    * { box-sizing: border-box; }
     body {
       margin: 0;
-      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
-        sans-serif;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
       background: radial-gradient(circle at top, #151b3c 0, #050712 55%, #020308 100%);
       color: #fff;
     }
@@ -82,9 +79,7 @@
       gap: 10px;
       margin-top: 8px;
     }
-    .row > div {
-      flex: 1;
-    }
+    .row > div { flex: 1; }
     .btn {
       width: 100%;
       padding: 12px;
@@ -134,23 +129,28 @@
       margin-bottom: 10px;
       width: auto;
       box-shadow: 0 8px 18px rgba(255, 152, 0, 0.5);
+      border: none;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
     }
     .btn-small {
-      padding: 8px 12px;
+      padding: 7px 12px;
       font-size: 13px;
       border-radius: 999px;
       width: auto;
     }
     .btn-outline {
       background: transparent;
-      border: 1px dashed rgba(255, 255, 255, 0.35);
+      border: 1px dashed rgba(255, 255, 255, 0.55);
       color: #e0e4ff;
       box-shadow: none;
     }
-    .hint {
-      font-size: 12px;
-      color: #a8b0ff;
-      margin-top: 4px;
+    .inline-right {
+      display: flex;
+      justify-content: flex-end;
+      margin-top: 6px;
     }
     .footer-note {
       font-size: 11px;
@@ -159,51 +159,7 @@
       text-align: center;
       opacity: 0.86;
     }
-    .hidden {
-      display: none;
-    }
-
-    /* Lista de ítems de la comida */
-    .items-header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin-top: 10px;
-      margin-bottom: 4px;
-    }
-    .items-header span {
-      font-size: 13px;
-      color: #d7ddff;
-    }
-    .items-list {
-      margin-top: 4px;
-      max-height: 150px;
-      overflow-y: auto;
-    }
-    .meal-item-card {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      background: rgba(15, 20, 60, 0.95);
-      border-radius: 14px;
-      padding: 6px 10px;
-      margin-top: 6px;
-      border: 1px solid rgba(255, 255, 255, 0.04);
-      font-size: 13px;
-    }
-    .meal-item-card span {
-      flex: 1;
-      padding-right: 8px;
-    }
-    .meal-item-card button {
-      border: none;
-      border-radius: 999px;
-      padding: 4px 8px;
-      font-size: 12px;
-      cursor: pointer;
-      background: rgba(244, 67, 54, 0.16);
-      color: #ffcdd2;
-    }
+    .hidden { display: none; }
 
     /* Resumen */
     .summary-block {
@@ -266,13 +222,12 @@
       gap: 8px;
       align-items: center;
     }
-    .base-entry-info {
-      flex: 1;
-    }
+    .base-entry-info { flex: 1; }
   </style>
 </head>
 <body>
   <div class="app-shell">
+    <!-- REGISTRO -->
     <div class="card" id="section-registro">
       <h1>CaloriFlow</h1>
       <div class="subtitle">Registro diario con memoria propia.</div>
@@ -289,7 +244,6 @@
       <div class="section-title">¿Qué comiste?</div>
       <textarea id="descripcion" placeholder="Ej: 1 taza de café con leche"></textarea>
 
-      <!-- Fila cantidad / porción / alimento -->
       <div class="row">
         <div>
           <label for="cantidad">Cant.</label>
@@ -309,22 +263,16 @@
         </div>
         <div>
           <label for="alimento">Alimento</label>
-          <input
-            type="text"
-            id="alimento"
-            placeholder="Café, tostada, fruta..."
-          />
+          <input type="text" id="alimento" placeholder="Café, tostada, fruta..." />
         </div>
       </div>
 
-      <!-- Cabecera y botón para ítems -->
-      <div class="items-header">
-        <span>Ítems en esta comida</span>
-        <button class="btn btn-small btn-outline" id="btnAgregarItem">
-          ➕ Añadir ítem
+      <!-- BOTÓN + PARA ÍTEMS -->
+      <div class="inline-right">
+        <button class="btn-small btn-outline" id="btnAgregarItem">
+          ➕ Añadir ítem a la descripción
         </button>
       </div>
-      <div class="items-list" id="listaItems"></div>
 
       <button class="btn btn-primary" id="btnPrompt">
         🧠 Generar prompt para ChatGPT
@@ -335,7 +283,7 @@
       </div>
       <textarea
         id="jsonInput"
-        placeholder='Pega aquí el resultado de ChatGPT (JSON)'
+        placeholder="Pega aquí el resultado de ChatGPT (JSON)"
       ></textarea>
 
       <button class="btn btn-green" id="btnAgregarComida">
@@ -355,7 +303,7 @@
       </div>
     </div>
 
-    <!-- Sección Resumen -->
+    <!-- RESUMEN -->
     <div class="card hidden" id="section-resumen">
       <button class="btn-back" id="btnVolverRegistroDesdeResumen">
         ← Volver al registro
@@ -392,7 +340,7 @@
       </div>
     </div>
 
-    <!-- Sección Base aprendida -->
+    <!-- BASE APRENDIDA -->
     <div class="card hidden" id="section-base">
       <button class="btn-back" id="btnVolverRegistroDesdeBase">
         ← Volver al registro
@@ -412,14 +360,9 @@
   </div>
 
   <script>
-    const STORAGE_KEY = "caloriflow_v3";
-
-    let state = {
-      comidas: [],
-      baseAprendida: {},
-    };
-
-    let currentItems = []; // ítems de la comida en construcción
+    const STORAGE_KEY = "caloriflow_v3_simple_multi";
+    let state = { comidas: [], baseAprendida: {} };
+    let mealItems = [];
 
     function todayISO() {
       const d = new Date();
@@ -429,11 +372,10 @@
     function loadState() {
       try {
         const raw = localStorage.getItem(STORAGE_KEY);
-        if (raw) {
-          const parsed = JSON.parse(raw);
-          if (parsed && Array.isArray(parsed.comidas) && parsed.baseAprendida) {
-            state = parsed;
-          }
+        if (!raw) return;
+        const parsed = JSON.parse(raw);
+        if (parsed && Array.isArray(parsed.comidas) && parsed.baseAprendida) {
+          state = parsed;
         }
       } catch (e) {
         console.error("Error al leer storage", e);
@@ -455,42 +397,9 @@
       return texto.trim().toLowerCase();
     }
 
-    // ---------- ÍTEMS DE LA COMIDA ----------
-    function renderItems() {
-      const cont = document.getElementById("listaItems");
-      cont.innerHTML = "";
-      if (currentItems.length === 0) {
-        cont.innerHTML =
-          '<div class="hint">Todavía no agregaste ítems a esta comida.</div>';
-        return;
-      }
-      currentItems.forEach((item, index) => {
-        const div = document.createElement("div");
-        div.className = "meal-item-card";
-        const span = document.createElement("span");
-        span.textContent = item.texto;
-        const btn = document.createElement("button");
-        btn.textContent = "Eliminar";
-        btn.onclick = () => {
-          currentItems.splice(index, 1);
-          actualizarDescripcionDesdeItems();
-          renderItems();
-        };
-        div.appendChild(span);
-        div.appendChild(btn);
-        cont.appendChild(div);
-      });
-    }
-
-    function actualizarDescripcionDesdeItems() {
-      const descripcionInput = document.getElementById("descripcion");
-      if (currentItems.length === 0) return; // no tocar si se vacía, dejo al usuario escribir a mano
-      const texto = currentItems.map((i) => i.texto).join(" + ");
-      descripcionInput.value = texto;
-    }
-
-    function agregarItemActual() {
-      const cant = document.getElementById("cantidad").value.trim();
+    // Añadir ítem a la descripción
+    function agregarItemALaDescripcion() {
+      const cantidadRaw = document.getElementById("cantidad").value.trim();
       const porcion = document.getElementById("porcion").value;
       const alimento = document.getElementById("alimento").value.trim();
 
@@ -499,21 +408,29 @@
         return;
       }
 
-      const cantidadNum = cant === "" ? 1 : Number(cant);
-      const cantidadValida = !isNaN(cantidadNum) && cantidadNum > 0 ? cantidadNum : 1;
+      const cantidadNum = cantidadRaw === "" ? 1 : Number(cantidadRaw);
+      const cantidad =
+        !isNaN(cantidadNum) && cantidadNum > 0 ? cantidadNum : 1;
 
-      let texto = `${cantidadValida} ${porcion}`;
-      if (alimento) {
-        texto += ` de ${alimento}`;
+      const itemTexto = `${cantidad} ${porcion} de ${alimento}`;
+
+      // Si el usuario escribió de antes en la descripción a mano,
+      // arrancamos desde cero con los ítems nuevos.
+      if (mealItems.length === 0) {
+        const descManual = document
+          .getElementById("descripcion")
+          .value.trim();
+        if (descManual) {
+          // lo descartamos para evitar repeticiones raras
+        }
       }
 
-      currentItems.push({ cantidad: cantidadValida, porcion, alimento, texto });
+      mealItems.push(itemTexto);
+      document.getElementById("descripcion").value = mealItems.join(" + ");
       document.getElementById("alimento").value = "";
-      actualizarDescripcionDesdeItems();
-      renderItems();
     }
 
-    // ---------- RESUMEN ----------
+    // RESUMEN
     function renderResumenHoy() {
       const hoy = todayISO();
       const comidasHoy = state.comidas.filter((c) => c.fecha === hoy);
@@ -589,7 +506,7 @@
         });
     }
 
-    // ---------- BASE APRENDIDA ----------
+    // BASE APRENDIDA
     function renderBaseAprendida() {
       const cont = document.getElementById("listaBaseAprendida");
       const claves = Object.keys(state.baseAprendida);
@@ -634,14 +551,17 @@
         });
     }
 
-    // ---------- EVENTOS PRINCIPALES ----------
     document.addEventListener("DOMContentLoaded", () => {
       loadState();
-      renderItems();
+
+      // Si el usuario escribe a mano en descripción, olvidamos los ítems armados
+      document
+        .getElementById("descripcion")
+        .addEventListener("input", () => (mealItems = []));
 
       document
         .getElementById("btnAgregarItem")
-        .addEventListener("click", agregarItemActual);
+        .addEventListener("click", agregarItemALaDescripcion);
 
       document.getElementById("btnPrompt").addEventListener("click", () => {
         const tipo = document.getElementById("tipoComida").value;
@@ -716,7 +636,6 @@ Usa exactamente estas claves numéricas (pueden ser decimales):
                 grasas_g: g,
                 proteinas_g: p,
               };
-              // Aprender / actualizar base
               state.baseAprendida[clave] = datos;
             } catch (e) {
               alert(
@@ -725,7 +644,6 @@ Usa exactamente estas claves numéricas (pueden ser decimales):
               return;
             }
           } else {
-            // Sin JSON: intentar usar lo aprendido
             if (state.baseAprendida[clave]) {
               datos = state.baseAprendida[clave];
             } else {
@@ -753,8 +671,7 @@ Usa exactamente estas claves numéricas (pueden ser decimales):
           // limpiar campos para la próxima comida
           document.getElementById("jsonInput").value = "";
           document.getElementById("descripcion").value = "";
-          currentItems = [];
-          renderItems();
+          mealItems = [];
 
           alert("Comida guardada.");
         });
