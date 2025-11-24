@@ -7,8 +7,8 @@
   <style>
     :root {
       --bg-main: #050714;
-      --bg-card: #131528;
-      --bg-card-soft: #191b30;
+      --bg-card: #16192e;
+      --bg-card-soft: #1e2140;
       --accent-purple: #7c4dff;
       --accent-green: #00c853;
       --accent-yellow: #ffeb3b;
@@ -26,7 +26,7 @@
       margin: 0;
       padding: 0;
       font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-      background: radial-gradient(circle at top, #1b2140 0, #050714 55%, #000000 100%);
+      background: radial-gradient(circle at top, #232a54 0, #050714 55%, #000000 100%);
       color: var(--text-main);
       display: flex;
       justify-content: center;
@@ -34,21 +34,21 @@
 
     .container {
       width: 100%;
-      max-width: 640px;
-      padding: 20px 16px 32px;
+      max-width: 520px;
+      padding: 20px 14px 32px;
     }
 
     .card {
       background: var(--bg-card);
-      border-radius: 24px;
-      padding: 18px 16px 22px;
-      box-shadow: 0 18px 40px rgba(0, 0, 0, 0.55);
+      border-radius: 26px;
+      padding: 20px 16px 24px;
+      box-shadow: 0 24px 40px rgba(0, 0, 0, 0.7);
     }
 
     h1 {
       text-align: center;
       margin: 0 0 4px;
-      font-size: 2.3rem;
+      font-size: 2.4rem;
       letter-spacing: 0.03em;
     }
 
@@ -72,8 +72,8 @@
     input {
       width: 100%;
       border-radius: 14px;
-      border: 1px solid #2a2d44;
-      padding: 12px 13px;
+      border: 1px solid #303457;
+      padding: 11px 13px;
       background: #080a18;
       color: var(--text-main);
       font-size: 0.98rem;
@@ -154,6 +154,7 @@
       width: auto;
       padding-inline: 18px;
       margin-bottom: 10px;
+      box-shadow: 0 8px 18px rgba(255, 152, 0, 0.45);
     }
 
     .btn:hover {
@@ -178,7 +179,6 @@
       font-size: 0.8rem;
     }
 
-    /* Pantallas */
     .screen {
       display: none;
     }
@@ -187,7 +187,6 @@
       display: block;
     }
 
-    /* Resumen */
     .section-title {
       text-align: left;
       margin: 6px 4px 4px;
@@ -305,7 +304,7 @@
           </div>
           <div>
             <label for="alimento">Alimento</label>
-            <input id="alimento" type="text" placeholder="café, pan, arroz...">
+            <input id="alimento" type="text" placeholder="café, arroz, manzana...">
           </div>
         </div>
 
@@ -313,7 +312,7 @@
           🧠 <span>Generar prompt para ChatGPT</span>
         </button>
         <p class="hint mini">
-          Se copiará el prompt al portapapeles. Luego abrís tu ChatGPT y lo pegás en la conversación que quieras.
+          Se copiará el prompt al portapapeles. Después abrís tu ChatGPT y lo pegás en la conversación que vos quieras.
         </p>
 
         <label for="jsonInput" style="margin-top:14px;">Pega aquí el resultado de ChatGPT (JSON)</label>
@@ -332,7 +331,7 @@
         </button>
 
         <p class="footer-note">
-          Todo se guarda solo en este dispositivo utilizando memoria local.
+          Todo se guarda solo en este dispositivo (memoria local).
         </p>
       </div>
     </div>
@@ -358,8 +357,8 @@
         <button class="btn btn-back" id="btnVolverRegistro2">← Volver al registro</button>
         <h2 style="text-align:left;margin:4px 0 4px;">Base aprendida</h2>
         <p class="msg">
-          Cada vez que registrás una comida con JSON, se guarda aquí. Si dejás el JSON vacío y escribís una comida
-          igual, la app usa estos valores sin preguntarle de nuevo a la IA.
+          Cada vez que registrás una comida con JSON, se guarda aquí.  
+          Si dejás el JSON vacío y escribís una comida igual, la app usa estos valores sin volver a preguntarle a la IA.
         </p>
         <div id="lista-base"></div>
       </div>
@@ -367,7 +366,7 @@
   </div>
 
   <script>
-    // --- Estado en localStorage ---
+    // --- Claves de almacenamiento ---
     const STORAGE_COMIDAS = "caloriflow_comidas_v3";
     const STORAGE_BASE = "caloriflow_base_v3";
 
@@ -379,13 +378,13 @@
       localStorage.setItem(STORAGE_BASE, JSON.stringify(baseAprendida));
     }
 
-    // --- Helpers de pantallas ---
+    // --- Pantallas ---
     function mostrarPantalla(id) {
       document.querySelectorAll(".screen").forEach(s => s.classList.remove("active"));
       document.getElementById(id).classList.add("active");
     }
 
-    // --- Construir descripción final (con atajo) ---
+    // --- Helpers descripción / clave ---
     function construirDescripcion() {
       const descLibre = document.getElementById("descripcion").value.trim();
       const cantidad = document.getElementById("cantidad").value.trim();
@@ -393,22 +392,15 @@
       const alimento = document.getElementById("alimento").value.trim();
 
       if (descLibre) return descLibre;
-
-      if (cantidad && alimento) {
-        return `${cantidad} ${unidad} de ${alimento}`;
-      }
-
+      if (cantidad && alimento) return `${cantidad} ${unidad} de ${alimento}`;
       return "";
     }
 
     function normalizarClaveDesc(texto) {
-      return texto
-        .toLowerCase()
-        .replace(/\s+/g, " ")
-        .trim();
+      return texto.toLowerCase().replace(/\s+/g, " ").trim();
     }
 
-    // --- Botón Generar prompt ---
+    // --- Botón: generar prompt ---
     document.getElementById("btnPrompt").addEventListener("click", async () => {
       const tipo = document.getElementById("tipoComida").value;
       const descripcion = construirDescripcion();
@@ -439,13 +431,13 @@ Rellena los valores con números (pueden ser decimales) según tu mejor estimaci
 
       try {
         await navigator.clipboard.writeText(prompt);
-        alert("Prompt copiado al portapapeles. Abrí tu ChatGPT y pegalo en la conversación que vos quieras.");
+        alert("Prompt copiado al portapapeles. Abrí tu ChatGPT y pegalo en la conversación que quieras.");
       } catch (e) {
-        alert("No pude copiar automáticamente. Copiá el prompt manualmente si querés:\n\n" + prompt);
+        alert("No se pudo copiar automático. Copiá el prompt manualmente si hace falta:\n\n" + prompt);
       }
     });
 
-    // --- Agregar comida ---
+    // --- Botón: agregar comida ---
     document.getElementById("btnAgregar").addEventListener("click", () => {
       const tipo = document.getElementById("tipoComida").value;
       const descripcion = construirDescripcion();
@@ -463,10 +455,9 @@ Rellena los valores con números (pueden ser decimales) según tu mejor estimaci
         try {
           datos = JSON.parse(jsonTexto);
         } catch (e) {
-          alert("El JSON que pegaste no es válido. Revisá que tenga comillas dobles y formato correcto.");
+          alert("El JSON que pegaste no es válido. Revisá comillas y formato.");
           return;
         }
-        // guarda / actualiza base aprendida para esa descripción exacta
         baseAprendida[clave] = {
           calorias: Number(datos.calorias) || 0,
           azucares_g: Number(datos.azucares_g) || 0,
@@ -474,11 +465,10 @@ Rellena los valores con números (pueden ser decimales) según tu mejor estimaci
           proteinas_g: Number(datos.proteinas_g) || 0
         };
       } else {
-        // sin JSON: intento usar lo aprendido
         if (baseAprendida[clave]) {
           datos = baseAprendida[clave];
         } else {
-          alert("Para esta comida la app todavía no tiene datos guardados.\nPrimero pedile los valores a ChatGPT, pegá el JSON y guardá una vez.");
+          alert("Para esta comida aún no hay datos guardados. Pedile primero a ChatGPT, pegá el JSON y guardá una vez.");
           return;
         }
       }
@@ -494,7 +484,6 @@ Rellena los valores con números (pueden ser decimales) según tu mejor estimaci
       guardarEstado();
 
       document.getElementById("jsonInput").value = "";
-
       alert("Comida guardada.");
     });
 
@@ -522,7 +511,9 @@ Rellena los valores con números (pueden ser decimales) según tu mejor estimaci
       const contLista = document.getElementById("lista-comidas");
       const msg = document.getElementById("mensaje-resumen");
 
-      const hoyComidas = comidas.filter(c => esHoy(c.fechaISO));
+      const hoyComidas = comidas
+        .map((c, idx) => ({ ...c, _idxGlobal: idx }))
+        .filter(c => esHoy(c.fechaISO));
 
       contNumeros.innerHTML = "";
       contBarras.innerHTML = "";
@@ -576,17 +567,15 @@ Rellena los valores con números (pueden ser decimales) según tu mejor estimaci
       barra("Grasas (g)", totales.grasas_g, metas.grasas_g, "gr");
       barra("Proteínas (g)", totales.proteinas_g, metas.proteinas_g, "pr");
 
-      // mensaje simple
       if (totales.calorias < metas.calorias * 0.5) {
-        msg.textContent = "Vas por debajo de la mitad de tu meta de calorías. Asegurate de no saltearte comidas importantes.";
+        msg.textContent = "Vas por debajo de la mitad de tu meta de calorías. Cuidá de no saltearte comidas importantes.";
       } else if (totales.calorias <= metas.calorias * 1.1) {
-        msg.textContent = "Estás cerca de tu meta diaria de calorías. Bastante equilibrado.";
+        msg.textContent = "Estás cerca de la meta diaria de calorías. Bastante equilibrado.";
       } else {
-        msg.textContent = "Superaste tu meta de calorías de referencia. No es un drama puntual, pero está bueno registrarlo.";
+        msg.textContent = "Superaste la meta de calorías de referencia. No es grave un día, pero está bueno tenerlo presente.";
       }
 
-      // lista de comidas
-      hoyComidas.forEach((c, idx) => {
+      hoyComidas.forEach(c => {
         const div = document.createElement("div");
         div.className = "registered-item";
 
@@ -601,7 +590,7 @@ Rellena los valores con números (pueden ser decimales) según tu mejor estimaci
               <span class="pill">${c.tipo}</span>
               <span style="font-size:0.8rem;opacity:.8;margin-left:6px;">${fechaLocal}</span>
             </div>
-            <button class="delete-small" data-idx="${idx}">Eliminar</button>
+            <button class="delete-small" data-global="${c._idxGlobal}">Eliminar</button>
           </div>
           <div style="margin-bottom:4px;">- ${c.descripcion}</div>
           <div style="font-size:0.85rem;opacity:.92;">
@@ -612,13 +601,11 @@ Rellena los valores con números (pueden ser decimales) según tu mejor estimaci
         contLista.appendChild(div);
       });
 
-      // manejar borrado
       contLista.querySelectorAll(".delete-small").forEach(btn => {
         btn.addEventListener("click", e => {
-          const idx = Number(e.target.getAttribute("data-idx"));
-          const realIndex = comidas.findIndex(c => esHoy(c.fechaISO)); // elimina en orden
-          if (realIndex !== -1) {
-            comidas.splice(realIndex + idx, 1);
+          const idxGlobal = Number(e.target.getAttribute("data-global"));
+          if (!Number.isNaN(idxGlobal)) {
+            comidas.splice(idxGlobal, 1);
             guardarEstado();
             construirResumen();
           }
@@ -666,7 +653,7 @@ Rellena los valores con números (pueden ser decimales) según tu mejor estimaci
       });
     }
 
-    // --- Navegación de botones ---
+    // --- Navegación ---
     document.getElementById("btnResumen").addEventListener("click", () => {
       construirResumen();
       mostrarPantalla("pantalla-resumen");
