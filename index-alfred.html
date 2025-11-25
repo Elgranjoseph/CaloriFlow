@@ -1,0 +1,1006 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>FocusFlow • Agenda TDA</title>
+  <style>
+    :root {
+      --bg-main: #050812;
+      --bg-panel: #151b28;
+      --bg-panel-soft: #1c2434;
+      --bg-chip: #252f3f;
+      --accent: #19b5ff;
+      --accent-soft: #4f46e5;
+      --accent-soft-2: #7c3aed;
+      --text-main: #e5e7eb;
+      --text-muted: #9ca3af;
+      --border-soft: #30374a;
+      --danger: #f97373;
+      --shadow-soft: 0 18px 40px rgba(0, 0, 0, 0.65);
+      --radius-lg: 18px;
+      --radius-full: 999px;
+      --transition-fast: 0.18s ease-out;
+    }
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{
+      font-family:system-ui,-apple-system,BlinkMacSystemFont,"SF Pro Text","Segoe UI",sans-serif;
+      background:radial-gradient(circle at top,#0b1220 0,#020617 55%,#000 100%);
+      color:var(--text-main);
+      min-height:100vh;
+      display:flex;
+      justify-content:center;
+      align-items:stretch;
+      padding:12px;
+    }
+    .app-shell{
+      width:100%;
+      max-width:480px;
+      background:radial-gradient(circle at top,#020617 0,#050812 60%);
+      border-radius:28px;
+      box-shadow:0 24px 60px rgba(0,0,0,0.85);
+      overflow:hidden;
+      border:1px solid rgba(148,163,184,0.15);
+      display:flex;
+      flex-direction:column;
+    }
+    .app-header{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      padding:14px 18px 10px;
+      background:linear-gradient(to bottom,#020617,#050816);
+      border-bottom:1px solid rgba(30,64,175,0.35);
+    }
+    .app-title{
+      font-size:1.1rem;
+      font-weight:700;
+      color:var(--accent);
+      letter-spacing:.03em;
+    }
+    .settings-btn{
+      width:32px;height:32px;border-radius:50%;border:none;
+      background:radial-gradient(circle at 30% 30%,#a855f7,#4f46e5);
+      display:inline-flex;align-items:center;justify-content:center;
+      box-shadow:0 0 0 2px rgba(79,70,229,0.3);cursor:pointer;
+      transition:transform var(--transition-fast),box-shadow var(--transition-fast);
+    }
+    .settings-btn span{font-size:18px;filter:drop-shadow(0 0 4px rgba(15,23,42,.8))}
+    .settings-btn:active{transform:scale(.94);box-shadow:0 0 0 2px rgba(79,70,229,.6)}
+
+    .app-body{
+      flex:1;padding:18px 16px 10px;
+      display:flex;flex-direction:column;gap:14px;
+    }
+    .empty-state{
+      flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;
+      text-align:center;color:var(--text-muted);gap:6px;padding:16px;
+    }
+    .empty-state-main{font-size:1.05rem;font-weight:500}
+    .empty-state-sub{font-size:.9rem}
+    .notes-list{
+      display:flex;flex-direction:column;gap:10px;
+      max-height:100%;overflow-y:auto;padding-right:4px;
+    }
+    .note-card{
+      background:radial-gradient(circle at top left,#1e293b 0,#0b1120 60%);
+      border-radius:18px;padding:10px 12px;
+      border:1px solid rgba(51,65,85,.8);
+      box-shadow:0 12px 30px rgba(15,23,42,.9);
+      display:flex;flex-direction:column;gap:6px;
+    }
+    .note-header-row{display:flex;justify-content:space-between;align-items:center;gap:6px}
+    .note-type{font-size:.78rem;text-transform:uppercase;letter-spacing:.11em;color:var(--accent)}
+    .note-meta{font-size:.74rem;color:var(--text-muted)}
+    .note-content{font-size:.9rem;line-height:1.35;white-space:pre-wrap}
+    .note-image-preview{margin-top:5px;border-radius:12px;overflow:hidden;border:1px solid rgba(148,163,184,.4);max-height:160px}
+    .note-image-preview img{width:100%;display:block;object-fit:cover}
+    .note-footer{display:flex;justify-content:space-between;align-items:center;margin-top:4px;gap:6px}
+    .note-tags{display:flex;flex-wrap:wrap;gap:4px}
+    .note-tag{font-size:.7rem;padding:2px 7px;border-radius:999px;background:rgba(15,23,42,.9);border:1px solid rgba(55,65,81,.9);color:var(--text-muted)}
+    .note-actions{display:flex;gap:6px}
+    .btn-chip{
+      border-radius:999px;border:none;padding:5px 10px;font-size:.75rem;
+      background:var(--bg-chip);color:var(--text-main);
+      display:inline-flex;align-items:center;gap:4px;cursor:pointer;
+      transition:background var(--transition-fast),transform var(--transition-fast),
+        box-shadow var(--transition-fast),opacity var(--transition-fast);
+      box-shadow:0 2px 0 rgba(15,23,42,.8);
+    }
+    .btn-chip:active{transform:translateY(1px) scale(.97);box-shadow:0 0 0 rgba(15,23,42,.8)}
+    .btn-chip-primary{
+      background:linear-gradient(135deg,#4f46e5,#7c3aed);
+      box-shadow:0 8px 22px rgba(79,70,229,.65);
+    }
+    .btn-chip-danger{
+      background:linear-gradient(135deg,#b91c1c,#ef4444);
+      box-shadow:0 8px 22px rgba(239,68,68,.55);
+    }
+    .btn-chip-primary:active,.btn-chip-danger:active{
+      transform:translateY(1px) scale(.96);
+      box-shadow:0 2px 10px rgba(15,23,42,.8);
+    }
+    .btn-chip-icon{font-size:1rem}
+    .btn-chip-muted{opacity:.65}
+
+    .app-footer{
+      padding:12px 18px 16px;border-top:1px solid rgba(30,64,175,.5);
+      background:radial-gradient(circle at top,#020617 0,#020617 20%,#050816 100%);
+      display:flex;justify-content:center;
+    }
+    .fab-row{display:flex;gap:18px}
+    .fab{
+      width:64px;height:64px;border-radius:50%;border:none;cursor:pointer;
+      display:flex;align-items:center;justify-content:center;
+      box-shadow:0 18px 35px rgba(15,23,42,.9);
+      transition:transform .16s ease-out,box-shadow .16s ease-out,background .16s ease-out,opacity .16s ease-out;
+      background:radial-gradient(circle at 30% 30%,#a855f7,#4338ca);
+      position:relative;
+    }
+    .fab-icon{font-size:1.55rem;color:#e5e7eb;text-shadow:0 0 6px rgba(15,23,42,.9)}
+    .fab-pencil{background:radial-gradient(circle at 30% 30%,#22c55e,#15803d)}
+    .fab-mic{background:radial-gradient(circle at 30% 30%,#6366f1,#312e81)}
+    .fab-camera{background:radial-gradient(circle at 30% 30%,#f97316,#7c2d12)}
+    .fab:active{transform:translateY(2px) scale(.96);box-shadow:0 8px 20px rgba(15,23,42,.9);opacity:.95}
+
+    .modal-backdrop{
+      position:fixed;inset:0;
+      background:radial-gradient(circle at top,rgba(15,23,42,.9),rgba(0,0,0,.88));
+      display:flex;align-items:center;justify-content:center;
+      z-index:40;padding:16px;
+    }
+    .modal-hidden{display:none}
+    .modal-panel{
+      width:100%;max-width:430px;
+      background:linear-gradient(to bottom right,#020617,#111827);
+      border-radius:20px;border:1px solid rgba(148,163,184,.4);
+      box-shadow:var(--shadow-soft);
+      padding:16px 16px 14px;
+      display:flex;flex-direction:column;gap:12px;
+    }
+    .modal-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:4px}
+    .modal-title{font-size:1.02rem;font-weight:700;color:var(--accent)}
+    .modal-close{border:none;background:transparent;color:var(--text-muted);font-size:1.25rem;cursor:pointer}
+    .modal-body{display:flex;flex-direction:column;gap:10px}
+    .image-drop{
+      border-radius:16px;border:1.5px dashed rgba(148,163,184,.6);
+      padding:16px;display:flex;align-items:center;justify-content:center;
+      background:radial-gradient(circle at top,rgba(30,64,175,.12),transparent 60%);
+      cursor:pointer;text-align:center;color:var(--text-muted);
+      position:relative;overflow:hidden;
+    }
+    .image-drop:hover{border-style:solid;border-color:rgba(56,189,248,.7)}
+    .image-drop-icon{font-size:2rem;margin-bottom:4px}
+    .image-drop-inner{display:flex;flex-direction:column;align-items:center;gap:2px}
+    .image-drop-preview{position:absolute;inset:0;display:none}
+    .image-drop-preview img{width:100%;height:100%;object-fit:cover}
+    .image-drop.has-image .image-drop-preview{display:block}
+    .image-drop.has-image .image-drop-inner{
+      position:relative;z-index:2;
+      background:linear-gradient(to top,rgba(15,23,42,.85),rgba(15,23,42,.1));
+      padding:12px 10px;border-radius:16px;
+    }
+    textarea.modal-input{
+      width:100%;min-height:80px;border-radius:14px;
+      border:1px solid var(--border-soft);
+      background:#020617;color:var(--text-main);
+      padding:10px 11px;resize:vertical;font-size:.9rem;
+    }
+    textarea.modal-input::placeholder{color:#6b7280}
+    .field-label{font-size:.85rem;color:var(--text-muted);margin-bottom:2px}
+    .checkbox-row{display:flex;align-items:center;gap:7px;margin-top:4px}
+    .checkbox-row label{font-size:.88rem;color:var(--text-main)}
+    .inline-fields{display:flex;align-items:center;gap:6px;margin-top:6px;flex-wrap:wrap}
+    .inline-fields input[type="number"],.inline-fields input[type="text"]{
+      width:90px;border-radius:10px;border:1px solid var(--border-soft);
+      background:#020617;color:var(--text-main);padding:6px 8px;font-size:.85rem;
+    }
+    .inline-fields span{font-size:.83rem;color:var(--text-muted)}
+    .modal-footer{display:flex;justify-content:flex-end;gap:10px;margin-top:6px}
+    .btn{
+      border-radius:999px;border:none;padding:7px 16px;
+      font-size:.88rem;cursor:pointer;
+      transition:background var(--transition-fast),transform var(--transition-fast),
+        box-shadow var(--transition-fast);
+    }
+    .btn-secondary{background:#1f2937;color:var(--text-main)}
+    .btn-primary{
+      background:var(--accent-soft);color:#fff;
+      box-shadow:0 10px 28px rgba(79,70,229,.8);
+    }
+    .btn:active{transform:translateY(1px) scale(.97);box-shadow:0 5px 15px rgba(15,23,42,.9)}
+
+    .voice-circle-wrapper{display:flex;justify-content:center;margin:6px 0 10px}
+    .voice-circle{
+      width:96px;height:96px;border-radius:50%;
+      background:radial-gradient(circle at 30% 30%,#a855f7,#4f46e5);
+      display:flex;align-items:center;justify-content:center;
+      cursor:pointer;box-shadow:0 12px 30px rgba(79,70,229,.7);
+      position:relative;overflow:hidden;
+    }
+    .voice-circle-icon{font-size:2rem;color:#e5e7eb;text-shadow:0 0 8px rgba(15,23,42,.9)}
+    .voice-circle.active::after{
+      content:"";position:absolute;inset:0;border-radius:inherit;
+      border:2px solid rgba(56,189,248,.8);
+      box-shadow:0 0 18px rgba(56,189,248,.9);
+      animation:pulse 1s infinite ease-out;
+    }
+    @keyframes pulse{
+      0%{transform:scale(1);opacity:1}
+      100%{transform:scale(1.1);opacity:0}
+    }
+    .voice-hint{text-align:center;font-size:.85rem;color:var(--text-muted)}
+
+    .slider-row{margin-top:4px}
+    .slider-row input[type="range"]{width:100%}
+    .select-row{margin-top:10px;font-size:.88rem}
+    .select-row select{
+      width:100%;margin-top:4px;border-radius:10px;border:1px solid var(--border-soft);
+      background:#020617;color:var(--text-main);padding:7px 10px;font-size:.88rem;
+    }
+    .custom-sound{margin-top:8px;font-size:.8rem;color:var(--text-muted)}
+    .custom-sound input[type="file"]{margin-top:4px;font-size:.8rem}
+
+    .hidden{display:none!important}
+
+    @media (max-width:480px){
+      body{padding:0}
+      .app-shell{border-radius:0;max-width:100%}
+    }
+  </style>
+</head>
+<body>
+  <div class="app-shell">
+    <header class="app-header">
+      <div class="app-title">FocusFlow</div>
+      <button class="settings-btn" id="btnSettings" aria-label="Configuración de sonido">
+        <span>⚙️</span>
+      </button>
+    </header>
+
+    <main class="app-body">
+      <div id="emptyState" class="empty-state">
+        <div class="empty-state-main">Tu agenda está vacía.</div>
+        <div class="empty-state-sub">
+          Usa los botones de abajo para añadir tu primera nota.
+        </div>
+      </div>
+      <div id="notesList" class="notes-list hidden"></div>
+    </main>
+
+    <footer class="app-footer">
+      <div class="fab-row">
+        <button class="fab fab-pencil" id="btnNewText" aria-label="Nueva nota de texto">
+          <span class="fab-icon">✏️</span>
+        </button>
+        <button class="fab fab-mic" id="btnNewVoice" aria-label="Nueva nota de voz">
+          <span class="fab-icon">🎙️</span>
+        </button>
+        <button class="fab fab-camera" id="btnNewImage" aria-label="Nueva nota de imagen">
+          <span class="fab-icon">📷</span>
+        </button>
+      </div>
+    </footer>
+  </div>
+
+  <!-- MODAL TEXTO -->
+  <div id="modalText" class="modal-backdrop modal-hidden">
+    <div class="modal-panel">
+      <div class="modal-header">
+        <div class="modal-title">Nueva Nota</div>
+        <button class="modal-close" data-close="modalText">✕</button>
+      </div>
+      <div class="modal-body">
+        <label class="field-label" for="textNoteContent">Escribe tu nota aquí…</label>
+        <textarea id="textNoteContent" class="modal-input"
+          placeholder="Escribe tu nota aquí…"></textarea>
+
+        <div class="checkbox-row">
+          <input type="checkbox" id="textRecurring" />
+          <label for="textRecurring">Activar recordatorio recurrente</label>
+        </div>
+        <div id="textRecurringFields" class="inline-fields hidden">
+          <span>Repetir cada:</span>
+          <input type="number" id="textIntervalMinutes" min="1" placeholder="Ej: 5" />
+          <span>minutos</span>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" data-close="modalText">Cancelar</button>
+        <button class="btn btn-primary" id="btnSaveText">Guardar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL VOZ -->
+  <div id="modalVoice" class="modal-backdrop modal-hidden">
+    <div class="modal-panel">
+      <div class="modal-header">
+        <div class="modal-title">Nota de Voz</div>
+        <button class="modal-close" data-close="modalVoice">✕</button>
+      </div>
+      <div class="modal-body">
+        <div class="voice-circle-wrapper">
+          <div class="voice-circle" id="voiceCircle">
+            <span class="voice-circle-icon">🎙️</span>
+          </div>
+        </div>
+        <div class="voice-hint" id="voiceHint">
+          Toca el micrófono para dictar tu nota. Se detendrá sola cuando termines.
+        </div>
+
+        <label class="field-label" for="voiceNoteContent">Texto de la nota</label>
+        <textarea id="voiceNoteContent" class="modal-input"
+          placeholder="Aquí se llenará la transcripción de lo que digas…"></textarea>
+
+        <div class="checkbox-row">
+          <input type="checkbox" id="voiceRecurring" />
+          <label for="voiceRecurring">Activar recordatorio recurrente</label>
+        </div>
+        <div id="voiceRecurringFields" class="inline-fields hidden">
+          <span>Repetir cada:</span>
+          <input type="number" id="voiceIntervalMinutes" min="1" placeholder="Ej: 5" />
+          <span>minutos</span>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" data-close="modalVoice">Cancelar</button>
+        <button class="btn btn-primary" id="btnSaveVoice">Guardar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL IMAGEN -->
+  <div id="modalImage" class="modal-backdrop modal-hidden">
+    <div class="modal-panel">
+      <div class="modal-header">
+        <div class="modal-title">Nota de Imagen</div>
+        <button class="modal-close" data-close="modalImage">✕</button>
+      </div>
+      <div class="modal-body">
+        <div class="image-drop" id="imageDrop">
+          <div class="image-drop-preview">
+            <img id="imagePreview" alt="Previsualización" />
+          </div>
+          <div class="image-drop-inner">
+            <div class="image-drop-icon">📷</div>
+            <div>Tomar o Elegir Foto</div>
+          </div>
+          <input type="file" id="imageInput" accept="image/*" capture="environment"
+            class="hidden" />
+        </div>
+
+        <label class="field-label" for="imageNoteContent">Texto (opcional)</label>
+        <textarea id="imageNoteContent" class="modal-input"
+          placeholder="Escribe tu nota aquí…"></textarea>
+
+        <div class="checkbox-row">
+          <input type="checkbox" id="imageRecurring" />
+          <label for="imageRecurring">Activar recordatorio recurrente</label>
+        </div>
+        <div id="imageRecurringFields" class="inline-fields hidden">
+          <span>Repetir cada:</span>
+          <input type="number" id="imageIntervalMinutes" min="1" placeholder="Ej: 5" />
+          <span>minutos</span>
+        </div>
+
+        <div class="checkbox-row">
+          <input type="checkbox" id="imageTrackLocation" />
+          <label for="imageTrackLocation">
+            Guardar ubicación y avisar si me alejo (~5 m)
+          </label>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" data-close="modalImage">Cancelar</button>
+        <button class="btn btn-primary" id="btnSaveImage">Guardar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL SONIDO -->
+  <div id="modalSound" class="modal-backdrop modal-hidden">
+    <div class="modal-panel">
+      <div class="modal-header">
+        <div class="modal-title">Configuración de Sonido</div>
+        <button class="modal-close" data-close="modalSound">✕</button>
+      </div>
+      <div class="modal-body">
+        <div>
+          <div class="field-label">Volumen de Notificación</div>
+          <div class="slider-row">
+            <input type="range" id="soundVolume" min="0" max="100" value="100" />
+          </div>
+        </div>
+
+        <div class="select-row">
+          <div class="field-label">Sonido de Notificación</div>
+          <select id="soundType">
+            <option value="default">Alarma Fuerte (por defecto)</option>
+            <option value="custom">Sonido Personalizado</option>
+          </select>
+
+          <div id="customSoundWrapper" class="custom-sound hidden">
+            <div>Selecciona un archivo de audio (mp3, wav, etc.)</div>
+            <input type="file" id="customSoundFile" accept="audio/*" />
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" data-close="modalSound">Cerrar</button>
+        <button class="btn btn-primary" id="btnTestSound">Probar Sonido</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function $(id){return document.getElementById(id);}
+    function nowIso(){return new Date().toISOString();}
+
+    var STORAGE_NOTES_KEY = "focusflow_notes_v5";
+    var STORAGE_SETTINGS_KEY = "focusflow_settings_v1";
+
+    var notes = [];
+    var settings = { volume:1, soundType:"default", customSoundUrl:null };
+
+    var SpeechRec = window.SpeechRecognition || window.webkitSpeechRecognition || null;
+    var voiceRecognizer = null;
+    var voiceRecognizedFinal = "";
+    var isRecordingVoice = false;
+
+    var geoWatchId = null;
+
+    function openModal(id){ $(id).classList.remove("modal-hidden"); }
+    function closeModal(id){
+      $(id).classList.add("modal-hidden");
+      if(id==="modalImage") resetImageModal();
+      if(id==="modalVoice") resetVoiceModal();
+    }
+
+    document.querySelectorAll("[data-close]").forEach(function(btn){
+      btn.addEventListener("click",function(){
+        closeModal(btn.getAttribute("data-close"));
+      });
+    });
+
+    $("btnNewText").addEventListener("click",function(){openModal("modalText");});
+    $("btnNewVoice").addEventListener("click",function(){openModal("modalVoice");});
+    $("btnNewImage").addEventListener("click",function(){openModal("modalImage");});
+    $("btnSettings").addEventListener("click",function(){openModal("modalSound");});
+
+    function loadFromStorage(){
+      try{
+        var raw = localStorage.getItem(STORAGE_NOTES_KEY);
+        if(raw){notes = JSON.parse(raw);}
+      }catch(e){notes=[];}
+      try{
+        var rs = localStorage.getItem(STORAGE_SETTINGS_KEY);
+        if(rs){settings = Object.assign(settings,JSON.parse(rs));}
+      }catch(e){}
+    }
+    function saveNotes(){
+      localStorage.setItem(STORAGE_NOTES_KEY,JSON.stringify(notes));
+      updateGeoWatch();
+    }
+    function saveSettings(){
+      localStorage.setItem(STORAGE_SETTINGS_KEY,JSON.stringify(settings));
+    }
+
+    var emptyStateEl = $("emptyState");
+    var notesListEl = $("notesList");
+
+    function render(){
+      if(!notes.length){
+        emptyStateEl.classList.remove("hidden");
+        notesListEl.classList.add("hidden");
+        notesListEl.innerHTML="";
+        return;
+      }
+      emptyStateEl.classList.add("hidden");
+      notesListEl.classList.remove("hidden");
+      notesListEl.innerHTML="";
+
+      var sorted = notes.slice().sort(function(a,b){
+        return new Date(b.createdAt)-new Date(a.createdAt);
+      });
+
+      sorted.forEach(function(note){
+        var card = document.createElement("article");
+        card.className="note-card";
+
+        var header = document.createElement("div");
+        header.className="note-header-row";
+
+        var typeLabel = document.createElement("div");
+        typeLabel.className="note-type";
+        typeLabel.textContent =
+          note.type==="text" ? "NOTA DE TEXTO" :
+          note.type==="voice" ? "NOTA DE VOZ" : "NOTA DE IMAGEN";
+
+        var meta = document.createElement("div");
+        meta.className="note-meta";
+        var d = new Date(note.createdAt);
+        meta.textContent = d.toLocaleDateString()+" • "+d.toLocaleTimeString().slice(0,5);
+
+        header.appendChild(typeLabel);header.appendChild(meta);
+        card.appendChild(header);
+
+        var c = document.createElement("div");
+        c.className="note-content";
+        c.textContent = note.text && note.text.trim()?note.text:"(Sin texto)";
+        card.appendChild(c);
+
+        if(note.imageDataUrl){
+          var imgWrap = document.createElement("div");
+          imgWrap.className="note-image-preview";
+          var img = document.createElement("img");
+          img.src = note.imageDataUrl;
+          img.alt="Imagen de la nota";
+          imgWrap.appendChild(img);
+          card.appendChild(imgWrap);
+        }
+
+        var footer = document.createElement("div");
+        footer.className="note-footer";
+
+        var tagsWrap = document.createElement("div");
+        tagsWrap.className="note-tags";
+
+        if(note.recurring && note.intervalMinutes){
+          var t1 = document.createElement("span");
+          t1.className="note-tag";
+          t1.textContent="Cada "+note.intervalMinutes+" min";
+          tagsWrap.appendChild(t1);
+        }
+
+        if(note.location){
+          var tLoc = document.createElement("span");
+          tLoc.className="note-tag";
+          tLoc.textContent="Ubicación guardada";
+          tagsWrap.appendChild(tLoc);
+        }
+
+        var tStatus = document.createElement("span");
+        tStatus.className="note-tag";
+        tStatus.textContent = note.completed?"Completada":"Activa";
+        tagsWrap.appendChild(tStatus);
+
+        footer.appendChild(tagsWrap);
+
+        var actions = document.createElement("div");
+        actions.className="note-actions";
+
+        var btnDone = document.createElement("button");
+        btnDone.className="btn-chip btn-chip-primary"+(note.completed?" btn-chip-muted":"");
+        btnDone.innerHTML='<span class="btn-chip-icon">✔</span>'+(note.completed?"Hecha":"Marcar hecha");
+        btnDone.addEventListener("click",function(){toggleCompleted(note.id);});
+
+        var btnDel = document.createElement("button");
+        btnDel.className="btn-chip btn-chip-danger";
+        btnDel.innerHTML='<span class="btn-chip-icon">🗑️</span>Borrar';
+        btnDel.addEventListener("click",function(){deleteNote(note.id);});
+
+        actions.appendChild(btnDone);actions.appendChild(btnDel);
+        footer.appendChild(actions);
+        card.appendChild(footer);
+
+        notesListEl.appendChild(card);
+      });
+    }
+
+    function toggleCompleted(id){
+      var n = notes.find(function(x){return x.id===id;});
+      if(!n)return;
+      n.completed = !n.completed;
+      saveNotes();render();
+    }
+    function deleteNote(id){
+      notes = notes.filter(function(n){return n.id!==id;});
+      saveNotes();render();
+    }
+
+    function createNote(opts){
+      var note = {
+        id: Date.now().toString(36)+Math.random().toString(36).slice(2),
+        type: opts.type,
+        text: (opts.text||"").trim(),
+        imageDataUrl: opts.imageDataUrl || null,
+        recurring: !!opts.recurring && !!opts.intervalMinutes,
+        intervalMinutes: opts.recurring?opts.intervalMinutes:null,
+        nextReminderAt: (opts.recurring && opts.intervalMinutes)?
+          Date.now()+opts.intervalMinutes*60000 : null,
+        location: opts.location || null,
+        geoAlerted: false,
+        createdAt: nowIso(),
+        completed:false
+      };
+      notes.push(note);
+      saveNotes();
+      render();
+    }
+
+    // TEXTO
+    $("textRecurring").addEventListener("change",function(e){
+      $("textRecurringFields").classList.toggle("hidden",!e.target.checked);
+    });
+    $("btnSaveText").addEventListener("click",function(){
+      var txt = $("textNoteContent").value;
+      if(!txt.trim()){alert("Escribe algo en la nota.");return;}
+      var rec = $("textRecurring").checked;
+      var intv = parseInt($("textIntervalMinutes").value,10);
+      if(rec && (!intv || intv<=0)){alert("Indica cada cuántos minutos repetir.");return;}
+      createNote({
+        type:"text",text:txt,
+        recurring:rec,intervalMinutes:rec?intv:null
+      });
+      $("textNoteContent").value="";
+      $("textRecurring").checked=false;
+      $("textIntervalMinutes").value="";
+      $("textRecurringFields").classList.add("hidden");
+      closeModal("modalText");
+    });
+
+    // VOZ – UNA FRASE, SIN REPETIR
+    $("voiceRecurring").addEventListener("change",function(e){
+      $("voiceRecurringFields").classList.toggle("hidden",!e.target.checked);
+    });
+
+    function resetVoiceModal(){
+      stopVoiceRecognition();
+      $("voiceNoteContent").value="";
+      $("voiceRecurring").checked=false;
+      $("voiceIntervalMinutes").value="";
+      $("voiceRecurringFields").classList.add("hidden");
+      $("voiceHint").textContent="Toca el micrófono para dictar tu nota. Se detendrá sola cuando termines.";
+      $("voiceCircle").classList.remove("active");
+      voiceRecognizedFinal="";
+      isRecordingVoice=false;
+    }
+
+    function startVoiceRecognition(){
+      if(!SpeechRec){
+        alert("Este navegador no soporta reconocimiento de voz. Escribe la nota a mano.");
+        return;
+      }
+      voiceRecognizedFinal = "";
+      var recognizer = new SpeechRec();
+      voiceRecognizer = recognizer;
+      recognizer.lang = "es-ES";
+      recognizer.continuous = false;      // <— IMPORTANTE
+      recognizer.interimResults = false;  // <— solo resultado final
+      recognizer.maxAlternatives = 1;
+
+      recognizer.onresult = function(ev){
+        var t = ev.results[0][0].transcript.trim();
+        voiceRecognizedFinal = t;
+        $("voiceNoteContent").value = t;
+      };
+      recognizer.onerror = function(){
+        $("voiceHint").textContent = "Hubo un problema con el reconocimiento. Intenta de nuevo.";
+      };
+      recognizer.onend = function(){
+        isRecordingVoice=false;
+        $("voiceCircle").classList.remove("active");
+        if(voiceRecognizedFinal){
+          $("voiceHint").textContent = "Revisa la transcripción y guarda la nota.";
+        }else{
+          $("voiceHint").textContent = "No se captó nada. Vuelve a tocar para dictar.";
+        }
+      };
+      try{
+        recognizer.start();
+        isRecordingVoice=true;
+        $("voiceCircle").classList.add("active");
+        $("voiceHint").textContent="Grabando… di algo como: 'salir a correr, recordame cada 5 minutos'.";
+      }catch(e){
+        alert("No se pudo iniciar el reconocimiento de voz.");
+      }
+    }
+    function stopVoiceRecognition(){
+      if(voiceRecognizer){
+        try{voiceRecognizer.stop();}catch(e){}
+        voiceRecognizer=null;
+      }
+    }
+
+    $("voiceCircle").addEventListener("click",function(){
+      // ahora lo usamos más como “pulsar para reintentar”
+      if(isRecordingVoice){
+        stopVoiceRecognition();
+      }else{
+        startVoiceRecognition();
+      }
+    });
+
+    // Texto → número
+    function textToNumber(token){
+      if(!token) return null;
+      token = token.trim().toLowerCase();
+      if(/^\d+$/.test(token)) return parseInt(token,10);
+      var map = {
+        "uno":1,"una":1,
+        "dos":2,
+        "tres":3,
+        "cuatro":4,
+        "cinco":5,
+        "seis":6,
+        "siete":7,
+        "ocho":8,
+        "nueve":9,
+        "diez":10
+      };
+      return map[token] || null;
+    }
+    function parseIntervalFromText(text){
+      if(!text) return null;
+      var lower = text.toLowerCase();
+
+      var m = lower.match(/cada\s+([0-9]+|[a-záéíóúñ]+)\s*(minuto|minutos|min)\b/);
+      if(m){
+        var n = textToNumber(m[1]);
+        if(n) return n;
+      }
+
+      m = lower.match(/cada\s+([0-9]+|[a-záéíóúñ]+)\s*(hora|horas|h)\b/);
+      if(m){
+        var n2 = textToNumber(m[1]);
+        if(n2) return n2*60;
+      }
+
+      return null;
+    }
+
+    $("voiceNoteContent").addEventListener("input",function(e){
+      var txt = e.target.value;
+      var parsed = parseIntervalFromText(txt);
+      if(parsed){
+        $("voiceRecurring").checked = true;
+        $("voiceRecurringFields").classList.remove("hidden");
+        $("voiceIntervalMinutes").value = parsed;
+      }
+    });
+
+    $("btnSaveVoice").addEventListener("click",function(){
+      var txt = $("voiceNoteContent").value.trim();
+      if(!txt && voiceRecognizedFinal){
+        txt = voiceRecognizedFinal.trim();
+      }
+      if(!txt){
+        alert("No hay texto en la nota. Dicta algo o escríbelo.");
+        return;
+      }
+
+      var rec = $("voiceRecurring").checked;
+      var intv = parseInt($("voiceIntervalMinutes").value,10);
+
+      var autoInterval = parseIntervalFromText(txt);
+      if(!rec && autoInterval){
+        rec = true;
+        intv = autoInterval;
+      }
+
+      if(rec && (!intv || intv<=0)){
+        alert("No entiendo cada cuánto repetir. Revisa el campo de minutos.");
+        return;
+      }
+
+      createNote({
+        type:"voice",
+        text:txt,
+        recurring:rec,
+        intervalMinutes:rec?intv:null
+      });
+      resetVoiceModal();
+      closeModal("modalVoice");
+    });
+
+    // IMAGEN + ubicación
+    var imageDrop = $("imageDrop");
+    var imageInput = $("imageInput");
+    var imagePreview = $("imagePreview");
+    var imageDataUrl = null;
+
+    imageDrop.addEventListener("click",function(){imageInput.click();});
+    imageInput.addEventListener("change",handleImageFile);
+
+    function handleImageFile(e){
+      var file = e.target.files && e.target.files[0];
+      if(!file)return;
+      var reader = new FileReader();
+      reader.onload=function(){
+        imageDataUrl = reader.result;
+        imagePreview.src = imageDataUrl;
+        imageDrop.classList.add("has-image");
+        var currentText = $("imageNoteContent").value.trim();
+        if(!currentText){
+          $("imageNoteContent").value = "No te olvides de esto.";
+        }
+      };
+      reader.readAsDataURL(file);
+    }
+
+    function resetImageModal(){
+      imageDataUrl=null;
+      imageInput.value="";
+      imagePreview.src="";
+      imageDrop.classList.remove("has-image");
+      $("imageNoteContent").value="";
+      $("imageRecurring").checked=false;
+      $("imageIntervalMinutes").value="";
+      $("imageRecurringFields").classList.add("hidden");
+      $("imageTrackLocation").checked=false;
+    }
+
+    $("imageRecurring").addEventListener("change",function(e){
+      $("imageRecurringFields").classList.toggle("hidden",!e.target.checked);
+    });
+
+    $("btnSaveImage").addEventListener("click",function(){
+      var txt = $("imageNoteContent").value;
+      var rec = $("imageRecurring").checked;
+      var intv = parseInt($("imageIntervalMinutes").value,10);
+      if(!imageDataUrl && !txt.trim()){
+        alert("Añade una foto o escribe una nota.");
+        return;
+      }
+      if(rec && (!intv || intv<=0)){
+        alert("Indica cada cuántos minutos repetir.");
+        return;
+      }
+
+      var trackLoc = $("imageTrackLocation").checked;
+      if(trackLoc && navigator.geolocation){
+        navigator.geolocation.getCurrentPosition(function(pos){
+          var loc = {lat:pos.coords.latitude,lng:pos.coords.longitude};
+          createNote({
+            type:"image",text:txt,imageDataUrl:imageDataUrl,
+            recurring:rec,intervalMinutes:rec?intv:null,
+            location:loc
+          });
+          resetImageModal();
+          closeModal("modalImage");
+        },function(){
+          alert("No se pudo obtener ubicación. Se guardará la nota sin ubicación.");
+          createNote({
+            type:"image",text:txt,imageDataUrl:imageDataUrl,
+            recurring:rec,intervalMinutes:rec?intv:null
+          });
+          resetImageModal();closeModal("modalImage");
+        });
+      }else{
+        createNote({
+          type:"image",text:txt,imageDataUrl:imageDataUrl,
+          recurring:rec,intervalMinutes:rec?intv:null
+        });
+        resetImageModal();closeModal("modalImage");
+      }
+    });
+
+    // SONIDO
+    var audioCtx=null, customAudio=null;
+    function ensureAudioContext(){
+      if(!audioCtx){
+        audioCtx = new (window.AudioContext||window.webkitAudioContext)();
+      }
+    }
+    function playDefaultAlarm(){
+      ensureAudioContext();
+      var duration=0.7,freq=880,now=audioCtx.currentTime;
+      for(var i=0;i<3;i++){
+        var osc=audioCtx.createOscillator();
+        var gain=audioCtx.createGain();
+        osc.frequency.value=freq;osc.type="square";
+        gain.gain.value=settings.volume;
+        osc.connect(gain);gain.connect(audioCtx.destination);
+        var start=now+i*(duration+0.15);
+        var end=start+duration;
+        osc.start(start);osc.stop(end);
+      }
+    }
+    function playCustomAlarm(){
+      if(!settings.customSoundUrl){playDefaultAlarm();return;}
+      if(customAudio){customAudio.pause();customAudio.currentTime=0;}
+      customAudio=new Audio(settings.customSoundUrl);
+      customAudio.volume=settings.volume;
+      customAudio.play();
+    }
+    function playNotificationSound(){
+      if(settings.soundType==="custom" && settings.customSoundUrl){
+        playCustomAlarm();
+      }else{playDefaultAlarm();}
+    }
+
+    $("soundVolume").addEventListener("input",function(e){
+      settings.volume = Number(e.target.value)/100;
+      saveSettings();
+    });
+    $("soundType").addEventListener("change",function(e){
+      settings.soundType=e.target.value;
+      $("customSoundWrapper").classList.toggle("hidden",settings.soundType!=="custom");
+      saveSettings();
+    });
+    $("customSoundFile").addEventListener("change",function(e){
+      var f = e.target.files && e.target.files[0];
+      if(!f)return;
+      var url = URL.createObjectURL(f);
+      settings.customSoundUrl=url;
+      settings.soundType="custom";
+      $("soundType").value="custom";
+      $("customSoundWrapper").classList.remove("hidden");
+      saveSettings();
+    });
+    $("btnTestSound").addEventListener("click",function(){playNotificationSound();});
+
+    function applySettingsToUI(){
+      $("soundVolume").value=Math.round(settings.volume*100);
+      $("soundType").value=settings.soundType;
+      $("customSoundWrapper").classList.toggle("hidden",settings.soundType!=="custom");
+    }
+
+    // RECORDATORIOS POR TIEMPO
+    function checkReminders(){
+      var now=Date.now();
+      var fired=false;
+      notes.forEach(function(n){
+        if(n.recurring && !n.completed && n.nextReminderAt && now>=n.nextReminderAt){
+          fired=true;
+          n.nextReminderAt = now + n.intervalMinutes*60000;
+        }
+      });
+      if(fired){saveNotes();playNotificationSound();}
+    }
+    setInterval(checkReminders,15000);
+
+    // GEO DISTANCIA
+    function distanceMeters(a,b){
+      var R=6371000;
+      var dLat=(b.lat-a.lat)*Math.PI/180;
+      var dLng=(b.lng-a.lng)*Math.PI/180;
+      var lat1=a.lat*Math.PI/180;
+      var lat2=b.lat*Math.PI/180;
+      var sin1=Math.sin(dLat/2),sin2=Math.sin(dLng/2);
+      var c=2*Math.atan2(Math.sqrt(sin1*sin1+Math.cos(lat1)*Math.cos(lat2)*sin2*sin2),
+                         Math.sqrt(1-(sin1*sin1+Math.cos(lat1)*Math.cos(lat2)*sin2*sin2)));
+      return R*c;
+    }
+
+    function updateGeoWatch(){
+      var hasTracked = notes.some(function(n){return n.location && !n.completed;});
+      if(hasTracked && navigator.geolocation){
+        if(geoWatchId===null){
+          geoWatchId = navigator.geolocation.watchPosition(function(pos){
+            var here = {lat:pos.coords.latitude,lng:pos.coords.longitude};
+            var triggered=false;
+            notes.forEach(function(n){
+              if(n.location && !n.completed && !n.geoAlerted){
+                var d = distanceMeters(n.location,here);
+                if(d>5){
+                  n.geoAlerted=true;
+                  triggered=true;
+                }
+              }
+            });
+            if(triggered){
+              saveNotes();
+              playNotificationSound();
+              alert("Te alejaste de un objeto con nota de imagen. Revisa FocusFlow.");
+            }
+          },function(err){
+            console.log("geo error",err);
+          },{enableHighAccuracy:true,maximumAge:5000,timeout:10000});
+        }
+      }else{
+        if(geoWatchId!==null && navigator.geolocation){
+          navigator.geolocation.clearWatch(geoWatchId);
+        }
+        geoWatchId=null;
+      }
+    }
+
+    loadFromStorage();
+    render();
+    applySettingsToUI();
+    updateGeoWatch();
+  </script>
+</body>
+</html>
