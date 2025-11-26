@@ -258,7 +258,6 @@
       margin-bottom: 4px;
       font-size: 14px;
     }
-    /* barras de metas */
     .goals-container {
       margin-bottom: 14px;
       font-size: 13px;
@@ -308,7 +307,6 @@
       background: linear-gradient(90deg, #22c55e, #16a34a);
       width: 0%;
     }
-
     @media (max-width: 480px) {
       .app-shell {
         padding: 20px 14px 26px;
@@ -376,8 +374,6 @@
           <span>Generar prompt para ChatGPT</span>
         </button>
 
-        <!-- LEYENDA QUITADA -->
-
         <div class="field" style="margin-top: 14px;">
           <label for="json-input"></label>
           <textarea
@@ -398,7 +394,7 @@
           📚 Ver base aprendida
         </button>
 
-        <!-- BOTÓN TDEE AHORA COMO LOS OTROS -->
+        <!-- BOTÓN TDEE IGUAL A LOS OTROS -->
         <button id="tdee-btn" class="btn btn-blue" style="margin-top:10px;">
           ⚙️ Calcular TDEE y metas
         </button>
@@ -440,7 +436,7 @@
       </div>
     </div>
 
-    <!-- NUEVA PANTALLA: TDEE / METAS -->
+    <!-- Pantalla TDEE / Metas -->
     <div id="screen-tdee" class="screen">
       <button id="back-from-tdee" class="btn-outline-back">
         <span class="arrow">←</span> Volver al registro
@@ -502,13 +498,20 @@
           </div>
         </div>
 
-        <button id="tdee-calc-btn" class="btn btn-green" type="button">
+        <!-- AQUÍ EL CAMBIO CLAVE: onclick -->
+        <button id="tdee-calc-btn"
+                class="btn btn-green"
+                type="button"
+                onclick="calcularObjetivoNutricional()">
           ⚙️ Calcular objetivo diario
         </button>
 
         <div id="tdee-result" class="totals" style="margin-top:10px;"></div>
 
-        <button id="tdee-apply-btn" class="btn btn-yellow" type="button" style="margin-top:6px; display:none;">
+        <button id="tdee-apply-btn"
+                class="btn btn-yellow"
+                type="button"
+                style="margin-top:6px; display:none;">
           ✅ Usar estas metas en la app
         </button>
 
@@ -531,11 +534,9 @@
         return [];
       }
     }
-
     function saveMeals(meals) {
       localStorage.setItem(STORAGE_MEALS_KEY, JSON.stringify(meals));
     }
-
     function loadDb() {
       try {
         return JSON.parse(localStorage.getItem(STORAGE_DB_KEY)) || {};
@@ -543,11 +544,9 @@
         return {};
       }
     }
-
     function saveDb(db) {
       localStorage.setItem(STORAGE_DB_KEY, JSON.stringify(db));
     }
-
     function loadGoals() {
       try {
         return JSON.parse(localStorage.getItem(STORAGE_GOALS_KEY)) || null;
@@ -555,7 +554,6 @@
         return null;
       }
     }
-
     function saveGoals(goals) {
       localStorage.setItem(STORAGE_GOALS_KEY, JSON.stringify(goals));
     }
@@ -563,7 +561,7 @@
     let meals = loadMeals();
     let learnedDb = loadDb();
     let goals = loadGoals();
-    let lastTdeeGoals = null; // metas calculadas desde TDEE
+    let lastTdeeGoals = null;
 
     const screenRegistro = document.getElementById("screen-registro");
     const screenResumen = document.getElementById("screen-resumen");
@@ -593,7 +591,6 @@
     const mealsListDiv = document.getElementById("meals-list");
     const dbListDiv = document.getElementById("db-list");
 
-    // TDEE DOM
     const objPesoInput = document.getElementById("obj-peso");
     const objAlturaInput = document.getElementById("obj-altura");
     const objEdadInput = document.getElementById("obj-edad");
@@ -611,7 +608,6 @@
       screen.classList.add("active");
     }
 
-    // Botón + : agrega "cant porción de alimento" a ¿Qué comiste?
     addPartBtn.addEventListener("click", () => {
       const cant = (cantidadInput.value || "").trim();
       const porc = (porcionInput.value || "").trim();
@@ -622,14 +618,9 @@
       }
       const parte = `${cant} ${porc} de ${alim}`;
       const actual = descripcionInput.value.trim();
-      if (!actual) {
-        descripcionInput.value = parte;
-      } else {
-        descripcionInput.value = actual + " + " + parte;
-      }
+      descripcionInput.value = actual ? actual + " + " + parte : parte;
     });
 
-    // Prompt para ChatGPT
     promptBtn.addEventListener("click", async () => {
       const tipo = tipoInput.value;
       const descripcion = descripcionInput.value.trim();
@@ -637,12 +628,16 @@
         alert("Primero escribí qué comiste.");
         return;
       }
-      const prompt = `Quiero que estimes calorías, azúcares (g), grasas (g) y proteínas (g) de esta comida:\nTipo de comida: ${tipo}\nDescripción: ${descripcion}\n\nResponde SOLO un JSON válido, sin texto extra, sin comentarios, sin explicación. Usa exactamente este formato de claves: {"calorias":0,"azucares_g":0,"grasas_g":0,"proteinas_g":0}\nCompleta los valores con números (pueden ser decimales).`;
+      const prompt = `Quiero que estimes calorías, azúcares (g), grasas (g) y proteínas (g) de esta comida:
+Tipo de comida: ${tipo}
+Descripción: ${descripcion}
+
+Responde SOLO un JSON válido, sin texto extra, sin comentarios, sin explicación. Usa exactamente este formato de claves: {"calorias":0,"azucares_g":0,"grasas_g":0,"proteinas_g":0}
+Completa los valores con números (pueden ser decimales).`;
       try {
         await navigator.clipboard.writeText(prompt);
         alert("Prompt copiado al portapapeles. Abrí tu ChatGPT y pegalo en la conversación que quieras.");
       } catch (e) {
-        console.error(e);
         alert("No pude copiar al portapapeles. Copiá el prompt manualmente.");
       }
     });
@@ -654,25 +649,20 @@
         const obj = JSON.parse(raw);
         const needed = ["calorias", "azucares_g", "grasas_g", "proteinas_g"];
         for (const key of needed) {
-          if (typeof obj[key] !== "number") {
-            throw new Error("Formato incorrecto");
-          }
+          if (typeof obj[key] !== "number") throw new Error();
         }
         return obj;
-      } catch (e) {
+      } catch {
         alert("El JSON no es válido. Revisá que tenga solo números y las claves correctas.");
         return null;
       }
     }
 
-    // busca exacto o suma partes separadas por '+'
     function findMacrosFromDb(description) {
       const exact = description.trim();
       if (!exact) return null;
 
-      if (learnedDb[exact]) {
-        return { ...learnedDb[exact] };
-      }
+      if (learnedDb[exact]) return { ...learnedDb[exact] };
 
       const parts = exact
         .split("+")
@@ -759,7 +749,6 @@
       const editBtn = document.createElement("button");
       editBtn.className = "goals-edit";
       editBtn.textContent = "Editar metas";
-
       editBtn.addEventListener("click", () => {
         const gCal = prompt("Meta diaria de calorías (kcal):", goals?.calorias ?? "2000");
         if (gCal === null) return;
@@ -788,7 +777,7 @@
         const p = document.createElement("div");
         p.style.fontSize = "12px";
         p.style.color = "#9ca3af";
-        p.textContent = "Aún no definiste metas. Tocá \"Editar metas\" o usá el cálculo de TDEE.";
+        p.textContent = 'Aún no definiste metas. Tocá "Editar metas" o usá el cálculo de TDEE.';
         container.appendChild(p);
         goalsBlock.appendChild(container);
         return;
@@ -816,18 +805,10 @@
         return row;
       }
 
-      container.appendChild(
-        createRow("Calorías", total.calorias, goals.calorias || 0, "kcal")
-      );
-      container.appendChild(
-        createRow("Azúcares", total.azucares_g, goals.azucares_g || 0, "g")
-      );
-      container.appendChild(
-        createRow("Grasas", total.grasas_g, goals.grasas_g || 0, "g")
-      );
-      container.appendChild(
-        createRow("Proteínas", total.proteinas_g, goals.proteinas_g || 0, "g")
-      );
+      container.appendChild(createRow("Calorías", total.calorias, goals.calorias || 0, "kcal"));
+      container.appendChild(createRow("Azúcares", total.azucares_g, goals.azucares_g || 0, "g"));
+      container.appendChild(createRow("Grasas", total.grasas_g, goals.grasas_g || 0, "g"));
+      container.appendChild(createRow("Proteínas", total.proteinas_g, goals.proteinas_g || 0, "g"));
 
       goalsBlock.appendChild(container);
     }
@@ -955,7 +936,6 @@
       });
     }
 
-    // Navegación
     summaryBtn.addEventListener("click", () => {
       renderSummary();
       showScreen(screenResumen);
@@ -973,38 +953,31 @@
     backFromSummaryBtn.addEventListener("click", () => {
       showScreen(screenRegistro);
     });
-
     backFromDbBtn.addEventListener("click", () => {
       showScreen(screenRegistro);
     });
-
     backFromTdeeBtn.addEventListener("click", () => {
       showScreen(screenRegistro);
     });
 
-    // --- CÁLCULO TDEE / METAS ---
+    // Cálculo TDEE (también se llama desde onclick del botón)
     function calcularObjetivoNutricional() {
       const peso = parseFloat(objPesoInput.value);
       const altura = parseFloat(objAlturaInput.value);
       const edad = parseFloat(objEdadInput.value);
       const actividad = parseFloat(objActividadSelect.value);
       const ajuste = parseFloat(objObjetivoSelect.value);
-
       const sexoInput = document.querySelector('input[name="obj-sexo"]:checked');
       const sexo = sexoInput ? sexo.value : "h";
 
-      if (
-        isNaN(peso) || isNaN(altura) || isNaN(edad) ||
-        peso <= 0 || altura <= 0 || edad <= 0
-      ) {
+      if (isNaN(peso) || isNaN(altura) || isNaN(edad) || peso <= 0 || altura <= 0 || edad <= 0) {
         tdeeResultDiv.style.color = "#f97373";
-        tdeeResultDiv.textContent = "Revisá los datos: peso, altura y edad deben ser válidos.";
+        tdeeResultDiv.textContent = "Revisá los datos: peso, altura y edad deben ser válidos (usa punto para decimales).";
         tdeeApplyBtn.style.display = "none";
         lastTdeeGoals = null;
         return;
       }
 
-      // TMB (Mifflin-St Jeor)
       let tmb;
       if (sexo === "h") {
         tmb = 10 * peso + 6.25 * altura - 5 * edad + 5;
@@ -1015,28 +988,22 @@
       const tdee = tmb * actividad;
       const objetivoKcal = Math.round(tdee * (1 + ajuste));
 
-      const proteinasG = Math.round(peso * 1.8); // 1.8 g/kg
-      const grasasG = Math.round(peso * 0.9);    // 0.9 g/kg
+      const proteinasG = Math.round(peso * 1.8);
+      const grasasG = Math.round(peso * 0.9);
 
       const kcalProt = proteinasG * 4;
       const kcalGrasa = grasasG * 9;
 
       let kcalRestantes = objetivoKcal - (kcalProt + kcalGrasa);
-      if (kcalRestantes < 0) {
-        kcalRestantes = Math.max(0, objetivoKcal * 0.25);
-      }
+      if (kcalRestantes < 0) kcalRestantes = Math.max(0, objetivoKcal * 0.25);
       const carbosG = Math.round(kcalRestantes / 4);
 
-      const azucarMaxG = Math.round((objetivoKcal * 0.08) / 4); // ~8%
+      const azucarMaxG = Math.round((objetivoKcal * 0.08) / 4);
 
       let textoObjetivo;
-      if (ajuste < 0) {
-        textoObjetivo = "Bajar peso";
-      } else if (ajuste === 0) {
-        textoObjetivo = "Mantener peso";
-      } else {
-        textoObjetivo = "Subir peso de forma controlada";
-      }
+      if (ajuste < 0) textoObjetivo = "Bajar peso";
+      else if (ajuste === 0) textoObjetivo = "Mantener peso";
+      else textoObjetivo = "Subir peso de forma controlada";
 
       tdeeResultDiv.style.color = "#e5e7eb";
       tdeeResultDiv.innerHTML = `
@@ -1062,7 +1029,10 @@
       tdeeApplyBtn.style.display = "flex";
     }
 
-    tdeeCalcBtn.addEventListener("click", calcularObjetivoNutricional);
+    // Por si el listener sí funciona en el navegador, lo dejamos también
+    if (tdeeCalcBtn) {
+      tdeeCalcBtn.addEventListener("click", calcularObjetivoNutricional);
+    }
 
     tdeeApplyBtn.addEventListener("click", () => {
       if (!lastTdeeGoals) {
