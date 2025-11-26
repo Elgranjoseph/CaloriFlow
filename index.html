@@ -376,13 +376,14 @@
           <span>Generar prompt para ChatGPT</span>
         </button>
 
-        <div class="status-text">
-          Se copiará el prompt al portapapeles. Abrí tu ChatGPT y pegalo en la conversación que quieras.
-        </div>
+        <!-- LEYENDA QUITADA -->
 
         <div class="field" style="margin-top: 14px;">
-          <label for="json-input">Pega aquí el resultado de ChatGPT (JSON)</label>
-          <textarea id="json-input"></textarea>
+          <label for="json-input"></label>
+          <textarea
+            id="json-input"
+            placeholder="Pega aquí el resultado de ChatGPT (JSON)"
+          ></textarea>
         </div>
 
         <button id="add-btn" class="btn btn-green">
@@ -397,8 +398,8 @@
           📚 Ver base aprendida
         </button>
 
-        <!-- NUEVO BOTÓN PARA TDEE -->
-        <button id="tdee-btn" class="btn-mini" style="margin-top:10px; width:100%; justify-content:center;">
+        <!-- BOTÓN TDEE AHORA COMO LOS OTROS -->
+        <button id="tdee-btn" class="btn btn-blue" style="margin-top:10px;">
           ⚙️ Calcular TDEE y metas
         </button>
 
@@ -1070,7 +1071,9 @@
       }
       goals = { ...lastTdeeGoals };
       saveGoals(goals);
-      alert("Metas aplicadas. Podés verlas en el Resumen de hoy.");
+      renderSummary();
+      showScreen(screenResumen);
+      alert("Metas aplicadas. Mirá las barras del resumen de hoy.");
     });
   </script>
 </body>
