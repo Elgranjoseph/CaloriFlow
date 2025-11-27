@@ -159,12 +159,6 @@
       box-shadow: 0 10px 20px rgba(14, 165, 233, 0.45);
     }
 
-    .btn-grey {
-      background: linear-gradient(135deg, #6b7280, #4b5563);
-      color: #e5e7eb;
-      box-shadow: 0 10px 20px rgba(75, 85, 99, 0.45);
-    }
-
     .btn-outline-back {
       background: transparent;
       border-radius: 999px;
@@ -193,12 +187,6 @@
       font-size: 18px;
     }
 
-    .status-text {
-      margin-top: 8px;
-      font-size: 13px;
-      color: #9ca3af;
-    }
-
     .small-note {
       margin-top: 8px;
       font-size: 12px;
@@ -214,14 +202,18 @@
     }
 
     .summary-title,
-    .db-title {
+    .db-title,
+    .tdee-title,
+    .progress-title {
       font-size: 24px;
       font-weight: 700;
       margin-bottom: 4px;
     }
 
     .summary-sub,
-    .db-sub {
+    .db-sub,
+    .tdee-sub,
+    .progress-sub {
       font-size: 13px;
       color: #d1d5db;
       margin-bottom: 14px;
@@ -364,53 +356,68 @@
       width: 0%;
     }
 
-    /* TDEE screen */
+    /* TDEE form */
     .tdee-grid {
       display: grid;
       grid-template-columns: 1fr 1fr;
       gap: 10px;
-      margin-bottom: 8px;
+      margin-top: 10px;
+      margin-bottom: 6px;
     }
 
     .tdee-radio-row {
       display: flex;
       align-items: center;
-      gap: 8px;
-      margin-top: 4px;
+      gap: 10px;
+      margin-bottom: 8px;
+      font-size: 14px;
     }
 
     .tdee-radio-row label {
-      margin-bottom: 0;
-      font-size: 13px;
-    }
-
-    .tdee-help {
-      font-size: 12px;
-      color: #9ca3af;
-      margin-top: 6px;
+      margin: 0;
     }
 
     .tdee-result {
-      margin-top: 12px;
-      font-size: 14px;
-      line-height: 1.5;
+      margin-top: 10px;
+      font-size: 13px;
       color: #e5e7eb;
-    }
-
-    .badge {
-      display: inline-block;
-      padding: 2px 8px;
-      border-radius: 999px;
-      background: rgba(56, 189, 248, 0.16);
-      color: #7dd3fc;
-      font-size: 11px;
-      margin-left: 4px;
-    }
-
-    .progress-summary {
-      font-size: 14px;
       line-height: 1.5;
+    }
+
+    .tdee-pill {
+      display: inline-block;
+      padding: 3px 7px;
+      border-radius: 999px;
+      font-size: 11px;
+      background: rgba(55, 65, 81, 0.9);
+      color: #e5e7eb;
+      margin-right: 6px;
+      margin-top: 4px;
+    }
+
+    .progress-day {
+      border-radius: 14px;
+      padding: 10px 10px 9px;
+      background: radial-gradient(circle at top left, rgba(15, 23, 42, 0.95), rgba(15, 23, 42, 0.9));
+      border: 1px solid rgba(55, 65, 81, 0.8);
       margin-bottom: 10px;
+      font-size: 13px;
+    }
+
+    .progress-day-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 4px;
+      font-size: 13px;
+    }
+
+    .progress-day-date {
+      font-weight: 600;
+    }
+
+    .progress-day-diff {
+      font-size: 12px;
     }
 
     @media (max-width: 480px) {
@@ -452,22 +459,25 @@
         <div class="row-3">
           <div>
             <label for="cantidad">Cant.</label>
-            <input type="number" id="cantidad" min="1" step="1" value="1">
+            <input type="number" id="cantidad" min="1" step="1" value="1" />
           </div>
           <div>
             <label for="porcion">Porción</label>
             <select id="porcion">
+              <option value="">(sin porción)</option>
               <option value="taza">taza</option>
               <option value="vaso">vaso</option>
               <option value="unidad">unidad</option>
               <option value="porción">porción</option>
               <option value="rebanada">rebanada</option>
               <option value="plato">plato</option>
+              <option value="cucharada">cucharada</option>
+              <option value="cucharadita">cucharadita</option>
             </select>
           </div>
           <div>
             <label for="alimento">Alimento</label>
-            <input type="text" id="alimento" placeholder="Café, tostada, fruta...">
+            <input type="text" id="alimento" placeholder="Café, tostada, fruta..." />
           </div>
         </div>
 
@@ -480,35 +490,27 @@
           <span>Generar prompt para ChatGPT</span>
         </button>
 
-        <div class="status-text">
-          Se copiará el prompt al portapapeles. Abrí tu ChatGPT y pegalo en la conversación que quieras.
-        </div>
-
         <div class="field" style="margin-top: 14px;">
-          <label for="json-input">Pega aquí el resultado de ChatGPT (JSON)</label>
+          <label for="json-input">Resultado (JSON)</label>
           <textarea
             id="json-input"
-            placeholder='{"calorias": 350, "azucares_g": 10, "grasas_g": 12, "proteinas_g": 20}'
+            placeholder="Pega aquí el resultado de ChatGPT (JSON)"
           ></textarea>
         </div>
 
         <button id="add-btn" class="btn btn-green">
           ✅ Agregar comida
         </button>
-
         <button id="summary-btn" class="btn btn-yellow">
           📊 Ver resumen de hoy
         </button>
-
         <button id="progress-btn" class="btn btn-blue">
           📈 Ver progreso
         </button>
-
         <button id="db-btn" class="btn btn-blue">
           📚 Ver base aprendida
         </button>
-
-        <button id="tdee-btn" class="btn btn-grey">
+        <button id="tdee-btn" class="btn btn-blue">
           ⚙️ Calcular TDEE y metas
         </button>
 
@@ -523,15 +525,34 @@
       <button id="back-from-summary" class="btn-outline-back">
         <span class="arrow">←</span> Volver al registro
       </button>
+
       <div class="card">
         <div class="summary-title">Resumen de hoy</div>
         <div class="summary-sub">
           Suma de todas las comidas registradas hoy.
         </div>
+
         <div id="goals-block" class="goals-container"></div>
         <div id="totals" class="totals"></div>
+
         <div class="section-title">Comidas registradas</div>
         <div id="meals-list" class="meals-list"></div>
+      </div>
+    </div>
+
+    <!-- Pantalla progreso -->
+    <div id="screen-progress" class="screen">
+      <button id="back-from-progress" class="btn-outline-back">
+        <span class="arrow">←</span> Volver al registro
+      </button>
+
+      <div class="card">
+        <div class="progress-title">Progreso</div>
+        <div class="progress-sub">
+          Resumen por día de tus calorías totales y el objetivo guardado (TDEE o metas manuales).
+        </div>
+
+        <div id="progress-days"></div>
       </div>
     </div>
 
@@ -540,11 +561,13 @@
       <button id="back-from-db" class="btn-outline-back">
         <span class="arrow">←</span> Volver al registro
       </button>
+
       <div class="card">
         <div class="db-title">Base aprendida</div>
         <div class="db-sub">
           Comidas que la app ya conoce. Si repetís una descripción, usará estos valores sin pedir de nuevo a ChatGPT.
         </div>
+
         <div id="db-list" class="meals-list"></div>
       </div>
     </div>
@@ -556,34 +579,32 @@
       </button>
 
       <div class="card">
-        <div class="summary-title">TDEE y metas</div>
-        <div class="summary-sub">
+        <div class="tdee-title">TDEE y metas</div>
+        <div class="tdee-sub">
           Calculamos tus calorías de mantenimiento y sugerimos metas para bajar, mantener o subir peso de forma controlada.
         </div>
 
         <div class="tdee-grid">
           <div>
             <label for="tdee-weight">Peso actual (kg)</label>
-            <input id="tdee-weight" type="number" min="30" max="300" step="0.1" value="80" />
+            <input type="number" id="tdee-weight" min="20" max="300" step="0.1" value="80" />
           </div>
           <div>
             <label for="tdee-height">Altura (cm)</label>
-            <input id="tdee-height" type="number" min="130" max="230" step="1" value="170" />
+            <input type="number" id="tdee-height" min="120" max="230" step="1" value="175" />
           </div>
         </div>
 
         <div class="tdee-grid">
           <div>
             <label for="tdee-age">Edad</label>
-            <input id="tdee-age" type="number" min="10" max="100" step="1" value="30" />
+            <input type="number" id="tdee-age" min="10" max="100" step="1" value="35" />
           </div>
           <div>
             <label>Sexo</label>
             <div class="tdee-radio-row">
-              <input type="radio" name="tdee-sex" id="tdee-sex-m" value="m" checked />
-              <label for="tdee-sex-m">Hombre</label>
-              <input type="radio" name="tdee-sex" id="tdee-sex-f" value="f" />
-              <label for="tdee-sex-f">Mujer</label>
+              <label><input type="radio" name="tdee-sex" value="M" checked /> Hombre</label>
+              <label><input type="radio" name="tdee-sex" value="F" /> Mujer</label>
             </div>
           </div>
         </div>
@@ -592,19 +613,21 @@
           <div>
             <label for="tdee-activity">Actividad</label>
             <select id="tdee-activity">
-              <option value="1.2">Sedentario (poco ejercicio)</option>
+              <option value="1.2">Sedentario (poca actividad)</option>
               <option value="1.375">Ligero (1-3 días/sem)</option>
-              <option value="1.55">Moderado (3-5 días/sem)</option>
-              <option value="1.725">Intenso (6-7 días/sem)</option>
-              <option value="1.9">Muy intenso (dos turnos)</option>
+              <option value="1.55">Moderado (ejercicio regular)</option>
+              <option value="1.725">Intenso (5-6 días/sem)</option>
+              <option value="1.9">Muy intenso / trabajo físico</option>
             </select>
           </div>
           <div>
             <label for="tdee-goal">Objetivo</label>
             <select id="tdee-goal">
-              <option value="bajar">Bajar peso (déficit)</option>
+              <option value="deficit10">Bajar peso (déficit ~10%)</option>
+              <option value="deficit20">Bajar más rápido (déficit ~20%)</option>
               <option value="mantener">Mantener peso</option>
-              <option value="subir">Subir peso (superávit)</option>
+              <option value="superavit10">Subir peso (superávit ~10%)</option>
+              <option value="superavit20">Subir más rápido (superávit ~20%)</option>
             </select>
           </div>
         </div>
@@ -613,30 +636,11 @@
           ⚙️ Calcular objetivo diario
         </button>
 
-        <div class="tdee-help">
+        <div id="tdee-result" class="tdee-result"></div>
+
+        <div class="small-note">
           Las metas se guardan en este dispositivo y se usan en las barras del resumen diario.
         </div>
-
-        <div id="tdee-result" class="tdee-result"></div>
-      </div>
-    </div>
-
-    <!-- Pantalla PROGRESO -->
-    <div id="screen-progress" class="screen">
-      <button id="back-from-progress" class="btn-outline-back">
-        <span class="arrow">←</span> Volver al registro
-      </button>
-
-      <div class="card">
-        <div class="db-title">Progreso del plan</div>
-        <div class="db-sub">
-          Muestra tus pesajes cada vez que calculás TDEE y cómo se comparan con las calorías registradas.
-        </div>
-
-        <div id="progress-summary" class="progress-summary"></div>
-
-        <div class="section-title">Historial de peso y calorías</div>
-        <div id="progress-list" class="meals-list"></div>
       </div>
     </div>
   </div>
@@ -645,7 +649,7 @@
     const STORAGE_MEALS_KEY = "caloriflow_meals_v2";
     const STORAGE_DB_KEY = "caloriflow_db_v2";
     const STORAGE_GOALS_KEY = "caloriflow_goals_v1";
-    const STORAGE_PROGRESS_KEY = "caloriflow_progress_v1";
+    const STORAGE_TDEE_HISTORY_KEY = "caloriflow_tdee_history_v1";
 
     function loadMeals() {
       try {
@@ -654,7 +658,6 @@
         return [];
       }
     }
-
     function saveMeals(meals) {
       localStorage.setItem(STORAGE_MEALS_KEY, JSON.stringify(meals));
     }
@@ -666,7 +669,6 @@
         return {};
       }
     }
-
     function saveDb(db) {
       localStorage.setItem(STORAGE_DB_KEY, JSON.stringify(db));
     }
@@ -678,30 +680,25 @@
         return null;
       }
     }
-
     function saveGoals(goals) {
       localStorage.setItem(STORAGE_GOALS_KEY, JSON.stringify(goals));
     }
 
-    function loadProgress() {
+    function loadTdeeHistory() {
       try {
-        return JSON.parse(localStorage.getItem(STORAGE_PROGRESS_KEY)) || {
-          planStartDate: null,
-          weighIns: []
-        };
+        return JSON.parse(localStorage.getItem(STORAGE_TDEE_HISTORY_KEY)) || [];
       } catch {
-        return { planStartDate: null, weighIns: [] };
+        return [];
       }
     }
-
-    function saveProgress(progress) {
-      localStorage.setItem(STORAGE_PROGRESS_KEY, JSON.stringify(progress));
+    function saveTdeeHistory(hist) {
+      localStorage.setItem(STORAGE_TDEE_HISTORY_KEY, JSON.stringify(hist));
     }
 
     let meals = loadMeals();
     let learnedDb = loadDb();
     let goals = loadGoals();
-    let progress = loadProgress();
+    let tdeeHistory = loadTdeeHistory();
 
     const screenRegistro = document.getElementById("screen-registro");
     const screenResumen = document.getElementById("screen-resumen");
@@ -733,8 +730,8 @@
     const totalsDiv = document.getElementById("totals");
     const mealsListDiv = document.getElementById("meals-list");
     const dbListDiv = document.getElementById("db-list");
+    const progressDaysDiv = document.getElementById("progress-days");
 
-    // TDEE dom
     const tdeeWeightInput = document.getElementById("tdee-weight");
     const tdeeHeightInput = document.getElementById("tdee-height");
     const tdeeAgeInput = document.getElementById("tdee-age");
@@ -742,10 +739,6 @@
     const tdeeGoalSelect = document.getElementById("tdee-goal");
     const tdeeCalcBtn = document.getElementById("tdee-calc-btn");
     const tdeeResultDiv = document.getElementById("tdee-result");
-
-    // Progreso dom
-    const progressSummaryDiv = document.getElementById("progress-summary");
-    const progressListDiv = document.getElementById("progress-list");
 
     function showScreen(screen) {
       screenRegistro.classList.remove("active");
@@ -761,11 +754,11 @@
       const cant = (cantidadInput.value || "").trim();
       const porc = (porcionInput.value || "").trim();
       const alim = (alimentoInput.value || "").trim();
-      if (!cant || !porc || !alim) {
-        alert("Completá Cantidad, Porción y Alimento para usar el +");
+      if (!cant || !alim) {
+        alert("Completá Cantidad y Alimento para usar el +");
         return;
       }
-      const parte = `${cant} ${porc} de ${alim}`;
+      const parte = porc ? `${cant} ${porc} de ${alim}` : `${cant} ${alim}`;
       const actual = descripcionInput.value.trim();
       if (!actual) {
         descripcionInput.value = parte;
@@ -782,13 +775,18 @@
         alert("Primero escribí qué comiste.");
         return;
       }
-      const prompt = `Quiero que estimes calorías, azúcares (g), grasas (g) y proteínas (g) de esta comida:
+      const prompt = `
+Quiero que estimes calorías, azúcares (g), grasas (g) y proteínas (g) de esta comida:
+
 Tipo de comida: ${tipo}
 Descripción: ${descripcion}
+
 Responde SOLO un JSON válido, sin texto extra, sin comentarios, sin explicación.
 Usa exactamente este formato de claves:
 {"calorias":0,"azucares_g":0,"grasas_g":0,"proteinas_g":0}
-Completa los valores con números (pueden ser decimales).`.trim();
+
+Completa los valores con números (pueden ser decimales).
+`.trim();
       try {
         await navigator.clipboard.writeText(prompt);
         alert("Prompt copiado al portapapeles. Abrí tu ChatGPT y pegalo en la conversación que quieras.");
@@ -847,7 +845,6 @@ Completa los valores con números (pueden ser decimales).`.trim();
         alert("Escribí qué comiste.");
         return;
       }
-
       let macros = null;
       const jsonObj = parseJsonFromInput();
       if (jsonObj) {
@@ -856,7 +853,7 @@ Completa los valores con números (pueden ser decimales).`.trim();
           calorias: Number(jsonObj.calorias) || 0,
           azucares_g: Number(jsonObj.azucares_g) || 0,
           grasas_g: Number(jsonObj.grasas_g) || 0,
-          proteinas_g: Number(jsonObj.proteinas_g) || 0
+          proteinas_g: Number(jsonObj.proteinas_g) || 0,
         };
         saveDb(learnedDb);
       } else {
@@ -866,14 +863,12 @@ Completa los valores con números (pueden ser decimales).`.trim();
           return;
         }
       }
-
       const now = new Date();
       const timeStr = now.toLocaleTimeString("es-UY", {
         hour: "2-digit",
         minute: "2-digit",
-        second: "2-digit"
+        second: "2-digit",
       });
-
       const meal = {
         tipo,
         descripcion,
@@ -882,9 +877,8 @@ Completa los valores con números (pueden ser decimales).`.trim();
         grasas_g: Number(macros.grasas_g) || 0,
         proteinas_g: Number(macros.proteinas_g) || 0,
         time: timeStr,
-        date: now.toISOString().slice(0, 10)
+        date: now.toISOString().slice(0, 10),
       };
-
       meals.push(meal);
       saveMeals(meals);
       jsonInput.value = "";
@@ -919,7 +913,7 @@ Completa los valores con números (pueden ser decimales).`.trim();
           calorias: Number(gCal) || 0,
           azucares_g: Number(gAz) || 0,
           grasas_g: Number(gGr) || 0,
-          proteinas_g: Number(gPr) || 0
+          proteinas_g: Number(gPr) || 0,
         };
         saveGoals(goals);
         renderSummary();
@@ -933,8 +927,7 @@ Completa los valores con números (pueden ser decimales).`.trim();
         const p = document.createElement("div");
         p.style.fontSize = "12px";
         p.style.color = "#9ca3af";
-        p.textContent =
-          'Aún no definiste metas. Usá "Calcular TDEE y metas" o tocá "Editar metas" para configurarlas.';
+        p.textContent = 'Aún no definiste metas. Tocá "Editar metas" para configurarlas.';
         container.appendChild(p);
         goalsBlock.appendChild(container);
         return;
@@ -947,13 +940,12 @@ Completa los valores con números (pueden ser decimales).`.trim();
         const label = document.createElement("div");
         label.className = "progress-label";
         const pct = goalVal > 0 ? (totalVal / goalVal) * 100 : 0;
-        label.innerHTML = `<span>${labelText}</span><span>${totalVal.toFixed(
+        label.innerHTML = `<span>${labelText}</span><span>${totalVal.toFixed(1)} / ${goalVal.toFixed(
           1
-        )} / ${goalVal.toFixed(1)} ${unidad}</span>`;
+        )} ${unidad}</span>`;
 
         const bar = document.createElement("div");
         bar.className = "progress-bar";
-
         const fill = document.createElement("div");
         fill.className = "progress-fill";
         fill.style.width = `${Math.min(100, pct)}%`;
@@ -1055,7 +1047,6 @@ Completa los valores con números (pueden ser decimales).`.trim();
         item.appendChild(desc);
         item.appendChild(macrosDiv);
         item.appendChild(delBtn);
-
         mealsListDiv.appendChild(item);
       });
     }
@@ -1106,184 +1097,172 @@ Completa los valores con números (pueden ser decimales).`.trim();
         item.appendChild(header);
         item.appendChild(macrosDiv);
         item.appendChild(delBtn);
-
         dbListDiv.appendChild(item);
       });
     }
 
-    // ---- TDEE / PROGRESS ----
+    function renderProgress() {
+      progressDaysDiv.innerHTML = "";
 
-    function addWeighInToProgress(weight, objective, tdee, targetCalories) {
-      const today = new Date().toISOString().slice(0, 10);
-      if (!progress || typeof progress !== "object") {
-        progress = { planStartDate: null, weighIns: [] };
-      }
-      if (!progress.planStartDate) {
-        progress.planStartDate = today;
-      }
-      if (!Array.isArray(progress.weighIns)) {
-        progress.weighIns = [];
-      }
-      progress.weighIns.push({
-        date: today,
-        weight,
-        objective,
-        tdee,
-        targetCalories
+      const byDate = {};
+      meals.forEach((m) => {
+        if (!byDate[m.date]) {
+          byDate[m.date] = { calorias: 0 };
+        }
+        byDate[m.date].calorias += m.calorias;
       });
-      saveProgress(progress);
+
+      const goalByDate = {};
+      tdeeHistory.forEach((h) => {
+        goalByDate[h.date] = h.targetCalories;
+      });
+
+      const dates = Array.from(
+        new Set([...Object.keys(byDate), ...Object.keys(goalByDate)])
+      ).sort();
+
+      if (dates.length === 0) {
+        progressDaysDiv.textContent =
+          "Todavía no hay días con comidas o cálculos de TDEE.";
+        return;
+      }
+
+      dates.forEach((date) => {
+        const totalCal = byDate[date]?.calorias ?? 0;
+        const goalCal = goalByDate[date] ?? goals?.calorias ?? 0;
+
+        const diff = totalCal - (goalCal || 0);
+
+        const item = document.createElement("div");
+        item.className = "progress-day";
+
+        const header = document.createElement("div");
+        header.className = "progress-day-header";
+
+        const dateSpan = document.createElement("div");
+        dateSpan.className = "progress-day-date";
+        dateSpan.textContent = date;
+
+        const goalSpan = document.createElement("div");
+        goalSpan.className = "progress-day-goal";
+        goalSpan.textContent =
+          goalCal > 0 ? `Objetivo: ${goalCal.toFixed(0)} kcal` : "Sin objetivo";
+
+        header.appendChild(dateSpan);
+        header.appendChild(goalSpan);
+
+        const body = document.createElement("div");
+        body.innerHTML = `
+          Consumido: <strong>${totalCal.toFixed(0)} kcal</strong><br>
+        `;
+
+        const diffDiv = document.createElement("div");
+        diffDiv.className = "progress-day-diff";
+        if (goalCal > 0) {
+          if (Math.abs(diff) < 50) {
+            diffDiv.textContent = "Estuviste muy cerca del objetivo 👌";
+          } else if (diff > 0) {
+            diffDiv.textContent = `Te pasaste aprox. +${diff.toFixed(0)} kcal`;
+          } else {
+            diffDiv.textContent = `Quedaste aprox. ${diff.toFixed(0)} kcal por debajo`;
+          }
+        } else {
+          diffDiv.textContent = "Define metas o calcula TDEE para tener referencia.";
+        }
+
+        item.appendChild(header);
+        item.appendChild(body);
+        item.appendChild(diffDiv);
+        progressDaysDiv.appendChild(item);
+      });
     }
 
-    function calculateTdeeAndGoals() {
+    // TDEE cálculo
+    tdeeCalcBtn.addEventListener("click", () => {
       const weight = Number(tdeeWeightInput.value);
       const height = Number(tdeeHeightInput.value);
       const age = Number(tdeeAgeInput.value);
-      const activity = Number(tdeeActivitySelect.value);
-      const goal = tdeeGoalSelect.value;
-      const sex =
-        document.querySelector('input[name="tdee-sex"]:checked')?.value || "m";
+      const activityFactor = Number(tdeeActivitySelect.value);
+      const sex = document.querySelector('input[name="tdee-sex"]:checked')?.value || "M";
+      const goalType = tdeeGoalSelect.value;
 
       if (!weight || !height || !age) {
         alert("Completá peso, altura y edad.");
         return;
       }
 
-      // Mifflin-St Jeor
       let bmr;
-      if (sex === "m") {
+      if (sex === "M") {
         bmr = 10 * weight + 6.25 * height - 5 * age + 5;
       } else {
         bmr = 10 * weight + 6.25 * height - 5 * age - 161;
       }
 
-      const tdee = bmr * activity;
+      const tdee = bmr * activityFactor;
 
-      let targetCalories = tdee;
-      if (goal === "bajar") {
-        targetCalories = tdee * 0.8; // -20%
-      } else if (goal === "subir") {
-        targetCalories = tdee * 1.15; // +15%
+      let factor = 1;
+      let textoObjetivo = "";
+      switch (goalType) {
+        case "deficit10":
+          factor = 0.9;
+          textoObjetivo = "Bajar peso (~10% déficit)";
+          break;
+        case "deficit20":
+          factor = 0.8;
+          textoObjetivo = "Bajar más rápido (~20% déficit)";
+          break;
+        case "mantener":
+          factor = 1;
+          textoObjetivo = "Mantener peso";
+          break;
+        case "superavit10":
+          factor = 1.1;
+          textoObjetivo = "Subir peso (~10% superávit)";
+          break;
+        case "superavit20":
+          factor = 1.2;
+          textoObjetivo = "Subir más rápido (~20% superávit)";
+          break;
       }
 
-      const proteinG = weight * 1.8;
-      const fatG = weight * 0.8;
-      const kcalFromProt = proteinG * 4;
-      const kcalFromFat = fatG * 9;
-      const remainingKcal = Math.max(targetCalories - kcalFromProt - kcalFromFat, 0);
-      const carbsG = remainingKcal / 4;
+      const targetCalories = tdee * factor;
+
+      const proteinMin = weight * 1.6;
+      const proteinMax = weight * 2.2;
+      const fatMin = weight * 0.6;
+      const fatMax = weight * 1.0;
 
       goals = {
-        calorias: Math.round(targetCalories),
+        calorias: targetCalories,
         azucares_g: 50,
-        grasas_g: Math.round(fatG),
-        proteinas_g: Math.round(proteinG)
+        grasas_g: (fatMin + fatMax) / 2,
+        proteinas_g: (proteinMin + proteinMax) / 2,
       };
       saveGoals(goals);
 
-      addWeighInToProgress(weight, goal, tdee, targetCalories);
+      const today = new Date().toISOString().slice(0, 10);
+      tdeeHistory.push({
+        date: today,
+        weight,
+        tdee,
+        targetCalories,
+        goalType,
+      });
+      saveTdeeHistory(tdeeHistory);
 
       tdeeResultDiv.innerHTML = `
-        <div><strong>TDEE (mantenimiento):</strong> ${tdee.toFixed(0)} kcal/día</div>
-        <div><strong>Objetivo actual:</strong> ${
-          goal === "bajar"
-            ? "Bajar peso (déficit)"
-            : goal === "subir"
-            ? "Subir peso (superávit)"
-            : "Mantener peso"
-        }</div>
-        <div><strong>Calorías objetivo:</strong> ${targetCalories.toFixed(
-          0
-        )} kcal/día <span class="badge">metas actualizadas</span></div>
-        <div style="margin-top:6px;">
-          Proteínas aprox: ${proteinG.toFixed(
-            0
-          )} g/día · Grasas aprox: ${fatG.toFixed(
-        0
-      )} g/día · Carbohidratos aprox: ${carbsG.toFixed(0)} g/día
+        <div><span class="tdee-pill">Mantenimiento estimado</span> ${tdee.toFixed(0)} kcal/día</div>
+        <div><span class="tdee-pill">Objetivo (${textoObjetivo})</span> ${targetCalories.toFixed(0)} kcal/día</div>
+        <div style="margin-top:6px;font-size:12px;color:#9ca3af;">
+          Guía de macros diarios aproximados (no es una dieta médica):<br>
+          · Proteínas: ${proteinMin.toFixed(0)}–${proteinMax.toFixed(0)} g/día<br>
+          · Grasas: ${fatMin.toFixed(0)}–${fatMax.toFixed(0)} g/día<br>
+          · Azúcares libres: idealmente &lt; 50 g/día
         </div>
       `;
 
-      alert("Metas diarias actualizadas con tu TDEE. Podés verlas en el resumen de hoy.");
-    }
-
-    tdeeCalcBtn.addEventListener("click", calculateTdeeAndGoals);
-
-    function renderProgress() {
-      progress = loadProgress();
-      if (!progress || !Array.isArray(progress.weighIns) || progress.weighIns.length === 0) {
-        progressSummaryDiv.textContent =
-          'Todavía no hay registros de TDEE. Calculá TDEE y metas al menos una vez.';
-        progressListDiv.innerHTML = "";
-        return;
-      }
-
-      const weighIns = [...progress.weighIns].sort((a, b) =>
-        a.date.localeCompare(b.date)
-      );
-      const first = weighIns[0];
-      const last = weighIns[weighIns.length - 1];
-
-      const startDate = progress.planStartDate || first.date;
-      const today = new Date().toISOString().slice(0, 10);
-      const diffMs = new Date(today) - new Date(startDate);
-      const diffDays = Math.max(Math.floor(diffMs / (1000 * 60 * 60 * 24)) + 1, 1);
-      const deltaWeight = last.weight - first.weight;
-
-      progressSummaryDiv.innerHTML = `
-        Plan desde: <strong>${startDate}</strong><br>
-        Peso inicial: <strong>${first.weight.toFixed(1)} kg</strong><br>
-        Peso actual: <strong>${last.weight.toFixed(1)} kg</strong><br>
-        Cambio: <strong>${deltaWeight > 0 ? "+" : ""}${deltaWeight.toFixed(
-        1
-      )} kg</strong> en ${diffDays} días.
-      `;
-
-      progressListDiv.innerHTML = "";
-      weighIns
-        .slice()
-        .reverse()
-        .forEach((entry) => {
-          const dayMeals = meals.filter((m) => m.date === entry.date);
-          const totalCal = dayMeals.reduce((s, m) => s + (m.calorias || 0), 0);
-
-          const item = document.createElement("div");
-          item.className = "meal-item";
-
-          const header = document.createElement("div");
-          header.className = "meal-header";
-
-          const left = document.createElement("span");
-          left.className = "meal-type";
-          left.textContent = `${entry.date} · ${entry.weight.toFixed(1)} kg`;
-
-          const right = document.createElement("span");
-          right.className = "meal-time";
-          right.textContent =
-            entry.objective === "bajar"
-              ? "Objetivo: bajar"
-              : entry.objective === "subir"
-              ? "Objetivo: subir"
-              : "Objetivo: mantener";
-
-          header.appendChild(left);
-          header.appendChild(right);
-
-          const macrosDiv = document.createElement("div");
-          macrosDiv.className = "meal-macros";
-          let line = `Calorías registradas: ${totalCal.toFixed(0)} kcal`;
-          if (entry.targetCalories) {
-            line += ` · Objetivo de ese día: ${entry.targetCalories.toFixed(
-              0
-            )} kcal`;
-          }
-          macrosDiv.textContent = line;
-
-          item.appendChild(header);
-          item.appendChild(macrosDiv);
-
-          progressListDiv.appendChild(item);
-        });
-    }
+      alert("Metas actualizadas. Se usarán en el resumen y el progreso.");
+    });
 
     // Navegación
     summaryBtn.addEventListener("click", () => {
@@ -1296,14 +1275,13 @@ Completa los valores con números (pueden ser decimales).`.trim();
       showScreen(screenDb);
     });
 
-    tdeeBtn.addEventListener("click", () => {
-      tdeeResultDiv.innerHTML = "";
-      showScreen(screenTdee);
-    });
-
     progressBtn.addEventListener("click", () => {
       renderProgress();
       showScreen(screenProgress);
+    });
+
+    tdeeBtn.addEventListener("click", () => {
+      showScreen(screenTdee);
     });
 
     backFromSummaryBtn.addEventListener("click", () => {
