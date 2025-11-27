@@ -11,6 +11,7 @@
       padding: 0;
       font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
     }
+
     body {
       min-height: 100vh;
       background: radial-gradient(circle at top, #1f2937 0, #020617 60%);
@@ -20,6 +21,7 @@
       align-items: flex-start;
       padding: 16px;
     }
+
     .app-shell {
       width: 100%;
       max-width: 480px;
@@ -28,30 +30,35 @@
       box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6);
       padding: 24px 20px 32px;
     }
+
     h1 {
       text-align: center;
       font-size: 32px;
       letter-spacing: 0.08em;
       margin-bottom: 4px;
     }
+
     .subtitle {
       text-align: center;
       font-size: 14px;
       color: #e5e7eb;
       margin-bottom: 24px;
     }
+
     .card {
       background: radial-gradient(circle at top left, #020617, #030712 60%);
       border-radius: 20px;
       padding: 18px 16px 20px;
       box-shadow: 0 0 0 1px rgba(148, 163, 184, 0.1);
     }
+
     label {
       display: block;
       font-size: 14px;
       margin-bottom: 6px;
       color: #e5e7eb;
     }
+
     select,
     input[type="number"],
     input[type="text"],
@@ -64,10 +71,12 @@
       padding: 10px 12px;
       font-size: 15px;
     }
+
     textarea {
       min-height: 70px;
       resize: vertical;
     }
+
     select:focus,
     input:focus,
     textarea:focus {
@@ -75,6 +84,7 @@
       border-color: #6366f1;
       box-shadow: 0 0 0 1px rgba(99, 102, 241, 0.5);
     }
+
     .row-3 {
       display: grid;
       grid-template-columns: 1fr 1.1fr 1.4fr;
@@ -82,6 +92,7 @@
       margin-top: 12px;
       margin-bottom: 4px;
     }
+
     .btn-mini {
       margin-top: 6px;
       border-radius: 999px;
@@ -96,10 +107,12 @@
       cursor: pointer;
       transition: transform 0.06s ease, background 0.06s ease;
     }
+
     .btn-mini:active {
       transform: scale(0.97);
       background: rgba(37, 99, 235, 0.25);
     }
+
     .btn {
       width: 100%;
       border: none;
@@ -115,31 +128,43 @@
       justify-content: center;
       gap: 8px;
     }
+
     .btn:active {
       transform: scale(0.98);
       filter: brightness(0.95);
       box-shadow: none;
     }
+
     .btn-primary {
       background: linear-gradient(135deg, #8b5cf6, #6366f1);
       color: white;
       box-shadow: 0 12px 25px rgba(79, 70, 229, 0.5);
     }
+
     .btn-green {
       background: linear-gradient(135deg, #22c55e, #16a34a);
       color: #022c22;
       box-shadow: 0 10px 20px rgba(16, 185, 129, 0.45);
     }
+
     .btn-yellow {
       background: linear-gradient(135deg, #facc15, #eab308);
       color: #1f2933;
       box-shadow: 0 10px 20px rgba(234, 179, 8, 0.45);
     }
+
     .btn-blue {
       background: linear-gradient(135deg, #38bdf8, #0ea5e9);
       color: #022c44;
       box-shadow: 0 10px 20px rgba(14, 165, 233, 0.45);
     }
+
+    .btn-grey {
+      background: linear-gradient(135deg, #6b7280, #4b5563);
+      color: #e5e7eb;
+      box-shadow: 0 10px 20px rgba(75, 85, 99, 0.45);
+    }
+
     .btn-outline-back {
       background: transparent;
       border-radius: 999px;
@@ -154,53 +179,64 @@
       cursor: pointer;
       transition: background 0.08s ease, color 0.08s ease, transform 0.06s ease;
     }
+
     .btn-outline-back:active {
       transform: scale(0.97);
       background: rgba(250, 204, 21, 0.08);
     }
+
     .btn-outline-back span.arrow {
       font-size: 16px;
     }
+
     .brain-icon {
       font-size: 18px;
     }
+
     .status-text {
       margin-top: 8px;
       font-size: 13px;
       color: #9ca3af;
     }
+
     .small-note {
       margin-top: 8px;
       font-size: 12px;
       color: #9ca3af;
     }
+
     .screen {
       display: none;
     }
+
     .screen.active {
       display: block;
     }
+
     .summary-title,
     .db-title {
       font-size: 24px;
       font-weight: 700;
       margin-bottom: 4px;
     }
+
     .summary-sub,
     .db-sub {
       font-size: 13px;
       color: #d1d5db;
       margin-bottom: 14px;
     }
+
     .totals {
       font-size: 14px;
       line-height: 1.6;
       margin-bottom: 16px;
-      white-space: pre-line; /* para que los \n se vean como saltos de línea */
     }
+
     .meals-list {
       margin-top: 8px;
     }
+
     .meal-item {
       border-radius: 14px;
       padding: 10px 10px 9px;
@@ -208,6 +244,7 @@
       border: 1px solid rgba(55, 65, 81, 0.8);
       margin-bottom: 10px;
     }
+
     .meal-header {
       font-size: 14px;
       margin-bottom: 4px;
@@ -216,23 +253,28 @@
       gap: 6px;
       align-items: center;
     }
+
     .meal-type {
       font-weight: 600;
     }
+
     .meal-time {
       font-size: 11px;
       color: #9ca3af;
       white-space: nowrap;
     }
+
     .meal-desc {
       font-size: 13px;
       margin-bottom: 3px;
       color: #e5e7eb;
     }
+
     .meal-macros {
       font-size: 12px;
       color: #cbd5f5;
     }
+
     .delete-btn {
       margin-top: 6px;
       border: none;
@@ -246,33 +288,41 @@
       align-items: center;
       gap: 4px;
     }
+
     .delete-btn:active {
       transform: scale(0.97);
       filter: brightness(0.95);
     }
+
     .delete-btn span {
       font-size: 13px;
     }
+
     .section-title {
       font-weight: 600;
       margin-top: 10px;
       margin-bottom: 4px;
       font-size: 14px;
     }
+
+    /* barras de metas */
     .goals-container {
       margin-bottom: 14px;
       font-size: 13px;
       color: #e5e7eb;
     }
+
     .goals-header {
       display: flex;
       justify-content: space-between;
       align-items: center;
       margin-bottom: 6px;
     }
+
     .goals-title {
       font-weight: 600;
     }
+
     .goals-edit {
       border-radius: 999px;
       border: 1px solid rgba(96, 165, 250, 0.9);
@@ -282,19 +332,23 @@
       padding: 3px 8px;
       cursor: pointer;
     }
+
     .goals-edit:active {
       transform: scale(0.97);
       background: rgba(37, 99, 235, 0.2);
     }
+
     .progress-row {
       margin-bottom: 6px;
     }
+
     .progress-label {
       font-size: 12px;
       margin-bottom: 2px;
       display: flex;
       justify-content: space-between;
     }
+
     .progress-bar {
       width: 100%;
       height: 6px;
@@ -302,12 +356,63 @@
       background: rgba(55, 65, 81, 0.9);
       overflow: hidden;
     }
+
     .progress-fill {
       height: 100%;
       border-radius: inherit;
       background: linear-gradient(90deg, #22c55e, #16a34a);
       width: 0%;
     }
+
+    /* TDEE screen */
+    .tdee-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-bottom: 8px;
+    }
+
+    .tdee-radio-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-top: 4px;
+    }
+
+    .tdee-radio-row label {
+      margin-bottom: 0;
+      font-size: 13px;
+    }
+
+    .tdee-help {
+      font-size: 12px;
+      color: #9ca3af;
+      margin-top: 6px;
+    }
+
+    .tdee-result {
+      margin-top: 12px;
+      font-size: 14px;
+      line-height: 1.5;
+      color: #e5e7eb;
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 999px;
+      background: rgba(56, 189, 248, 0.16);
+      color: #7dd3fc;
+      font-size: 11px;
+      margin-left: 4px;
+    }
+
+    .progress-summary {
+      font-size: 14px;
+      line-height: 1.5;
+      margin-bottom: 10px;
+    }
+
     @media (max-width: 480px) {
       .app-shell {
         padding: 20px 14px 26px;
@@ -375,11 +480,15 @@
           <span>Generar prompt para ChatGPT</span>
         </button>
 
+        <div class="status-text">
+          Se copiará el prompt al portapapeles. Abrí tu ChatGPT y pegalo en la conversación que quieras.
+        </div>
+
         <div class="field" style="margin-top: 14px;">
-          <label for="json-input"></label>
+          <label for="json-input">Pega aquí el resultado de ChatGPT (JSON)</label>
           <textarea
             id="json-input"
-            placeholder="Pega aquí el resultado de ChatGPT (JSON)"
+            placeholder='{"calorias": 350, "azucares_g": 10, "grasas_g": 12, "proteinas_g": 20}'
           ></textarea>
         </div>
 
@@ -391,11 +500,15 @@
           📊 Ver resumen de hoy
         </button>
 
+        <button id="progress-btn" class="btn btn-blue">
+          📈 Ver progreso
+        </button>
+
         <button id="db-btn" class="btn btn-blue">
           📚 Ver base aprendida
         </button>
 
-        <button id="tdee-btn" class="btn btn-blue" style="margin-top:10px;">
+        <button id="tdee-btn" class="btn btn-grey">
           ⚙️ Calcular TDEE y metas
         </button>
 
@@ -436,88 +549,94 @@
       </div>
     </div>
 
-    <!-- Pantalla TDEE / Metas -->
+    <!-- Pantalla TDEE -->
     <div id="screen-tdee" class="screen">
       <button id="back-from-tdee" class="btn-outline-back">
         <span class="arrow">←</span> Volver al registro
       </button>
+
       <div class="card">
         <div class="summary-title">TDEE y metas</div>
         <div class="summary-sub">
           Calculamos tus calorías de mantenimiento y sugerimos metas para bajar, mantener o subir peso de forma controlada.
         </div>
 
-        <div style="display:flex; gap:8px; margin-bottom:6px;">
-          <div style="flex:1;">
-            <label for="obj-peso">Peso actual (kg)</label>
-            <input id="obj-peso" type="number" min="30" max="300" step="0.1">
+        <div class="tdee-grid">
+          <div>
+            <label for="tdee-weight">Peso actual (kg)</label>
+            <input id="tdee-weight" type="number" min="30" max="300" step="0.1" value="80" />
           </div>
-          <div style="flex:1;">
-            <label for="obj-altura">Altura (cm)</label>
-            <input id="obj-altura" type="number" min="130" max="230" step="1">
+          <div>
+            <label for="tdee-height">Altura (cm)</label>
+            <input id="tdee-height" type="number" min="130" max="230" step="1" value="170" />
           </div>
         </div>
 
-        <div style="display:flex; gap:8px; margin-bottom:6px;">
-          <div style="flex:1;">
-            <label for="obj-edad">Edad</label>
-            <input id="obj-edad" type="number" min="15" max="100" step="1">
+        <div class="tdee-grid">
+          <div>
+            <label for="tdee-age">Edad</label>
+            <input id="tdee-age" type="number" min="10" max="100" step="1" value="30" />
           </div>
-          <div style="flex:1;">
+          <div>
             <label>Sexo</label>
-            <div style="display:flex; gap:8px; align-items:center; font-size:13px;">
-              <label style="display:flex; align-items:center; gap:4px;">
-                <input type="radio" name="obj-sexo" value="h" checked> Hombre
-              </label>
-              <label style="display:flex; align-items:center; gap:4px;">
-                <input type="radio" name="obj-sexo" value="m"> Mujer
-              </label>
+            <div class="tdee-radio-row">
+              <input type="radio" name="tdee-sex" id="tdee-sex-m" value="m" checked />
+              <label for="tdee-sex-m">Hombre</label>
+              <input type="radio" name="tdee-sex" id="tdee-sex-f" value="f" />
+              <label for="tdee-sex-f">Mujer</label>
             </div>
           </div>
         </div>
 
-        <div style="display:flex; gap:8px; margin-bottom:6px;">
-          <div style="flex:1;">
-            <label for="obj-actividad">Actividad</label>
-            <select id="obj-actividad">
-              <option value="1.2">Sedentario (poco movimiento)</option>
-              <option value="1.375">Ligero (caminar algo)</option>
-              <option value="1.55">Moderado (ejercicio 3–5 días)</option>
-              <option value="1.725">Alto (entrenás fuerte)</option>
+        <div class="tdee-grid">
+          <div>
+            <label for="tdee-activity">Actividad</label>
+            <select id="tdee-activity">
+              <option value="1.2">Sedentario (poco ejercicio)</option>
+              <option value="1.375">Ligero (1-3 días/sem)</option>
+              <option value="1.55">Moderado (3-5 días/sem)</option>
+              <option value="1.725">Intenso (6-7 días/sem)</option>
+              <option value="1.9">Muy intenso (dos turnos)</option>
             </select>
           </div>
-          <div style="flex:1;">
-            <label for="obj-objetivo">Objetivo</label>
-            <select id="obj-objetivo">
-              <option value="-0.20">Bajar peso (déficit 20%)</option>
-              <option value="-0.15">Bajar suave (déficit 15%)</option>
-              <option value="0">Mantener peso</option>
-              <option value="0.10">Subir peso suave (+10%)</option>
-              <option value="0.15">Subir peso moderado (+15%)</option>
+          <div>
+            <label for="tdee-goal">Objetivo</label>
+            <select id="tdee-goal">
+              <option value="bajar">Bajar peso (déficit)</option>
+              <option value="mantener">Mantener peso</option>
+              <option value="subir">Subir peso (superávit)</option>
             </select>
           </div>
         </div>
 
-        <!-- Botón de cálculo -->
-        <button id="tdee-calc-btn"
-                class="btn btn-green"
-                type="button"
-                onclick="calcularObjetivoNutricional()">
+        <button id="tdee-calc-btn" class="btn btn-green">
           ⚙️ Calcular objetivo diario
         </button>
 
-        <div id="tdee-result" class="totals" style="margin-top:10px;"></div>
-
-        <button id="tdee-apply-btn"
-                class="btn btn-yellow"
-                type="button"
-                style="margin-top:6px; display:none;">
-          ✅ Usar estas metas en la app
-        </button>
-
-        <div class="small-note">
+        <div class="tdee-help">
           Las metas se guardan en este dispositivo y se usan en las barras del resumen diario.
         </div>
+
+        <div id="tdee-result" class="tdee-result"></div>
+      </div>
+    </div>
+
+    <!-- Pantalla PROGRESO -->
+    <div id="screen-progress" class="screen">
+      <button id="back-from-progress" class="btn-outline-back">
+        <span class="arrow">←</span> Volver al registro
+      </button>
+
+      <div class="card">
+        <div class="db-title">Progreso del plan</div>
+        <div class="db-sub">
+          Muestra tus pesajes cada vez que calculás TDEE y cómo se comparan con las calorías registradas.
+        </div>
+
+        <div id="progress-summary" class="progress-summary"></div>
+
+        <div class="section-title">Historial de peso y calorías</div>
+        <div id="progress-list" class="meals-list"></div>
       </div>
     </div>
   </div>
@@ -526,79 +645,118 @@
     const STORAGE_MEALS_KEY = "caloriflow_meals_v2";
     const STORAGE_DB_KEY = "caloriflow_db_v2";
     const STORAGE_GOALS_KEY = "caloriflow_goals_v1";
+    const STORAGE_PROGRESS_KEY = "caloriflow_progress_v1";
 
     function loadMeals() {
-      try { return JSON.parse(localStorage.getItem(STORAGE_MEALS_KEY)) || []; }
-      catch { return []; }
+      try {
+        return JSON.parse(localStorage.getItem(STORAGE_MEALS_KEY)) || [];
+      } catch {
+        return [];
+      }
     }
+
     function saveMeals(meals) {
       localStorage.setItem(STORAGE_MEALS_KEY, JSON.stringify(meals));
     }
+
     function loadDb() {
-      try { return JSON.parse(localStorage.getItem(STORAGE_DB_KEY)) || {}; }
-      catch { return {}; }
+      try {
+        return JSON.parse(localStorage.getItem(STORAGE_DB_KEY)) || {};
+      } catch {
+        return {};
+      }
     }
+
     function saveDb(db) {
       localStorage.setItem(STORAGE_DB_KEY, JSON.stringify(db));
     }
+
     function loadGoals() {
-      try { return JSON.parse(localStorage.getItem(STORAGE_GOALS_KEY)) || null; }
-      catch { return null; }
+      try {
+        return JSON.parse(localStorage.getItem(STORAGE_GOALS_KEY)) || null;
+      } catch {
+        return null;
+      }
     }
+
     function saveGoals(goals) {
       localStorage.setItem(STORAGE_GOALS_KEY, JSON.stringify(goals));
+    }
+
+    function loadProgress() {
+      try {
+        return JSON.parse(localStorage.getItem(STORAGE_PROGRESS_KEY)) || {
+          planStartDate: null,
+          weighIns: []
+        };
+      } catch {
+        return { planStartDate: null, weighIns: [] };
+      }
+    }
+
+    function saveProgress(progress) {
+      localStorage.setItem(STORAGE_PROGRESS_KEY, JSON.stringify(progress));
     }
 
     let meals = loadMeals();
     let learnedDb = loadDb();
     let goals = loadGoals();
-    let lastTdeeGoals = null;
+    let progress = loadProgress();
 
     const screenRegistro = document.getElementById("screen-registro");
-    const screenResumen  = document.getElementById("screen-resumen");
-    const screenDb       = document.getElementById("screen-db");
-    const screenTdee     = document.getElementById("screen-tdee");
+    const screenResumen = document.getElementById("screen-resumen");
+    const screenDb = document.getElementById("screen-db");
+    const screenTdee = document.getElementById("screen-tdee");
+    const screenProgress = document.getElementById("screen-progress");
 
-    const tipoInput       = document.getElementById("tipo");
-    const descripcionInput= document.getElementById("descripcion");
-    const cantidadInput   = document.getElementById("cantidad");
-    const porcionInput    = document.getElementById("porcion");
-    const alimentoInput   = document.getElementById("alimento");
-    const jsonInput       = document.getElementById("json-input");
+    const tipoInput = document.getElementById("tipo");
+    const descripcionInput = document.getElementById("descripcion");
+    const cantidadInput = document.getElementById("cantidad");
+    const porcionInput = document.getElementById("porcion");
+    const alimentoInput = document.getElementById("alimento");
+    const jsonInput = document.getElementById("json-input");
 
-    const addPartBtn      = document.getElementById("add-part-btn");
-    const promptBtn       = document.getElementById("prompt-btn");
-    const addBtn          = document.getElementById("add-btn");
-    const summaryBtn      = document.getElementById("summary-btn");
-    const dbBtn           = document.getElementById("db-btn");
-    const tdeeBtn         = document.getElementById("tdee-btn");
+    const addPartBtn = document.getElementById("add-part-btn");
+    const promptBtn = document.getElementById("prompt-btn");
+    const addBtn = document.getElementById("add-btn");
+    const summaryBtn = document.getElementById("summary-btn");
+    const progressBtn = document.getElementById("progress-btn");
+    const dbBtn = document.getElementById("db-btn");
+    const tdeeBtn = document.getElementById("tdee-btn");
 
     const backFromSummaryBtn = document.getElementById("back-from-summary");
-    const backFromDbBtn      = document.getElementById("back-from-db");
-    const backFromTdeeBtn    = document.getElementById("back-from-tdee");
+    const backFromDbBtn = document.getElementById("back-from-db");
+    const backFromTdeeBtn = document.getElementById("back-from-tdee");
+    const backFromProgressBtn = document.getElementById("back-from-progress");
 
-    const goalsBlock   = document.getElementById("goals-block");
-    const totalsDiv    = document.getElementById("totals");
+    const goalsBlock = document.getElementById("goals-block");
+    const totalsDiv = document.getElementById("totals");
     const mealsListDiv = document.getElementById("meals-list");
-    const dbListDiv    = document.getElementById("db-list");
+    const dbListDiv = document.getElementById("db-list");
 
-    const objPesoInput     = document.getElementById("obj-peso");
-    const objAlturaInput   = document.getElementById("obj-altura");
-    const objEdadInput     = document.getElementById("obj-edad");
-    const objActividadSel  = document.getElementById("obj-actividad");
-    const objObjetivoSel   = document.getElementById("obj-objetivo");
-    const tdeeCalcBtn      = document.getElementById("tdee-calc-btn");
-    const tdeeApplyBtn     = document.getElementById("tdee-apply-btn");
-    const tdeeResultDiv    = document.getElementById("tdee-result");
+    // TDEE dom
+    const tdeeWeightInput = document.getElementById("tdee-weight");
+    const tdeeHeightInput = document.getElementById("tdee-height");
+    const tdeeAgeInput = document.getElementById("tdee-age");
+    const tdeeActivitySelect = document.getElementById("tdee-activity");
+    const tdeeGoalSelect = document.getElementById("tdee-goal");
+    const tdeeCalcBtn = document.getElementById("tdee-calc-btn");
+    const tdeeResultDiv = document.getElementById("tdee-result");
+
+    // Progreso dom
+    const progressSummaryDiv = document.getElementById("progress-summary");
+    const progressListDiv = document.getElementById("progress-list");
 
     function showScreen(screen) {
       screenRegistro.classList.remove("active");
       screenResumen.classList.remove("active");
       screenDb.classList.remove("active");
       screenTdee.classList.remove("active");
+      screenProgress.classList.remove("active");
       screen.classList.add("active");
     }
 
+    // Botón + : agrega "cant porción de alimento" a ¿Qué comiste?
     addPartBtn.addEventListener("click", () => {
       const cant = (cantidadInput.value || "").trim();
       const porc = (porcionInput.value || "").trim();
@@ -607,11 +765,16 @@
         alert("Completá Cantidad, Porción y Alimento para usar el +");
         return;
       }
-      const parte = cant + " " + porc + " de " + alim;
+      const parte = `${cant} ${porc} de ${alim}`;
       const actual = descripcionInput.value.trim();
-      descripcionInput.value = actual ? actual + " + " + parte : parte;
+      if (!actual) {
+        descripcionInput.value = parte;
+      } else {
+        descripcionInput.value = actual + " + " + parte;
+      }
     });
 
+    // Prompt para ChatGPT
     promptBtn.addEventListener("click", async () => {
       const tipo = tipoInput.value;
       const descripcion = descripcionInput.value.trim();
@@ -619,18 +782,18 @@
         alert("Primero escribí qué comiste.");
         return;
       }
-      const prompt =
-`Quiero que estimes calorías, azúcares (g), grasas (g) y proteínas (g) de esta comida:
+      const prompt = `Quiero que estimes calorías, azúcares (g), grasas (g) y proteínas (g) de esta comida:
 Tipo de comida: ${tipo}
 Descripción: ${descripcion}
-
 Responde SOLO un JSON válido, sin texto extra, sin comentarios, sin explicación.
-Usa exactamente este formato de claves: {"calorias":0,"azucares_g":0,"grasas_g":0,"proteinas_g":0}
-Completa los valores con números (pueden ser decimales).`;
+Usa exactamente este formato de claves:
+{"calorias":0,"azucares_g":0,"grasas_g":0,"proteinas_g":0}
+Completa los valores con números (pueden ser decimales).`.trim();
       try {
         await navigator.clipboard.writeText(prompt);
         alert("Prompt copiado al portapapeles. Abrí tu ChatGPT y pegalo en la conversación que quieras.");
       } catch (e) {
+        console.error(e);
         alert("No pude copiar al portapapeles. Copiá el prompt manualmente.");
       }
     });
@@ -640,33 +803,39 @@ Completa los valores con números (pueden ser decimales).`;
       if (!raw) return null;
       try {
         const obj = JSON.parse(raw);
-        const keys = ["calorias","azucares_g","grasas_g","proteinas_g"];
-        for (let k of keys) {
-          if (typeof obj[k] !== "number") throw new Error();
+        const needed = ["calorias", "azucares_g", "grasas_g", "proteinas_g"];
+        for (const key of needed) {
+          if (typeof obj[key] !== "number") {
+            throw new Error("Formato incorrecto");
+          }
         }
         return obj;
-      } catch {
+      } catch (e) {
         alert("El JSON no es válido. Revisá que tenga solo números y las claves correctas.");
         return null;
       }
     }
 
+    // busca exacto o suma partes separadas por '+'
     function findMacrosFromDb(description) {
       const exact = description.trim();
       if (!exact) return null;
-      if (learnedDb[exact]) return Object.assign({}, learnedDb[exact]);
-
-      const parts = exact.split("+").map(p => p.trim()).filter(p => p.length > 0);
+      if (learnedDb[exact]) {
+        return { ...learnedDb[exact] };
+      }
+      const parts = exact
+        .split("+")
+        .map((p) => p.trim())
+        .filter((p) => p.length > 0);
       if (parts.length <= 1) return null;
-
-      let sum = { calorias:0, azucares_g:0, grasas_g:0, proteinas_g:0 };
-      for (let part of parts) {
-        const e = learnedDb[part];
-        if (!e) return null;
-        sum.calorias    += Number(e.calorias)    || 0;
-        sum.azucares_g  += Number(e.azucares_g)  || 0;
-        sum.grasas_g    += Number(e.grasas_g)    || 0;
-        sum.proteinas_g += Number(e.proteinas_g) || 0;
+      let sum = { calorias: 0, azucares_g: 0, grasas_g: 0, proteinas_g: 0 };
+      for (const part of parts) {
+        const entry = learnedDb[part];
+        if (!entry) return null;
+        sum.calorias += Number(entry.calorias) || 0;
+        sum.azucares_g += Number(entry.azucares_g) || 0;
+        sum.grasas_g += Number(entry.grasas_g) || 0;
+        sum.proteinas_g += Number(entry.proteinas_g) || 0;
       }
       return sum;
     }
@@ -678,14 +847,15 @@ Completa los valores con números (pueden ser decimales).`;
         alert("Escribí qué comiste.");
         return;
       }
+
       let macros = null;
       const jsonObj = parseJsonFromInput();
       if (jsonObj) {
         macros = jsonObj;
         learnedDb[descripcion] = {
-          calorias:    Number(jsonObj.calorias)    || 0,
-          azucares_g:  Number(jsonObj.azucares_g)  || 0,
-          grasas_g:    Number(jsonObj.grasas_g)    || 0,
+          calorias: Number(jsonObj.calorias) || 0,
+          azucares_g: Number(jsonObj.azucares_g) || 0,
+          grasas_g: Number(jsonObj.grasas_g) || 0,
           proteinas_g: Number(jsonObj.proteinas_g) || 0
         };
         saveDb(learnedDb);
@@ -696,20 +866,25 @@ Completa los valores con números (pueden ser decimales).`;
           return;
         }
       }
+
       const now = new Date();
       const timeStr = now.toLocaleTimeString("es-UY", {
-        hour:"2-digit", minute:"2-digit", second:"2-digit"
+        hour: "2-digit",
+        minute: "2-digit",
+        second: "2-digit"
       });
+
       const meal = {
         tipo,
         descripcion,
-        calorias:    Number(macros.calorias)    || 0,
-        azucares_g:  Number(macros.azucares_g)  || 0,
-        grasas_g:    Number(macros.grasas_g)    || 0,
+        calorias: Number(macros.calorias) || 0,
+        azucares_g: Number(macros.azucares_g) || 0,
+        grasas_g: Number(macros.grasas_g) || 0,
         proteinas_g: Number(macros.proteinas_g) || 0,
         time: timeStr,
-        date: now.toISOString().slice(0,10)
+        date: now.toISOString().slice(0, 10)
       };
+
       meals.push(meal);
       saveMeals(meals);
       jsonInput.value = "";
@@ -731,21 +906,20 @@ Completa los valores con números (pueden ser decimales).`;
       const editBtn = document.createElement("button");
       editBtn.className = "goals-edit";
       editBtn.textContent = "Editar metas";
-      editBtn.addEventListener("click", function() {
-        const gCal = prompt("Meta diaria de calorías (kcal):", goals && goals.calorias || "2000");
+      editBtn.addEventListener("click", () => {
+        const gCal = prompt("Meta diaria de calorías (kcal):", goals?.calorias ?? "2000");
         if (gCal === null) return;
-        const gAz = prompt("Meta diaria de azúcares (g):", goals && goals.azucares_g || "50");
+        const gAz = prompt("Meta diaria de azúcares (g):", goals?.azucares_g ?? "50");
         if (gAz === null) return;
-        const gGr = prompt("Meta diaria de grasas (g):", goals && goals.grasas_g || "60");
+        const gGr = prompt("Meta diaria de grasas (g):", goals?.grasas_g ?? "60");
         if (gGr === null) return;
-        const gPr = prompt("Meta diaria de proteínas (g):", goals && goals.proteinas_g || "70");
+        const gPr = prompt("Meta diaria de proteínas (g):", goals?.proteinas_g ?? "70");
         if (gPr === null) return;
-
         goals = {
-          calorias:    Number(gCal) || 0,
-          azucares_g:  Number(gAz)  || 0,
-          grasas_g:    Number(gGr)  || 0,
-          proteinas_g: Number(gPr)  || 0
+          calorias: Number(gCal) || 0,
+          azucares_g: Number(gAz) || 0,
+          grasas_g: Number(gGr) || 0,
+          proteinas_g: Number(gPr) || 0
         };
         saveGoals(goals);
         renderSummary();
@@ -759,60 +933,74 @@ Completa los valores con números (pueden ser decimales).`;
         const p = document.createElement("div");
         p.style.fontSize = "12px";
         p.style.color = "#9ca3af";
-        p.textContent = "Aún no definiste metas. Podés calcularlas con TDEE o editarlas a mano.";
+        p.textContent =
+          'Aún no definiste metas. Usá "Calcular TDEE y metas" o tocá "Editar metas" para configurarlas.';
         container.appendChild(p);
         goalsBlock.appendChild(container);
         return;
       }
 
-      function row(labelText, totalVal, goalVal, unidad) {
+      function createRow(labelText, totalVal, goalVal, unidad) {
         const row = document.createElement("div");
         row.className = "progress-row";
+
         const label = document.createElement("div");
         label.className = "progress-label";
         const pct = goalVal > 0 ? (totalVal / goalVal) * 100 : 0;
-        label.innerHTML =
-          "<span>" + labelText + "</span>" +
-          "<span>" + totalVal.toFixed(1) + " / " + goalVal.toFixed(1) + " " + unidad + "</span>";
+        label.innerHTML = `<span>${labelText}</span><span>${totalVal.toFixed(
+          1
+        )} / ${goalVal.toFixed(1)} ${unidad}</span>`;
+
         const bar = document.createElement("div");
         bar.className = "progress-bar";
+
         const fill = document.createElement("div");
         fill.className = "progress-fill";
-        fill.style.width = Math.min(100, pct) + "%";
+        fill.style.width = `${Math.min(100, pct)}%`;
+
         bar.appendChild(fill);
         row.appendChild(label);
         row.appendChild(bar);
         return row;
       }
 
-      container.appendChild(row("Calorías",  total.calorias,    goals.calorias    || 0, "kcal"));
-      container.appendChild(row("Azúcares",  total.azucares_g,  goals.azucares_g  || 0, "g"));
-      container.appendChild(row("Grasas",    total.grasas_g,    goals.grasas_g    || 0, "g"));
-      container.appendChild(row("Proteínas", total.proteinas_g, goals.proteinas_g || 0, "g"));
+      container.appendChild(
+        createRow("Calorías", total.calorias, goals.calorias || 0, "kcal")
+      );
+      container.appendChild(
+        createRow("Azúcares", total.azucares_g, goals.azucares_g || 0, "g")
+      );
+      container.appendChild(
+        createRow("Grasas", total.grasas_g, goals.grasas_g || 0, "g")
+      );
+      container.appendChild(
+        createRow("Proteínas", total.proteinas_g, goals.proteinas_g || 0, "g")
+      );
 
       goalsBlock.appendChild(container);
     }
 
     function renderSummary() {
-      const today = new Date().toISOString().slice(0,10);
-      const todayMeals = meals.filter(m => m.date === today);
+      const today = new Date().toISOString().slice(0, 10);
+      const todayMeals = meals.filter((m) => m.date === today);
 
-      let total = { calorias:0, azucares_g:0, grasas_g:0, proteinas_g:0 };
-      todayMeals.forEach(m => {
-        total.calorias    += m.calorias;
-        total.azucares_g  += m.azucares_g;
-        total.grasas_g    += m.grasas_g;
+      let total = { calorias: 0, azucares_g: 0, grasas_g: 0, proteinas_g: 0 };
+      todayMeals.forEach((m) => {
+        total.calorias += m.calorias;
+        total.azucares_g += m.azucares_g;
+        total.grasas_g += m.grasas_g;
         total.proteinas_g += m.proteinas_g;
       });
 
       renderGoalsBlock(total);
 
-      totalsDiv.textContent =
-        "Totales de hoy\n" +
-        "Calorías: "  + total.calorias.toFixed(1)    + " kcal\n" +
-        "Azúcares: "  + total.azucares_g.toFixed(1)  + " g\n" +
-        "Grasas: "    + total.grasas_g.toFixed(1)    + " g\n" +
-        "Proteínas: " + total.proteinas_g.toFixed(1) + " g";
+      totalsDiv.innerHTML = `
+        <strong>Totales de hoy</strong><br>
+        Calorías: ${total.calorias.toFixed(1)} kcal<br>
+        Azúcares: ${total.azucares_g.toFixed(1)} g<br>
+        Grasas: ${total.grasas_g.toFixed(1)} g<br>
+        Proteínas: ${total.proteinas_g.toFixed(1)} g
+      `;
 
       mealsListDiv.innerHTML = "";
       if (todayMeals.length === 0) {
@@ -820,18 +1008,21 @@ Completa los valores con números (pueden ser decimales).`;
         return;
       }
 
-      todayMeals.forEach(m => {
+      todayMeals.forEach((m) => {
         const item = document.createElement("div");
         item.className = "meal-item";
 
         const header = document.createElement("div");
         header.className = "meal-header";
+
         const typeSpan = document.createElement("span");
         typeSpan.className = "meal-type";
         typeSpan.textContent = m.tipo;
+
         const timeSpan = document.createElement("span");
         timeSpan.className = "meal-time";
         timeSpan.textContent = m.time;
+
         header.appendChild(typeSpan);
         header.appendChild(timeSpan);
 
@@ -842,19 +1033,19 @@ Completa los valores con números (pueden ser decimales).`;
         const macrosDiv = document.createElement("div");
         macrosDiv.className = "meal-macros";
         macrosDiv.textContent =
-          m.calorias.toFixed(1)    + " kcal · " +
-          m.proteinas_g.toFixed(1) + " g prot · " +
-          m.grasas_g.toFixed(1)    + " g grasa · " +
-          m.azucares_g.toFixed(1)  + " g azúcar";
+          `${m.calorias.toFixed(1)} kcal · ` +
+          `${m.proteinas_g.toFixed(1)} g prot · ` +
+          `${m.grasas_g.toFixed(1)} g grasa · ` +
+          `${m.azucares_g.toFixed(1)} g azúcar`;
 
         const delBtn = document.createElement("button");
         delBtn.className = "delete-btn";
-        delBtn.innerHTML = "<span>🗑️</span> Eliminar";
-        delBtn.addEventListener("click", function() {
+        delBtn.innerHTML = `<span>🗑️</span> Eliminar`;
+        delBtn.addEventListener("click", () => {
           if (!confirm("¿Eliminar esta comida del registro de hoy?")) return;
-          const idx = meals.indexOf(m);
-          if (idx >= 0) {
-            meals.splice(idx, 1);
+          const globalIndex = meals.findIndex((x) => x === m);
+          if (globalIndex >= 0) {
+            meals.splice(globalIndex, 1);
             saveMeals(meals);
             renderSummary();
           }
@@ -864,6 +1055,7 @@ Completa los valores con números (pueden ser decimales).`;
         item.appendChild(desc);
         item.appendChild(macrosDiv);
         item.appendChild(delBtn);
+
         mealsListDiv.appendChild(item);
       });
     }
@@ -875,32 +1067,36 @@ Completa los valores con números (pueden ser decimales).`;
         dbListDiv.textContent = "Todavía no hay comidas aprendidas.";
         return;
       }
-      entries.forEach(function([desc, vals]) {
+
+      entries.forEach(([desc, vals]) => {
         const item = document.createElement("div");
         item.className = "meal-item";
 
         const header = document.createElement("div");
         header.className = "meal-header";
+
         const descSpan = document.createElement("div");
         descSpan.className = "meal-desc";
         descSpan.textContent = desc;
+
         const dummy = document.createElement("span");
         dummy.textContent = "";
+
         header.appendChild(descSpan);
         header.appendChild(dummy);
 
         const macrosDiv = document.createElement("div");
         macrosDiv.className = "meal-macros";
         macrosDiv.textContent =
-          (vals.calorias    || 0).toFixed(1) + " kcal · " +
-          (vals.proteinas_g || 0).toFixed(1) + " g prot · " +
-          (vals.grasas_g    || 0).toFixed(1) + " g grasa · " +
-          (vals.azucares_g  || 0).toFixed(1) + " g azúcar";
+          `${(vals.calorias ?? 0).toFixed(1)} kcal · ` +
+          `${(vals.proteinas_g ?? 0).toFixed(1)} g prot · ` +
+          `${(vals.grasas_g ?? 0).toFixed(1)} g grasa · ` +
+          `${(vals.azucares_g ?? 0).toFixed(1)} g azúcar`;
 
         const delBtn = document.createElement("button");
         delBtn.className = "delete-btn";
-        delBtn.innerHTML = "<span>🗑️</span> Eliminar";
-        delBtn.addEventListener("click", function() {
+        delBtn.innerHTML = `<span>🗑️</span> Eliminar`;
+        delBtn.addEventListener("click", () => {
           if (!confirm("¿Eliminar esta entrada de la base aprendida?")) return;
           delete learnedDb[desc];
           saveDb(learnedDb);
@@ -910,109 +1106,220 @@ Completa los valores con números (pueden ser decimales).`;
         item.appendChild(header);
         item.appendChild(macrosDiv);
         item.appendChild(delBtn);
+
         dbListDiv.appendChild(item);
       });
     }
 
-    summaryBtn.addEventListener("click", function() {
+    // ---- TDEE / PROGRESS ----
+
+    function addWeighInToProgress(weight, objective, tdee, targetCalories) {
+      const today = new Date().toISOString().slice(0, 10);
+      if (!progress || typeof progress !== "object") {
+        progress = { planStartDate: null, weighIns: [] };
+      }
+      if (!progress.planStartDate) {
+        progress.planStartDate = today;
+      }
+      if (!Array.isArray(progress.weighIns)) {
+        progress.weighIns = [];
+      }
+      progress.weighIns.push({
+        date: today,
+        weight,
+        objective,
+        tdee,
+        targetCalories
+      });
+      saveProgress(progress);
+    }
+
+    function calculateTdeeAndGoals() {
+      const weight = Number(tdeeWeightInput.value);
+      const height = Number(tdeeHeightInput.value);
+      const age = Number(tdeeAgeInput.value);
+      const activity = Number(tdeeActivitySelect.value);
+      const goal = tdeeGoalSelect.value;
+      const sex =
+        document.querySelector('input[name="tdee-sex"]:checked')?.value || "m";
+
+      if (!weight || !height || !age) {
+        alert("Completá peso, altura y edad.");
+        return;
+      }
+
+      // Mifflin-St Jeor
+      let bmr;
+      if (sex === "m") {
+        bmr = 10 * weight + 6.25 * height - 5 * age + 5;
+      } else {
+        bmr = 10 * weight + 6.25 * height - 5 * age - 161;
+      }
+
+      const tdee = bmr * activity;
+
+      let targetCalories = tdee;
+      if (goal === "bajar") {
+        targetCalories = tdee * 0.8; // -20%
+      } else if (goal === "subir") {
+        targetCalories = tdee * 1.15; // +15%
+      }
+
+      const proteinG = weight * 1.8;
+      const fatG = weight * 0.8;
+      const kcalFromProt = proteinG * 4;
+      const kcalFromFat = fatG * 9;
+      const remainingKcal = Math.max(targetCalories - kcalFromProt - kcalFromFat, 0);
+      const carbsG = remainingKcal / 4;
+
+      goals = {
+        calorias: Math.round(targetCalories),
+        azucares_g: 50,
+        grasas_g: Math.round(fatG),
+        proteinas_g: Math.round(proteinG)
+      };
+      saveGoals(goals);
+
+      addWeighInToProgress(weight, goal, tdee, targetCalories);
+
+      tdeeResultDiv.innerHTML = `
+        <div><strong>TDEE (mantenimiento):</strong> ${tdee.toFixed(0)} kcal/día</div>
+        <div><strong>Objetivo actual:</strong> ${
+          goal === "bajar"
+            ? "Bajar peso (déficit)"
+            : goal === "subir"
+            ? "Subir peso (superávit)"
+            : "Mantener peso"
+        }</div>
+        <div><strong>Calorías objetivo:</strong> ${targetCalories.toFixed(
+          0
+        )} kcal/día <span class="badge">metas actualizadas</span></div>
+        <div style="margin-top:6px;">
+          Proteínas aprox: ${proteinG.toFixed(
+            0
+          )} g/día · Grasas aprox: ${fatG.toFixed(
+        0
+      )} g/día · Carbohidratos aprox: ${carbsG.toFixed(0)} g/día
+        </div>
+      `;
+
+      alert("Metas diarias actualizadas con tu TDEE. Podés verlas en el resumen de hoy.");
+    }
+
+    tdeeCalcBtn.addEventListener("click", calculateTdeeAndGoals);
+
+    function renderProgress() {
+      progress = loadProgress();
+      if (!progress || !Array.isArray(progress.weighIns) || progress.weighIns.length === 0) {
+        progressSummaryDiv.textContent =
+          'Todavía no hay registros de TDEE. Calculá TDEE y metas al menos una vez.';
+        progressListDiv.innerHTML = "";
+        return;
+      }
+
+      const weighIns = [...progress.weighIns].sort((a, b) =>
+        a.date.localeCompare(b.date)
+      );
+      const first = weighIns[0];
+      const last = weighIns[weighIns.length - 1];
+
+      const startDate = progress.planStartDate || first.date;
+      const today = new Date().toISOString().slice(0, 10);
+      const diffMs = new Date(today) - new Date(startDate);
+      const diffDays = Math.max(Math.floor(diffMs / (1000 * 60 * 60 * 24)) + 1, 1);
+      const deltaWeight = last.weight - first.weight;
+
+      progressSummaryDiv.innerHTML = `
+        Plan desde: <strong>${startDate}</strong><br>
+        Peso inicial: <strong>${first.weight.toFixed(1)} kg</strong><br>
+        Peso actual: <strong>${last.weight.toFixed(1)} kg</strong><br>
+        Cambio: <strong>${deltaWeight > 0 ? "+" : ""}${deltaWeight.toFixed(
+        1
+      )} kg</strong> en ${diffDays} días.
+      `;
+
+      progressListDiv.innerHTML = "";
+      weighIns
+        .slice()
+        .reverse()
+        .forEach((entry) => {
+          const dayMeals = meals.filter((m) => m.date === entry.date);
+          const totalCal = dayMeals.reduce((s, m) => s + (m.calorias || 0), 0);
+
+          const item = document.createElement("div");
+          item.className = "meal-item";
+
+          const header = document.createElement("div");
+          header.className = "meal-header";
+
+          const left = document.createElement("span");
+          left.className = "meal-type";
+          left.textContent = `${entry.date} · ${entry.weight.toFixed(1)} kg`;
+
+          const right = document.createElement("span");
+          right.className = "meal-time";
+          right.textContent =
+            entry.objective === "bajar"
+              ? "Objetivo: bajar"
+              : entry.objective === "subir"
+              ? "Objetivo: subir"
+              : "Objetivo: mantener";
+
+          header.appendChild(left);
+          header.appendChild(right);
+
+          const macrosDiv = document.createElement("div");
+          macrosDiv.className = "meal-macros";
+          let line = `Calorías registradas: ${totalCal.toFixed(0)} kcal`;
+          if (entry.targetCalories) {
+            line += ` · Objetivo de ese día: ${entry.targetCalories.toFixed(
+              0
+            )} kcal`;
+          }
+          macrosDiv.textContent = line;
+
+          item.appendChild(header);
+          item.appendChild(macrosDiv);
+
+          progressListDiv.appendChild(item);
+        });
+    }
+
+    // Navegación
+    summaryBtn.addEventListener("click", () => {
       renderSummary();
       showScreen(screenResumen);
     });
-    dbBtn.addEventListener("click", function() {
+
+    dbBtn.addEventListener("click", () => {
       renderDb();
       showScreen(screenDb);
     });
-    tdeeBtn.addEventListener("click", function() {
+
+    tdeeBtn.addEventListener("click", () => {
+      tdeeResultDiv.innerHTML = "";
       showScreen(screenTdee);
     });
 
-    backFromSummaryBtn.addEventListener("click", function() {
-      showScreen(screenRegistro);
-    });
-    backFromDbBtn.addEventListener("click", function() {
-      showScreen(screenRegistro);
-    });
-    backFromTdeeBtn.addEventListener("click", function() {
-      showScreen(screenRegistro);
+    progressBtn.addEventListener("click", () => {
+      renderProgress();
+      showScreen(screenProgress);
     });
 
-    // --- Cálculo TDEE muy simple ---
-    function calcularObjetivoNutricional() {
-      const peso     = parseFloat(objPesoInput.value);
-      const altura   = parseFloat(objAlturaInput.value);
-      const edad     = parseFloat(objEdadInput.value);
-      const actividad= parseFloat(objActividadSel.value);
-      const ajuste   = parseFloat(objObjetivoSel.value);
-      const sexoEl   = document.querySelector('input[name="obj-sexo"]:checked');
-      const sexo     = sexoEl ? sexoEl.value : "h";
+    backFromSummaryBtn.addEventListener("click", () => {
+      showScreen(screenRegistro);
+    });
 
-      if (!peso || !altura || !edad) {
-        tdeeResultDiv.style.color = "#f97373";
-        tdeeResultDiv.textContent =
-          "Revisá los datos: peso, altura y edad deben ser números válidos (usa punto para decimales).";
-        tdeeApplyBtn.style.display = "none";
-        lastTdeeGoals = null;
-        return;
-      }
+    backFromDbBtn.addEventListener("click", () => {
+      showScreen(screenRegistro);
+    });
 
-      // Harris-Benedict simplificado
-      let tmb;
-      if (sexo === "h") {
-        tmb = 10 * peso + 6.25 * altura - 5 * edad + 5;
-      } else {
-        tmb = 10 * peso + 6.25 * altura - 5 * edad - 161;
-      }
-      const tdee = tmb * actividad;
-      const objetivoKcal = Math.round(tdee * (1 + ajuste));
+    backFromTdeeBtn.addEventListener("click", () => {
+      showScreen(screenRegistro);
+    });
 
-      const proteinasG = Math.round(peso * 1.8);
-      const grasasG    = Math.round(peso * 0.9);
-
-      const kcalProt   = proteinasG * 4;
-      const kcalGrasa  = grasasG * 9;
-      let kcalRest     = objetivoKcal - (kcalProt + kcalGrasa);
-      if (kcalRest < 0) kcalRest = Math.max(0, objetivoKcal * 0.25);
-      const carbosG    = Math.round(kcalRest / 4);
-
-      const azucarMaxG = Math.round((objetivoKcal * 0.08) / 4);
-
-      let textoObjetivo;
-      if (ajuste < 0) textoObjetivo = "Bajar peso";
-      else if (ajuste === 0) textoObjetivo = "Mantener peso";
-      else textoObjetivo = "Subir peso de forma controlada";
-
-      tdeeResultDiv.style.color = "#e5e7eb";
-      tdeeResultDiv.textContent =
-        "Objetivo: " + textoObjetivo + "\n" +
-        "Calorías objetivo: " + objetivoKcal + " kcal/día\n" +
-        "\n" +
-        "Proteínas: " + proteinasG + " g/día (≈ 1.8 g/kg)\n" +
-        "Grasas: "    + grasasG    + " g/día (≈ 0.9 g/kg)\n" +
-        "Carbohidratos: " + carbosG + " g/día\n" +
-        "Azúcares libres (máx): " + azucarMaxG + " g/día";
-
-      lastTdeeGoals = {
-        calorias:    objetivoKcal,
-        azucares_g:  azucarMaxG,
-        grasas_g:    grasasG,
-        proteinas_g: proteinasG
-      };
-      tdeeApplyBtn.style.display = "flex";
-    }
-
-    // por si el WebView ignora el onclick, también lo enganchamos aquí
-    tdeeCalcBtn.addEventListener("click", calcularObjetivoNutricional);
-
-    tdeeApplyBtn.addEventListener("click", function() {
-      if (!lastTdeeGoals) {
-        alert("Primero calculá el objetivo diario.");
-        return;
-      }
-      goals = Object.assign({}, lastTdeeGoals);
-      saveGoals(goals);
-      renderSummary();
-      showScreen(screenResumen);
-      alert("Metas aplicadas. Mirá las barras del resumen de hoy.");
+    backFromProgressBtn.addEventListener("click", () => {
+      showScreen(screenRegistro);
     });
   </script>
 </body>
